@@ -1,0 +1,11 @@
+# You can use a Docker image from Docker Hub or your own container
+# registry for your build environment.
+image: python:3.5.1
+
+pipelines:
+  default:
+    - step:
+        script: # Modify the commands below to build your repository.
+          - pip install -r requirements.txt
+          - pip install -r requirements.test.txt
+          - echo "Just testing"
