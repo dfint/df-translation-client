@@ -14,7 +14,9 @@ class App(tk.Tk):
         
         self.entry_password = ttk.Entry(self, show='\u2022')  # 'bullet' symbol
         self.entry_password.pack()
-
+        
+        self.button = ttk.Button(self, text='Check connection')
+        self.button.pack()
 
 app = App()
 app.mainloop()
