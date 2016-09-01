@@ -26,7 +26,7 @@ class App(tk.Tk):
         self.entry_password.grid(column=1, row=1)
         
         self.button = ttk.Button(parent, text='Check connection')
-        self.button.grid(column=0, row=2)
+        self.button.grid(column=2, row=0, rowspan=2, sticky=tk.N + tk.S)
         self.button.bind('<1>', self.bt_check_connection)
     
     def __init__(self):
