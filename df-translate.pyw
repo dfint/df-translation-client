@@ -19,7 +19,9 @@ class App(tk.Tk):
         else:
             self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=resources[0]['slug']))
             self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
-            self.listbox_resources.insert(tk.END, *(res['slug'] for res in resources))
+            
+            self.listbox_resources.delete(0, tk.END)
+            self.listbox_resources.insert(tk.END, *(res['name'] for res in resources))
     
     def init_connection_page(self, parent):
         label = tk.Label(parent, text='Username')
