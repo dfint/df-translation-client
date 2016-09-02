@@ -7,8 +7,8 @@ from transifex.api import TransifexAPI, TransifexAPIException
 
 class App(tk.Tk):
     def bt_check_connection(self, event):
-        username = self.entry_username.get()
-        password = self.entry_password.get()
+        username = self.entry_username.get()  # Todo: remember username in the settings
+        password = self.entry_password.get()  # DO NOT remember password (not safe)
         project = 'dwarf-fortress'
         try:
             t = TransifexAPI(username, password, 'http://transifex.com')
