@@ -11,6 +11,7 @@ class App(tk.Tk):
         password = self.entry_password.get()  # DO NOT remember password (not safe)
         project = 'dwarf-fortress'
         try:
+            # Todo: make connection in separate thread
             t = TransifexAPI(username, password, 'http://transifex.com')
             assert t.project_exists(project)
             resources = t.list_resources(project)
