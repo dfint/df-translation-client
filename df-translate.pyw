@@ -15,6 +15,8 @@ class App(tk.Tk):
         assert t.project_exists(project)
         resources = t.list_resources(project)
         self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=resources[0]['slug']))
+        self.combo_languages.current(0)
+        # messagebox.showinfo('List of languages loaded', 'A list of available languages is loaded.')
     
     def init_connection_page(self, parent):
         label = tk.Label(parent, text='Username')
