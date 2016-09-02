@@ -2,21 +2,23 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
-from transifex.api import TransifexAPI
+from transifex.api import TransifexAPI, TransifexAPIException
 
 
 class App(tk.Tk):
     def bt_check_connection(self, event):
         username = self.entry_username.get()
         password = self.entry_password.get()
-        t = TransifexAPI(username, password, 'http://transifex.com')
-        # messagebox.showinfo('Warning', 'Connected' if t.ping() else 'Failed to connect')
         project = 'dwarf-fortress'
-        assert t.project_exists(project)
-        resources = t.list_resources(project)
-        self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=resources[0]['slug']))
-        self.combo_languages.current(0)
-        # messagebox.showinfo('List of languages loaded', 'A list of available languages is loaded.')
+        try:
+            t = TransifexAPI(username, password, 'http://transifex.com')
+            assert t.project_exists(project)
+            resources = t.list_resources(project)
+        except (TransifexAPIException, AssertionError) as err:
+            messagebox.showerror('Error', err)
+        else:
+            self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=resources[0]['slug']))
+            self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
     
     def init_connection_page(self, parent):
         label = tk.Label(parent, text='Username')
