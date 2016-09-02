@@ -6,7 +6,7 @@ from transifex.api import TransifexAPI, TransifexAPIException
 
 
 class App(tk.Tk):
-    def bt_check_connection(self, event):
+    def bt_connect(self, event):
         username = self.entry_username.get()  # Todo: remember username in the settings
         password = self.entry_password.get()  # DO NOT remember password (not safe)
         project = 'dwarf-fortress'
@@ -19,6 +19,7 @@ class App(tk.Tk):
         else:
             self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=resources[0]['slug']))
             self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
+            self.listbox_resources.insert(tk.END, *(res['slug'] for res in resources))
     
     def init_connection_page(self, parent):
         label = tk.Label(parent, text='Username')
@@ -33,15 +34,21 @@ class App(tk.Tk):
         self.entry_password = ttk.Entry(parent, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=1)
         
-        self.button = ttk.Button(parent, text='Check connection')
+        self.button = ttk.Button(parent, text='Connect')
         self.button.grid(column=2, row=0, rowspan=2, sticky=tk.N + tk.S)
-        self.button.bind('<1>', self.bt_check_connection)
+        self.button.bind('<1>', self.bt_connect)
         
-        label = tk.Label(parent, text='Available languages:')
+        label = tk.Label(parent, text='Choose language:')
         label.grid(column=0, row=3)
         
         self.combo_languages = ttk.Combobox(parent)
-        self.combo_languages.grid(column=1, row=3, columnspan=2)
+        self.combo_languages.grid(column=1, row=3, columnspan=2, sticky=tk.W)
+        
+        label = tk.Label(parent, text='Available resources:')
+        label.grid(column=0)
+        
+        self.listbox_resources = tk.Listbox(parent)
+        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
     
     def __init__(self):
         super().__init__()
