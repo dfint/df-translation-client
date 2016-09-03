@@ -24,6 +24,9 @@ class App(tk.Tk):
             self.listbox_resources.delete(0, tk.END)
             self.listbox_resources.insert(tk.END, *(res['name'] for res in resources))
     
+    def bt_download(self, event):
+        self.progressbar.start()
+    
     def init_connection_page(self, parent):
         label = tk.Label(parent, text='Project:')
         label.grid()
@@ -45,9 +48,9 @@ class App(tk.Tk):
         self.entry_password = ttk.Entry(parent, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
-        self.button = ttk.Button(parent, text='Connect')
-        self.button.grid(column=4, row=1, rowspan=2, sticky=tk.N + tk.S)
-        self.button.bind('<1>', self.bt_connect)
+        button_connect = ttk.Button(parent, text='Connect')
+        button_connect.grid(column=4, row=1, rowspan=2, sticky=tk.N + tk.S)
+        button_connect.bind('<1>', self.bt_connect)
         
         label = tk.Label(parent, text='Choose language:')
         label.grid(column=0, row=3)
@@ -60,6 +63,13 @@ class App(tk.Tk):
         
         self.listbox_resources = tk.Listbox(parent)
         self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
+        
+        self.button_download = ttk.Button(parent, text='Download translations')
+        self.button_download.bind('<1>', self.bt_download)
+        self.button_download.grid()
+        
+        self.progressbar = ttk.Progressbar(parent, mode='indeterminate')
+        self.progressbar.grid(columnspan=3, sticky=tk.W + tk.E)
     
     def __init__(self):
         super().__init__()
