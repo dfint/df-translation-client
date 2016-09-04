@@ -70,7 +70,7 @@ class DownloadTranslationsFrame(tk.Frame):
         self.button_download.bind('<1>', self.bt_download)
         self.button_download.grid()
         
-        self.progressbar = ttk.Progressbar(self, mode='indeterminate')
+        self.progressbar = ttk.Progressbar(self)
         self.progressbar.grid(columnspan=3, sticky=tk.W + tk.E)
 
 
@@ -81,10 +81,16 @@ class App(tk.Tk):
         notebook = ttk.Notebook()
         notebook.pack(fill='both', expand=1)
         f1 = DownloadTranslationsFrame(notebook)
-        notebook.add(f1, text='Download tranlation')
+        notebook.add(f1, text='Download tranlations')
         
         f1 = tk.Frame(notebook)
         notebook.add(f1, text='Patch executable file')
+        
+        f1 = tk.Frame(notebook)
+        notebook.add(f1, text='Translate external text files')
+        
+        f1 = tk.Frame(notebook)
+        notebook.add(f1, text='Translate packed files')
 
 
 app = App()
