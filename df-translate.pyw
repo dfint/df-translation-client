@@ -13,20 +13,20 @@ class DownloadTranslationsFrame(tk.Frame):
         project = self.combo_projects.get()
         try:
             # Todo: make connection in separate thread
-            t = TransifexAPI(username, password, 'http://transifex.com')
-            assert t.project_exists(project), "Project %r does not exist" % project
-            self.resources = t.list_resources(project)
+            self.tx = TransifexAPI(username, password, 'http://transifex.com')
+            assert self.tx.project_exists(project), "Project %r does not exist" % project
+            self.resources = self.tx.list_resources(project)
         except (TransifexAPIException, AssertionError) as err:
             messagebox.showerror('Error', err)
         else:
-            self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=self.resources[0]['slug']))
+            self.combo_languages['values'] = tuple(self.tx.list_languages(project, resource_slug=self.resources[0]['slug']))
             self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
             
             self.listbox_resources.delete(0, tk.END)
             self.listbox_resources_var.set(tuple(res['name'] for res in self.resources))
     
     def bt_download(self, event):
-        if self.resources:
+        if self.tx and self.resources:
             self.progressbar['maximum'] = len(self.resources) * 1.01
             
             resources = [res['name'] for res in self.resources]
@@ -88,6 +88,7 @@ class DownloadTranslationsFrame(tk.Frame):
         self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
         
         self.resources = None
+        self.tx = None
 
 
 class App(tk.Tk):
