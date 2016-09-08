@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
+from time import sleep
 from transifex.api import TransifexAPI, TransifexAPIException
 
 
@@ -14,21 +15,32 @@ class DownloadTranslationsFrame(tk.Frame):
             # Todo: make connection in separate thread
             t = TransifexAPI(username, password, 'http://transifex.com')
             assert t.project_exists(project), "Project %r does not exist" % project
-            resources = t.list_resources(project)
+            self.resources = t.list_resources(project)
         except (TransifexAPIException, AssertionError) as err:
             messagebox.showerror('Error', err)
         else:
-            self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=resources[0]['slug']))
+            self.combo_languages['values'] = tuple(t.list_languages(project, resource_slug=self.resources[0]['slug']))
             self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
             
             self.listbox_resources.delete(0, tk.END)
-            self.listbox_resources.insert(tk.END, *(res['name'] for res in resources))
+            self.listbox_resources_var.set(tuple(res['name'] for res in self.resources))
     
     def bt_download(self, event):
         self.progressbar.start()
+        
+        resources = list(self.listbox_resources_var.get())
+        for i, item in enumerate(self.resources):
+            resources[i] += ' - ok!'
+            self.listbox_resources_var.set(tuple(resources))
+            self.app.update()
+            sleep(0.5)
+        
+        self.progressbar.stop()
     
-    def __init__(self, master=None):
+    def __init__(self, master=None, app=None):
         super().__init__(master)
+        
+        self.app = app
         
         label = tk.Label(self, text='Project:')
         label.grid()
@@ -60,18 +72,21 @@ class DownloadTranslationsFrame(tk.Frame):
         self.combo_languages = ttk.Combobox(self)
         self.combo_languages.grid(column=1, row=3, sticky=tk.W + tk.E)
         
-        label = tk.Label(self, text='Available resources:')
-        label.grid(column=0)
-        
-        self.listbox_resources = tk.Listbox(self)
-        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
-        
         self.button_download = ttk.Button(self, text='Download translations')
         self.button_download.bind('<1>', self.bt_download)
         self.button_download.grid()
         
         self.progressbar = ttk.Progressbar(self)
         self.progressbar.grid(columnspan=3, sticky=tk.W + tk.E)
+        
+        label = tk.Label(self, text='Resources:')
+        label.grid(column=0)
+        
+        self.listbox_resources_var = tk.Variable()
+        self.listbox_resources = tk.Listbox(self, listvariable=self.listbox_resources_var)
+        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
+        
+        self.resources = None
 
 
 class App(tk.Tk):
@@ -80,7 +95,7 @@ class App(tk.Tk):
         
         notebook = ttk.Notebook()
         notebook.pack(fill='both', expand=1)
-        f1 = DownloadTranslationsFrame(notebook)
+        f1 = DownloadTranslationsFrame(notebook, self)
         notebook.add(f1, text='Download tranlations')
         
         f1 = tk.Frame(notebook)
