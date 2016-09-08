@@ -26,16 +26,18 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources_var.set(tuple(res['name'] for res in self.resources))
     
     def bt_download(self, event):
-        self.progressbar.start()
-        
-        resources = list(self.listbox_resources_var.get())
-        for i, item in enumerate(self.resources):
-            resources[i] += ' - ok!'
+        if self.resources:
+            self.progressbar.start()
+            
+            resources = [res['name'] for res in self.resources]
             self.listbox_resources_var.set(tuple(resources))
-            self.app.update()
-            sleep(0.5)
-        
-        self.progressbar.stop()
+            for i, item in enumerate(self.resources):
+                resources[i] += ' - ok!'
+                self.listbox_resources_var.set(tuple(resources))
+                self.app.update()
+                sleep(0.5)
+            
+            self.progressbar.stop()
     
     def __init__(self, master=None, app=None):
         super().__init__(master)
