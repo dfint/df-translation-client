@@ -94,12 +94,16 @@ class DownloadTranslationsFrame(tk.Frame):
         self.combo_languages = ttk.Combobox(self)
         self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
         
+        # self.chk_all_languages_var = tk.IntVar()
+        # chk_all_languages = tk.Checkbutton(self, text='All languages (backup)', variable=self.chk_all_languages_var)
+        # chk_all_languages.grid(column=1)
+        
         self.button_download = ttk.Button(self, text='Download translations')
         self.button_download.bind('<1>', self.bt_download)
-        self.button_download.grid(sticky=tk.W + tk.E)
+        self.button_download.grid(row=6, sticky=tk.W + tk.E)
         
         self.progressbar = ttk.Progressbar(self)
-        self.progressbar.grid(column=1, row=5, sticky=tk.W + tk.E)
+        self.progressbar.grid(column=1, row=6, sticky=tk.W + tk.E)
         
         label = tk.Label(self, text='Resources:')
         label.grid(columnspan=2)
