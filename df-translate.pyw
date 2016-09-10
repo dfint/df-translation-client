@@ -4,7 +4,6 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
 from os import path
-from time import sleep
 from transifex.api import TransifexAPI, TransifexAPIException
 
 
@@ -56,7 +55,6 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.listbox_resources_var.set(tuple(resource_names))
                 self.progressbar.step()
                 self.app.update()
-                sleep(0.5)
             
             import subprocess
             subprocess.Popen('explorer "%s"' % (download_dir))
