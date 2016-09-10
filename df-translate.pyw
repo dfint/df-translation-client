@@ -3,6 +3,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
+from os import path
 from time import sleep
 from transifex.api import TransifexAPI, TransifexAPIException
 
@@ -42,14 +43,23 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.temp_dir = tempfile.TemporaryDirectory()
                 download_dir = self.temp_dir.name
             
-            resources = [res['name'] for res in self.resources]
-            self.listbox_resources_var.set(tuple(resources))
-            for i, item in enumerate(self.resources):
-                resources[i] += ' - ok!'
-                self.listbox_resources_var.set(tuple(resources))
+            project = self.combo_projects.get()
+            language = self.combo_languages.get()
+            
+            resource_names = [res['name'] for res in self.resources]
+            self.listbox_resources_var.set(tuple(resource_names))
+            for i, res in enumerate(self.resources):
+                file_path = path.join(download_dir, '%s_%s.po' % (res['slug'], language))
+                self.tx.get_translation(project, res['slug'], language, file_path)
+                
+                resource_names[i] += ' - ok!'
+                self.listbox_resources_var.set(tuple(resource_names))
                 self.progressbar.step()
                 self.app.update()
                 sleep(0.5)
+            
+            import subprocess
+            subprocess.Popen('explorer "%s"' % (download_dir))
     
     def __init__(self, master=None, app=None):
         super().__init__(master)
