@@ -45,7 +45,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.app = app
         
-        label = tk.Label(self, text='Project:')
+        label = tk.Label(self, text='Transifex project:')
         label.grid()
         
         # Todo: remember a list of recently used projects and the last used one
@@ -65,29 +65,29 @@ class DownloadTranslationsFrame(tk.Frame):
         self.entry_password = ttk.Entry(self, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
-        button_connect = ttk.Button(self, text='Connect')
-        button_connect.grid(column=4, row=1, rowspan=2, sticky=tk.N + tk.S)
+        button_connect = ttk.Button(self, text='Connect...')
+        button_connect.grid(columnspan=2, sticky=tk.W + tk.E)
         button_connect.bind('<1>', self.bt_connect)
         
         label = tk.Label(self, text='Choose language:')
-        label.grid(column=0, row=3)
+        label.grid(column=0)
         
         self.combo_languages = ttk.Combobox(self)
-        self.combo_languages.grid(column=1, row=3, sticky=tk.W + tk.E)
+        self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
         
         self.button_download = ttk.Button(self, text='Download translations')
         self.button_download.bind('<1>', self.bt_download)
-        self.button_download.grid()
+        self.button_download.grid(sticky=tk.W + tk.E)
         
         self.progressbar = ttk.Progressbar(self)
-        self.progressbar.grid(columnspan=3, sticky=tk.W + tk.E)
+        self.progressbar.grid(column=1, row=5, sticky=tk.W + tk.E)
         
         label = tk.Label(self, text='Resources:')
-        label.grid(column=0)
+        label.grid(columnspan=2)
         
         self.listbox_resources_var = tk.Variable()
         self.listbox_resources = tk.Listbox(self, listvariable=self.listbox_resources_var)
-        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
+        self.listbox_resources.grid(column=0, columnspan=2, sticky=tk.E + tk.W)
         
         self.resources = None
         self.tx = None
