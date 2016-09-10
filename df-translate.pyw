@@ -1,3 +1,4 @@
+import tempfile
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
@@ -30,6 +31,16 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.tx and self.resources:
             self.progressbar['maximum'] = len(self.resources) * 1.001
             self.progressbar['value'] = 0
+            
+            if self.temp_dir is not None:
+                self.temp_dir.cleanup()
+                self.temp_dir = None
+            
+            if self.download_dir:
+                download_dir = self.download_dir
+            else:
+                self.temp_dir = tempfile.TemporaryDirectory()
+                download_dir = self.temp_dir.name
             
             resources = [res['name'] for res in self.resources]
             self.listbox_resources_var.set(tuple(resources))
@@ -91,6 +102,12 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.resources = None
         self.tx = None
+        self.temp_dir = None
+        self.download_dir = None
+    
+    def __del__(self):
+        if self.temp_dir is not None:
+            self.temp_dir.cleanup()
 
 
 class App(tk.Tk):
