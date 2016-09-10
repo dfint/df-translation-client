@@ -16,10 +16,11 @@ class DownloadTranslationsFrame(tk.Frame):
             self.tx = TransifexAPI(username, password, 'http://transifex.com')
             assert self.tx.project_exists(project), "Project %r does not exist" % project
             self.resources = self.tx.list_resources(project)
+            languages = self.tx.list_languages(project, resource_slug=self.resources[0]['slug'])
         except (TransifexAPIException, AssertionError) as err:
             messagebox.showerror('Error', err)
         else:
-            self.combo_languages['values'] = tuple(self.tx.list_languages(project, resource_slug=self.resources[0]['slug']))
+            self.combo_languages['values'] = tuple(languages)
             self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
             
             self.listbox_resources.delete(0, tk.END)
