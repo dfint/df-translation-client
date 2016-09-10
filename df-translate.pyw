@@ -27,7 +27,7 @@ class DownloadTranslationsFrame(tk.Frame):
     
     def bt_download(self, event):
         if self.tx and self.resources:
-            self.progressbar['maximum'] = len(self.resources) * 1.01
+            self.progressbar['maximum'] = len(self.resources) * 1.001
             self.progressbar['value'] = 0
             
             resources = [res['name'] for res in self.resources]
