@@ -64,6 +64,8 @@ class DownloadTranslationsFrame(tk.Frame):
                         self.listbox_resources_var.set(tuple(resource_names))
                         self.app.update()
                 else:
+                    resource_names[i] = initial_names[i] + ' - error'
+                    messagebox.showerror('Downloading error', repr(sys.exc_info()[0]))
                     raise
                 
                 resource_names[i] = initial_names[i] + ' - ok!'
