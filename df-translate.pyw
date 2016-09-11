@@ -139,16 +139,37 @@ class DownloadTranslationsFrame(tk.Frame):
             self.temp_dir.cleanup()
 
 
+class PatchExecutableFrame(tk.Frame):
+    def bt_browse_executable(self, event):
+        pass
+    
+    def __init__(self, master=None, app=None):
+        super().__init__(master)
+        
+        self.app = app
+        
+        label = tk.Label(self, text='DF executable file:')
+        label.grid()
+        
+        self.entry_executable_file = ttk.Entry(self)
+        self.entry_executable_file.grid(column=1, row=0)
+        
+        button_browse_executable = ttk.Button(self, text='Browse...')
+        button_browse_executable.grid(column=2, row=0)
+        button_browse_executable.bind('<1>', self.bt_browse_executable)
+
+
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         
         notebook = ttk.Notebook()
         notebook.pack(fill='both', expand=1)
+        
         f1 = DownloadTranslationsFrame(notebook, self)
         notebook.add(f1, text='Download tranlations')
         
-        f1 = tk.Frame(notebook)
+        f1 = PatchExecutableFrame(notebook, self)
         notebook.add(f1, text='Patch executable file')
         
         f1 = tk.Frame(notebook)
