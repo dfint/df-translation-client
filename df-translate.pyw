@@ -49,13 +49,24 @@ class DownloadTranslationsFrame(tk.Frame):
             project = self.combo_projects.get()
             language = self.combo_languages.get()
             
-            resource_names = [res['name'] for res in self.resources]
+            initial_names = [res['name'] for res in self.resources]
+            resource_names = list(initial_names)
+            
             self.listbox_resources_var.set(tuple(resource_names))
             for i, res in enumerate(self.resources):
                 file_path = path.join(download_dir, '%s_%s.po' % (res['slug'], language))
-                self.tx.get_translation(project, res['slug'], language, file_path)
+                for _ in range(10):
+                    try:
+                        self.tx.get_translation(project, res['slug'], language, file_path)
+                        break
+                    except:
+                        resource_names[i] = initial_names[i] + ' - retry...'
+                        self.listbox_resources_var.set(tuple(resource_names))
+                        self.app.update()
+                else:
+                    raise
                 
-                resource_names[i] += ' - ok!'
+                resource_names[i] = initial_names[i] + ' - ok!'
                 self.listbox_resources_var.set(tuple(resource_names))
                 self.progressbar.step()
                 self.app.update()
