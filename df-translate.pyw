@@ -1,3 +1,5 @@
+import requests
+import sys
 import tempfile
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -18,8 +20,10 @@ class DownloadTranslationsFrame(tk.Frame):
             assert self.tx.project_exists(project), "Project %r does not exist" % project
             self.resources = self.tx.list_resources(project)
             languages = self.tx.list_languages(project, resource_slug=self.resources[0]['slug'])
-        except (TransifexAPIException, AssertionError) as err:
+        except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
             messagebox.showerror('Error', err)
+        except:
+            messagebox.showerror('Unexpected error', repr(sys.exc_info()[0]))
         else:
             self.combo_languages['values'] = tuple(languages)
             self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
