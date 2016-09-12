@@ -176,10 +176,15 @@ class PatchExecutableFrame(tk.Frame):
         label.grid()
         
         self.combo_encoding = ttk.Combobox(self)
-        self.combo_encoding.grid(column=1, row=2)
+        self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
         
         self.combo_encoding['values'] = tuple(['cp437'] + list(codepages.keys()))
         self.combo_encoding.current(0)
+        
+        self.chk_dont_patch_charmap_var = tk.IntVar()
+        chk_dont_patch_charmap = ttk.Checkbutton(self, text="Don't patch charmap table",
+                                                 variable=self.chk_dont_patch_charmap_var)
+        chk_dont_patch_charmap.grid(column=1)
 
 
 class App(tk.Tk):
