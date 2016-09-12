@@ -5,6 +5,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
+from dfrus.patchdf import codepages
 from os import path
 from transifex.api import TransifexAPI, TransifexAPIException
 
@@ -155,7 +156,7 @@ class PatchExecutableFrame(tk.Frame):
         label.grid()
         
         self.entry_executable_file = ttk.Entry(self)
-        self.entry_executable_file.grid(column=1, row=0)
+        self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
         
         button_browse_executable = ttk.Button(self, text='Browse...')
         button_browse_executable.grid(column=2, row=0)
@@ -165,11 +166,20 @@ class PatchExecutableFrame(tk.Frame):
         label.grid()
         
         self.entry_translation_file = ttk.Entry(self)
-        self.entry_translation_file.grid(column=1, row=1)
+        self.entry_translation_file.grid(column=1, row=1, sticky=tk.E + tk.W)
         
         button_browse_translation = ttk.Button(self, text='Browse...')
         button_browse_translation.grid(column=2, row=1)
         button_browse_translation.bind('<1>', self.bt_browse_translation)
+        
+        label = tk.Label(self, text='Encoding:')
+        label.grid()
+        
+        self.combo_encoding = ttk.Combobox(self)
+        self.combo_encoding.grid(column=1, row=2)
+        
+        self.combo_encoding['values'] = tuple(['cp437'] + list(codepages.keys()))
+        self.combo_encoding.current(0)
 
 
 class App(tk.Tk):
