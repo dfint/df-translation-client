@@ -143,6 +143,9 @@ class PatchExecutableFrame(tk.Frame):
     def bt_browse_executable(self, event):
         pass
     
+    def bt_browse_translation(self, event):
+        pass
+    
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -157,6 +160,16 @@ class PatchExecutableFrame(tk.Frame):
         button_browse_executable = ttk.Button(self, text='Browse...')
         button_browse_executable.grid(column=2, row=0)
         button_browse_executable.bind('<1>', self.bt_browse_executable)
+        
+        label = tk.Label(self, text='DF executable tranlation file:')
+        label.grid()
+        
+        self.entry_translation_file = ttk.Entry(self)
+        self.entry_translation_file.grid(column=1, row=1)
+        
+        button_browse_translation = ttk.Button(self, text='Browse...')
+        button_browse_translation.grid(column=2, row=1)
+        button_browse_translation.bind('<1>', self.bt_browse_translation)
 
 
 class App(tk.Tk):
