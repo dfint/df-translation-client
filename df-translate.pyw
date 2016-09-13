@@ -189,8 +189,13 @@ class PatchExecutableFrame(tk.Frame):
                                                  variable=self.chk_dont_patch_charmap_var)
         chk_dont_patch_charmap.grid(column=1)
         
+        self.chk_debug_output_var = tk.IntVar()
+        chk_debug_output = ttk.Checkbutton(self, text='Enable debugging output',
+                                           variable=self.chk_debug_output_var)
+        chk_debug_output.grid(column=1)
+        
         button_patch = ttk.Button(self, text='Patch!')
-        button_patch.grid(column=2)
+        button_patch.grid(row=4, column=2)
         button_patch.bind('<1>', self.bt_patch)
         
         log_field = tk.Text(self, width=48, height=16)
