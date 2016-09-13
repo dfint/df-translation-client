@@ -192,6 +192,9 @@ class PatchExecutableFrame(tk.Frame):
         button_patch = ttk.Button(self, text='Patch!')
         button_patch.grid(column=2)
         button_patch.bind('<1>', self.bt_patch)
+        
+        log_field = tk.Text(self, width=48, height=16)
+        log_field.grid(columnspan=3)
 
 
 class App(tk.Tk):
