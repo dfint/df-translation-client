@@ -147,6 +147,9 @@ class PatchExecutableFrame(tk.Frame):
     def bt_browse_translation(self, event):
         pass
     
+    def bt_patch(self, event):
+        pass
+    
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -185,6 +188,10 @@ class PatchExecutableFrame(tk.Frame):
         chk_dont_patch_charmap = ttk.Checkbutton(self, text="Don't patch charmap table",
                                                  variable=self.chk_dont_patch_charmap_var)
         chk_dont_patch_charmap.grid(column=1)
+        
+        button_patch = ttk.Button(self, text='Patch!')
+        button_patch.grid(column=2)
+        button_patch.bind('<1>', self.bt_patch)
 
 
 class App(tk.Tk):
