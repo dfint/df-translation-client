@@ -1,4 +1,3 @@
-tkinter
 https://github.com/insolor/python-transifex/archive/master.zip
 https://bitbucket.org/dfint/dfrus-py/get/package.zip
 https://bitbucket.org/dfint/df-gettext-toolkit/get/default.zip
