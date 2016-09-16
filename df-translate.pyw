@@ -57,6 +57,10 @@ class DownloadTranslationsFrame(tk.Frame):
             
             self.listbox_resources_var.set(tuple(resource_names))
             for i, res in enumerate(self.resources):
+                resource_names[i] = initial_names[i] + ' - downloading...'
+                self.listbox_resources_var.set(tuple(resource_names))
+                self.app.update()
+                
                 file_path = path.join(download_dir, '%s_%s.po' % (res['slug'], language))
                 for _ in range(10):
                     try:
