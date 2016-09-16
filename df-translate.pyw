@@ -8,6 +8,7 @@ import string
 
 from dfrus.patchdf import codepages
 from os import path
+from tkinter import filedialog
 from transifex.api import TransifexAPI, TransifexAPIException
 
 
@@ -143,10 +144,16 @@ class DownloadTranslationsFrame(tk.Frame):
 
 class PatchExecutableFrame(tk.Frame):
     def bt_browse_executable(self, event):
-        pass
+        file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
+        if file_path:
+            self.entry_executable_file.delete(0, tk.END)
+            self.entry_executable_file.insert(0, file_path)
     
     def bt_browse_translation(self, event):
-        pass
+        file_path = filedialog.askopenfilename(filetypes=[('Translation files', '*.po')])
+        if file_path:
+            self.entry_translation_file.delete(0, tk.END)
+            self.entry_translation_file.insert(0, file_path)
     
     def bt_patch(self, event):
         pass
