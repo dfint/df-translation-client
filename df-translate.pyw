@@ -4,6 +4,7 @@ import tempfile
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
+import string
 
 from dfrus.patchdf import codepages
 from os import path
@@ -181,7 +182,8 @@ class PatchExecutableFrame(tk.Frame):
         self.combo_encoding = ttk.Combobox(self)
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
         
-        self.combo_encoding['values'] = tuple(['cp437'] + list(codepages.keys()))
+        self.combo_encoding['values'] = tuple(sorted(codepages.keys(),
+                                                     key=lambda x: int(x.strip(string.ascii_letters))))
         self.combo_encoding.current(0)
         
         self.chk_dont_patch_charmap_var = tk.IntVar()
