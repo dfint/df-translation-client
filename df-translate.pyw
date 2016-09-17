@@ -12,6 +12,18 @@ from tkinter import filedialog
 from transifex.api import TransifexAPI, TransifexAPIException
 
 
+class CheckbuttonVar(ttk.Checkbutton):
+    def __init__(self, *args, **kwargs):
+        self.var = tk.IntVar()
+        super().__init__(*args, variable=self.var, **kwargs)
+    
+    def get(self):
+        return self.var.get()
+    
+    def set(self, value):
+        self.var.set(value)
+
+
 class DownloadTranslationsFrame(tk.Frame):
     def bt_connect(self, event):
         username = self.entry_username.get()  # Todo: remember username in the settings
@@ -118,9 +130,8 @@ class DownloadTranslationsFrame(tk.Frame):
         self.combo_languages = ttk.Combobox(self)
         self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
         
-        # self.chk_all_languages_var = tk.IntVar()
-        # chk_all_languages = tk.Checkbutton(self, text='All languages (backup)', variable=self.chk_all_languages_var)
-        # chk_all_languages.grid(column=1)
+        # self.chk_all_languages = CheckbuttonVar(self, text='All languages (backup)')
+        # self.chk_all_languages.grid(column=1)
         
         self.button_download = ttk.Button(self, text='Download translations')
         self.button_download.bind('<1>', self.bt_download)
@@ -197,15 +208,11 @@ class PatchExecutableFrame(tk.Frame):
                                                      key=lambda x: int(x.strip(string.ascii_letters))))
         self.combo_encoding.current(0)
         
-        self.chk_dont_patch_charmap_var = tk.IntVar()
-        chk_dont_patch_charmap = ttk.Checkbutton(self, text="Don't patch charmap table",
-                                                 variable=self.chk_dont_patch_charmap_var)
-        chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
+        self.chk_dont_patch_charmap = CheckbuttonVar(self, text="Don't patch charmap table")
+        self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
         
-        self.chk_debug_output_var = tk.IntVar()
-        chk_debug_output = ttk.Checkbutton(self, text='Enable debugging output',
-                                           variable=self.chk_debug_output_var)
-        chk_debug_output.grid(column=1, sticky=tk.W)
+        self.chk_debug_output = CheckbuttonVar(self, text='Enable debugging output')
+        self.chk_debug_output.grid(column=1, sticky=tk.W)
         
         button_patch = ttk.Button(self, text='Patch!')
         button_patch.grid(row=4, column=2)
