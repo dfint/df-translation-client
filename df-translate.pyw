@@ -173,6 +173,9 @@ class PatchExecutableFrame(tk.Frame):
     def bt_patch(self, event):
         pass
     
+    def bt_exclusions(self, event):
+        messagebox.showinfo('Sorry', 'Not implemented yet')
+    
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -217,6 +220,7 @@ class PatchExecutableFrame(tk.Frame):
         
         button_exclusions = ttk.Button(self, text='Exclusions...')
         button_exclusions.grid(row=4, column=2)
+        button_exclusions.bind('<1>', self.bt_exclusions)
 
         self.chk_debug_output = CheckbuttonVar(self, text='Enable debugging output')
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
