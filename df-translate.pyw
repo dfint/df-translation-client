@@ -212,21 +212,21 @@ class PatchExecutableFrame(tk.Frame):
         self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
         
         self.chk_add_leading_trailing_spaces = CheckbuttonVar(self, text='Add necessary leading/trailing spaces')
-        self.chk_add_leading_trailing_spaces.grid(column=1, sticky=tk.W)
+        self.chk_add_leading_trailing_spaces.grid(columnspan=2, sticky=tk.W)
         self.chk_add_leading_trailing_spaces.set(1)
         
         button_exclusions = ttk.Button(self, text='Exclusions...')
         button_exclusions.grid(row=4, column=2)
 
         self.chk_debug_output = CheckbuttonVar(self, text='Enable debugging output')
-        self.chk_debug_output.grid(column=1, sticky=tk.W)
+        self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
         
         button_patch = ttk.Button(self, text='Patch!')
         button_patch.grid(row=5, column=2)
         button_patch.bind('<1>', self.bt_patch)
         
         log_field = tk.Text(self, width=48, height=16)
-        log_field.grid(columnspan=3)
+        log_field.grid(columnspan=3, sticky=tk.W + tk.E)
 
 
 class App(tk.Tk):
