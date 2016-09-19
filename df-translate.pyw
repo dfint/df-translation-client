@@ -102,7 +102,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     resource_names[i] = initial_names[i] + ' - failed'
                     self.listbox_resources_var.set(tuple(resource_names))
                     self.app.update()
-                    messagebox.showerror('Downloading error', repr(error))
+                    messagebox.showerror('Downloading error', error)
                     break
                 
                 resource_names[i] = initial_names[i] + ' - ok!'
