@@ -87,18 +87,23 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.app.update()
                 
                 file_path = path.join(download_dir, '%s_%s.po' % (res['slug'], language))
-                for _ in range(10):
+                
+                error = None
+                for j in range(10):
                     try:
                         self.tx.get_translation(project, res['slug'], language, file_path)
                         break
                     except:
-                        resource_names[i] = initial_names[i] + ' - retry...'
+                        resource_names[i] = initial_names[i] + ' - retry... (%d)' % (10 - j)
                         self.listbox_resources_var.set(tuple(resource_names))
                         self.app.update()
+                        error = sys.exc_info()[0]
                 else:
-                    resource_names[i] = initial_names[i] + ' - error'
-                    messagebox.showerror('Downloading error', repr(sys.exc_info()[0]))
-                    raise
+                    resource_names[i] = initial_names[i] + ' - failed'
+                    self.listbox_resources_var.set(tuple(resource_names))
+                    self.app.update()
+                    messagebox.showerror('Downloading error', repr(error))
+                    break
                 
                 resource_names[i] = initial_names[i] + ' - ok!'
                 self.listbox_resources_var.set(tuple(resource_names))
@@ -106,7 +111,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.app.update()
             
             if sys.platform == 'win32':
-                subprocess.Popen('explorer "%s"' % (download_dir))
+                subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
             else:
                 pass  # Todo: open the directory in a file manager on linux
     
