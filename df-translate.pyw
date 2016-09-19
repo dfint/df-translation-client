@@ -121,8 +121,10 @@ class DownloadTranslationsFrame(tk.Frame):
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
         button_connect = ttk.Button(self, text='Connect...')
-        button_connect.grid(columnspan=2, sticky=tk.W + tk.E)
+        button_connect.grid(row=0, column=2, rowspan=3, sticky=tk.N + tk.S + tk.W + tk.E)
         button_connect.bind('<1>', self.bt_connect)
+        
+        ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
         
         label = tk.Label(self, text='Choose language:')
         label.grid(column=0)
@@ -133,19 +135,30 @@ class DownloadTranslationsFrame(tk.Frame):
         # self.chk_all_languages = CheckbuttonVar(self, text='All languages (backup)')
         # self.chk_all_languages.grid(column=1)
         
+        ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
+        
+        label = tk.Label(self, text='Download to:')
+        label.grid()
+        
+        self.entry_download_to = ttk.Entry(self)
+        self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
+        
+        button_choose_directory = ttk.Button(self, text='Choose directory...')
+        button_choose_directory.grid(column=2, row=6)
+        
         self.button_download = ttk.Button(self, text='Download translations')
         self.button_download.bind('<1>', self.bt_download)
-        self.button_download.grid(row=6, sticky=tk.W + tk.E)
+        self.button_download.grid(sticky=tk.W + tk.E)
         
         self.progressbar = ttk.Progressbar(self)
-        self.progressbar.grid(column=1, row=6, sticky=tk.W + tk.E)
+        self.progressbar.grid(column=1, row=7, columnspan=2, sticky=tk.W + tk.E)
         
         label = tk.Label(self, text='Resources:')
-        label.grid(columnspan=2)
+        label.grid(columnspan=3)
         
         self.listbox_resources_var = tk.Variable()
         self.listbox_resources = tk.Listbox(self, listvariable=self.listbox_resources_var)
-        self.listbox_resources.grid(column=0, columnspan=2, sticky=tk.E + tk.W)
+        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
         
         self.resources = None
         self.tx = None
