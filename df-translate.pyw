@@ -5,6 +5,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 import string
+import subprocess
 
 from dfrus.patchdf import codepages
 from os import path
@@ -104,8 +105,10 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.progressbar.step()
                 self.app.update()
             
-            import subprocess
-            subprocess.Popen('explorer "%s"' % (download_dir))
+            if sys.platform == 'win32':
+                subprocess.Popen('explorer "%s"' % (download_dir))
+            else:
+                pass  # Todo: open the directory in a file manager on linux
     
     def bt_choose_directory(self, event):
         path = filedialog.askdirectory()
