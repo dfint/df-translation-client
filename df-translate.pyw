@@ -62,7 +62,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.progressbar['value'] = 0
             
             download_dir = self.entry_download_to.get()
-            if download_dir and download_dir != self.temp_dir.name:
+            if download_dir and (self.temp_dir is None or download_dir != self.temp_dir.name):
                 if self.temp_dir:
                     self.temp_dir.cleanup()
                 
