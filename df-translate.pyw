@@ -203,7 +203,10 @@ class PatchExecutableFrame(tk.Frame):
             self.entry_executable_file.set(file_path)
     
     def bt_browse_translation(self, event):
-        file_path = filedialog.askopenfilename(filetypes=[('Translation files', '*.po')])
+        file_path = filedialog.askopenfilename(filetypes=[
+            ("Hardcoded strings' translation", '*hardcoded*.po'),
+            ('Translation files', '*.po')],
+        )
         if file_path:
             self.entry_translation_file.set(file_path)
     
