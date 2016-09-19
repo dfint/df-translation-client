@@ -206,6 +206,7 @@ class PatchExecutableFrame(tk.Frame):
         file_path = filedialog.askopenfilename(filetypes=[
             ("Hardcoded strings' translation", '*hardcoded*.po'),
             ('Translation files', '*.po')],
+            ('csv file', '*.csv')],
         )
         if file_path:
             self.entry_translation_file.set(file_path)
