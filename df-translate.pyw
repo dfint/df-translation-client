@@ -24,6 +24,15 @@ class CheckbuttonVar(ttk.Checkbutton):
         self.var.set(value)
 
 
+class EntryCustom(ttk.Entry):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
+    def set(self, value):
+        self.delete(0, tk.END)
+        self.insert(0, value)
+
+
 class DownloadTranslationsFrame(tk.Frame):
     def bt_connect(self, event):
         username = self.entry_username.get()  # Todo: remember username in the settings
@@ -51,15 +60,18 @@ class DownloadTranslationsFrame(tk.Frame):
             self.progressbar['maximum'] = len(self.resources) * 1.001
             self.progressbar['value'] = 0
             
-            if self.temp_dir is not None:
-                self.temp_dir.cleanup()
-                self.temp_dir = None
-            
-            if self.download_dir:
-                download_dir = self.download_dir
+            download_dir = self.entry_download_to.get()
+            if download_dir and download_dir != self.temp_dir.name:
+                if self.temp_dir:
+                    self.temp_dir.cleanup()
+                
+                download_dir = self.entry_download_to.get()
             else:
-                self.temp_dir = tempfile.TemporaryDirectory()
+                if not self.temp_dir:
+                    self.temp_dir = tempfile.TemporaryDirectory()
+                
                 download_dir = self.temp_dir.name
+                self.entry_download_to.set(self.temp_dir.name)
             
             project = self.combo_projects.get()
             language = self.combo_languages.get()
@@ -94,6 +106,12 @@ class DownloadTranslationsFrame(tk.Frame):
             
             import subprocess
             subprocess.Popen('explorer "%s"' % (download_dir))
+    
+    def bt_choose_directory(self, event):
+        path = filedialog.askdirectory()
+        if path:
+            self.entry_download_to.delete(0, tk.END)
+            self.entry_download_to.insert(0, path)
     
     def __init__(self, master=None, app=None):
         super().__init__(master)
@@ -140,11 +158,12 @@ class DownloadTranslationsFrame(tk.Frame):
         label = tk.Label(self, text='Download to:')
         label.grid()
         
-        self.entry_download_to = ttk.Entry(self)
+        self.entry_download_to = EntryCustom(self)
         self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
         
         button_choose_directory = ttk.Button(self, text='Choose directory...')
         button_choose_directory.grid(column=2, row=6)
+        button_choose_directory.bind('<1>', self.bt_choose_directory)
         
         self.button_download = ttk.Button(self, text='Download translations')
         self.button_download.bind('<1>', self.bt_download)
