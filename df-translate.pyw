@@ -113,8 +113,7 @@ class DownloadTranslationsFrame(tk.Frame):
     def bt_choose_directory(self, event):
         path = filedialog.askdirectory()
         if path:
-            self.entry_download_to.delete(0, tk.END)
-            self.entry_download_to.insert(0, path)
+            self.entry_download_to.set(path)
     
     def __init__(self, master=None, app=None):
         super().__init__(master)
@@ -196,14 +195,12 @@ class PatchExecutableFrame(tk.Frame):
     def bt_browse_executable(self, event):
         file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
         if file_path:
-            self.entry_executable_file.delete(0, tk.END)
-            self.entry_executable_file.insert(0, file_path)
+            self.entry_executable_file.set(file_path)
     
     def bt_browse_translation(self, event):
         file_path = filedialog.askopenfilename(filetypes=[('Translation files', '*.po')])
         if file_path:
-            self.entry_translation_file.delete(0, tk.END)
-            self.entry_translation_file.insert(0, file_path)
+            self.entry_translation_file.set(file_path)
     
     def bt_patch(self, event):
         pass
@@ -219,7 +216,7 @@ class PatchExecutableFrame(tk.Frame):
         label = tk.Label(self, text='DF executable file:')
         label.grid()
         
-        self.entry_executable_file = ttk.Entry(self)
+        self.entry_executable_file = EntryCustom(self)
         self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
         
         button_browse_executable = ttk.Button(self, text='Browse...')
@@ -229,7 +226,7 @@ class PatchExecutableFrame(tk.Frame):
         label = tk.Label(self, text='DF executable tranlation file:')
         label.grid()
         
-        self.entry_translation_file = ttk.Entry(self)
+        self.entry_translation_file = EntryCustom(self)
         self.entry_translation_file.grid(column=1, row=1, sticky=tk.E + tk.W)
         
         button_browse_translation = ttk.Button(self, text='Browse...')
