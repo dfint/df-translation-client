@@ -197,7 +197,15 @@ class PatchExecutableFrame(tk.Frame):
             self.entry_translation_file.set(file_path)
     
     def bt_patch(self, event):
-        pass
+        executable_file = self.entry_executable_file.get()
+        translation_file = self.entry_translation_file.get()
+        
+        if not executable_file:
+            messagebox.showerror('Error', 'Executable file path must be specified')
+        elif not translation_file:
+            messagebox.showerror('Error', 'Translation file path must be specified')
+        else:
+            pass
     
     def bt_exclusions(self, event):
         messagebox.showinfo('Sorry', 'Not implemented yet')
