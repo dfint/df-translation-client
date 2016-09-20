@@ -1,6 +1,5 @@
 import requests
 import sys
-import tempfile
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
@@ -62,17 +61,9 @@ class DownloadTranslationsFrame(tk.Frame):
             self.progressbar['value'] = 0
             
             download_dir = self.entry_download_to.get()
-            if download_dir and (self.temp_dir is None or download_dir != self.temp_dir.name):
-                if self.temp_dir:
-                    self.temp_dir.cleanup()
-                
-                download_dir = self.entry_download_to.get()
-            else:
-                if not self.temp_dir:
-                    self.temp_dir = tempfile.TemporaryDirectory()
-                
-                download_dir = self.temp_dir.name
-                self.entry_download_to.set(self.temp_dir.name)
+            if not download_dir:
+                messagebox.showwarning('Directory not specified', 'Specify directory to downloading to first')
+                return
             
             project = self.combo_projects.get()
             language = self.combo_languages.get()
@@ -188,12 +179,6 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.resources = None
         self.tx = None
-        self.temp_dir = None
-        self.download_dir = None
-    
-    def __del__(self):
-        if self.temp_dir is not None:
-            self.temp_dir.cleanup()
 
 
 class PatchExecutableFrame(tk.Frame):
