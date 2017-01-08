@@ -1,3 +1,3 @@
 -e git+https://github.com/insolor/python-transifex#egg=python-transifex
--e hg+https://bitbucket.org/dfint/dfrus-py@package#egg=dfrus
--e hg+https://bitbucket.org/dfint/df-gettext-toolkit#egg=df-gettext-toolkit
+https://bitbucket.org/dfint/dfrus-py/get/package.zip#egg=dfrus
+https://bitbucket.org/dfint/df-gettext-toolkit/get/default.zip#egg=df-gettext-toolkit
