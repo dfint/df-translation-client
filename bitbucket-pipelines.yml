@@ -6,7 +6,7 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - apt-get install hg
+          - apt-get install mercurial
           - pip install -r requirements.txt
           - pip install -r requirements.test.txt
           - echo "Just testing"
