@@ -2,13 +2,12 @@ import requests
 import sys
 import tkinter as tk
 import tkinter.ttk as ttk
-import tkinter.messagebox as messagebox
 import string
 import subprocess
 
 from dfrus.patchdf import codepages
 from os import path
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 
 
