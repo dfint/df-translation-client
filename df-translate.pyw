@@ -13,14 +13,16 @@ from transifex.api import TransifexAPI, TransifexAPIException
 
 class CheckbuttonVar(ttk.Checkbutton):
     def __init__(self, *args, **kwargs):
-        self.var = tk.IntVar()
-        super().__init__(*args, variable=self.var, **kwargs)
-    
-    def get(self):
-        return self.var.get()
-    
-    def set(self, value):
-        self.var.set(value)
+        self._var = tk.BooleanVar()
+        super().__init__(*args, variable=self._var, **kwargs)
+
+    @property
+    def is_checked(self):
+        return self._var.get()
+
+    @is_checked.setter
+    def is_checked(self, value):
+        self._var.set(value)
 
 
 class EntryCustom(ttk.Entry):
