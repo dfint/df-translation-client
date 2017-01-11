@@ -251,7 +251,7 @@ class PatchExecutableFrame(tk.Frame):
         
         self.chk_add_leading_trailing_spaces = CheckbuttonVar(self, text='Add necessary leading/trailing spaces')
         self.chk_add_leading_trailing_spaces.grid(columnspan=2, sticky=tk.W)
-        self.chk_add_leading_trailing_spaces.set(1)
+        self.chk_add_leading_trailing_spaces.is_checked = True
         
         button_exclusions = ttk.Button(self, text='Exclusions...')
         button_exclusions.grid(row=4, column=2)
