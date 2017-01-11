@@ -63,7 +63,7 @@ class DownloadTranslationsFrame(tk.Frame):
             
             download_dir = self.entry_download_to.get()
             if not download_dir:
-                messagebox.showwarning('Directory not specified', 'Specify directory to downloading to first')
+                messagebox.showwarning('Directory not specified', 'Specify download directory at first')
                 return
             
             project = self.combo_projects.get()
