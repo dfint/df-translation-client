@@ -108,8 +108,8 @@ class DownloadTranslationsFrame(tk.Frame):
                 pass  # Todo: open the directory in a file manager on linux
     
     def bt_choose_directory(self, event):
-        path = filedialog.askdirectory()
-        if path:
+        download_path = filedialog.askdirectory()
+        if download_path:
             self.entry_download_to.set(path)
     
     def __init__(self, master=None, app=None):
@@ -121,7 +121,7 @@ class DownloadTranslationsFrame(tk.Frame):
         label.grid()
         
         # Todo: remember a list of recently used projects and the last used one
-        self.combo_projects = ttk.Combobox(self, values=('dwarf-fortress'))
+        self.combo_projects = ttk.Combobox(self, values=('dwarf-fortress',))
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0)
         
