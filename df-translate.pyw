@@ -282,7 +282,7 @@ class App(tk.Tk):
                 self.config = json.load(config_file)
         except FileNotFoundError:
             self.config = default_config
-        self.after(500, self.save_settings)
+        self.after_idle(500, self.save_settings)
 
         notebook = ttk.Notebook()
         notebook.pack(fill='both', expand=1)
@@ -302,7 +302,7 @@ class App(tk.Tk):
     def save_settings(self):
         with open(self.config_path, 'w', encoding='utf-8') as config_file:
             json.dump(self.config, config_file, indent=4)
-            self.after(500, self.save_settings)
+            self.after_idle(500, self.save_settings)
 
 
 app = App()
