@@ -270,9 +270,15 @@ class PatchExecutableFrame(tk.Frame):
 
 
 class App(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        
+    def save_settings(self, event=None):
+        with open(self.config_path, 'w', encoding='utf-8') as config_file:
+            json.dump(self.config, config_file, indent=4)
+
+    def save_settings_repeatedly(self, delay=500):
+        self.after(ms=delay, func=self.save_settings_repeatedly)
+        self.save_settings()
+
+    def init_config(self):
         config_name = '.df-translate.json'
         userdir = path.expanduser('~')
         self.config_path = path.join(userdir, config_name)
@@ -285,6 +291,13 @@ class App(tk.Tk):
 
         self.bind('<Destroy>', self.save_settings)  # Save settings on quit
         self.save_settings_repeatedly(delay=500)  # Save settings every 500 ms
+
+    def __init__(self):
+        super().__init__()
+
+        self.config = None
+        self.config_path = None
+        self.init_config()
 
         notebook = ttk.Notebook()
         notebook.pack(fill='both', expand=1)
@@ -300,14 +313,6 @@ class App(tk.Tk):
         
         f1 = tk.Frame(notebook)
         notebook.add(f1, text='Translate packed files')
-
-    def save_settings(self, event=None):
-        with open(self.config_path, 'w', encoding='utf-8') as config_file:
-            json.dump(self.config, config_file, indent=4)
-
-    def save_settings_repeatedly(self, delay=500):
-        self.after(ms=delay, func=self.save_settings_repeatedly)
-        self.save_settings()
 
 
 app = App()
