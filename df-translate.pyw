@@ -4,6 +4,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import string
 import subprocess
+import json
 
 from dfrus.patchdf import codepages
 from os import path
@@ -272,6 +273,17 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         
+        config_name = '.df-translate.json'
+        userdir = path.expanduser('~')
+        self.config_path = path.join(userdir, config_name)
+        default_config = dict()
+        try:
+            with open(self.config_path, encoding='utf-8') as config_file:
+                self.config = json.load(config_file)
+        except FileNotFoundError:
+            self.config = default_config
+        self.after(500, self.save_settings)
+
         notebook = ttk.Notebook()
         notebook.pack(fill='both', expand=1)
         
@@ -286,6 +298,11 @@ class App(tk.Tk):
         
         f1 = tk.Frame(notebook)
         notebook.add(f1, text='Translate packed files')
+
+    def save_settings(self):
+        with open(self.config_path, 'w', encoding='utf-8') as config_file:
+            json.dump(self.config, config_file, indent=4)
+            self.after(500, self.save_settings)
 
 
 app = App()
