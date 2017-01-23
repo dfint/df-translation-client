@@ -222,7 +222,7 @@ class PatchExecutableFrame(tk.Frame):
         button_browse_executable.grid(column=2, row=0)
         button_browse_executable.bind('<1>', self.bt_browse_executable)
         
-        label = tk.Label(self, text='DF executable tranlation file:')
+        label = tk.Label(self, text='DF executable translation file:')
         label.grid()
         
         self.entry_translation_file = EntryCustom(self)
@@ -298,7 +298,7 @@ class App(tk.Tk):
         notebook.pack(fill='both', expand=1)
         
         f1 = DownloadTranslationsFrame(notebook, self)
-        notebook.add(f1, text='Download tranlations')
+        notebook.add(f1, text='Download translations')
         
         f1 = PatchExecutableFrame(notebook, self)
         notebook.add(f1, text='Patch executable file')
