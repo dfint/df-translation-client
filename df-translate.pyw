@@ -14,8 +14,20 @@ from custom_widgets import CheckbuttonVar, EntryCustom
 
 
 class DownloadTranslationsFrame(tk.Frame):
+    def init_config(self):
+        config = self.app.config
+        
+        if 'download_translations' not in config:
+            config['download_translations'] = dict()
+        
+        config = config['download_translations']
+        if 'recent_projects' not in config:
+            config['recent_projects'] = ['dwarf-fortress']
+        
+        return config
+    
     def bt_connect(self, event):
-        username = self.entry_username.get()  # Todo: remember username in the settings
+        username = self.entry_username.get()
         password = self.entry_password.get()  # DO NOT remember password (not safe)
         project = self.combo_projects.get()
         try:
@@ -34,6 +46,8 @@ class DownloadTranslationsFrame(tk.Frame):
             
             self.listbox_resources.delete(0, tk.END)
             self.listbox_resources_var.set(tuple(res['name'] for res in self.resources))
+            
+            self.config['username'] = username
     
     def bt_download(self, event):
         if self.tx and self.resources:
@@ -96,18 +110,21 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.app = app
         
+        self.config = self.init_config()
+        
         label = tk.Label(self, text='Transifex project:')
         label.grid()
         
         # Todo: remember a list of recently used projects and the last used one
-        self.combo_projects = ttk.Combobox(self, values=('dwarf-fortress',))
+        self.combo_projects = ttk.Combobox(self, values=self.config['recent_projects'])
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0)
         
         label = tk.Label(self, text='Username:')
         label.grid(column=0, row=1)
         
-        self.entry_username = ttk.Entry(self)
+        self.entry_username = EntryCustom(self)
+        self.entry_username.set(self.config.get('username', ''))
         self.entry_username.grid(column=1, row=1, sticky=tk.W + tk.E)
         
         label = tk.Label(self, text='Password:')
