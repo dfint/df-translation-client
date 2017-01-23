@@ -103,7 +103,7 @@ class DownloadTranslationsFrame(tk.Frame):
     def bt_choose_directory(self, event):
         download_path = filedialog.askdirectory()
         if download_path:
-            self.entry_download_to.set(path)
+            self.entry_download_to.set(download_path)
     
     def __init__(self, master=None, app=None):
         super().__init__(master)
