@@ -179,6 +179,9 @@ class DownloadTranslationsFrame(tk.Frame):
 
 
 class DialogDontFixSpaces(tk.Toplevel):
+    def combo_language_change_selection(self, event):
+        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language_text.get()]))
+
     def __init__(self, parent, exclusions, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.grab_set()
@@ -191,6 +194,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.combo_language = ttk.Combobox(self, values=list(self.exclusions), textvariable=self.combo_language_text)
         self.combo_language.grid()
         self.combo_language.current(0)
+        self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
 
         bt = ttk.Button(self, text='-- Remove selected --')
         bt.grid(column=0, row=1, sticky=tk.N)
