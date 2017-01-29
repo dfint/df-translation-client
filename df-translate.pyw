@@ -24,6 +24,9 @@ class DownloadTranslationsFrame(tk.Frame):
         if 'recent_projects' not in config:
             config['recent_projects'] = ['dwarf-fortress']
         
+        if 'download_to' not in config:
+            config['download_to'] = None
+        
         return config
     
     def bt_connect(self, event):
@@ -58,6 +61,8 @@ class DownloadTranslationsFrame(tk.Frame):
             if not download_dir:
                 messagebox.showwarning('Directory not specified', 'Specify download directory first')
                 return
+            else:
+                self.config['download_to'] = download_dir
             
             project = self.combo_projects.get()
             language = self.combo_languages.get()
@@ -104,6 +109,7 @@ class DownloadTranslationsFrame(tk.Frame):
         download_path = filedialog.askdirectory()
         if download_path:
             self.entry_download_to.set(download_path)
+            self.config['download_to'] = download_path
     
     def __init__(self, master=None, app=None):
         super().__init__(master)
@@ -155,6 +161,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.entry_download_to = EntryCustom(self)
         self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
+        self.entry_download_to.set(self.config['download_to'] or '')
         
         button_choose_directory = ttk.Button(self, text='Choose directory...')
         button_choose_directory.grid(column=2, row=6)
