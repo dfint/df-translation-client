@@ -178,7 +178,63 @@ class DownloadTranslationsFrame(tk.Frame):
         self.tx = None
 
 
+class DialogDontFixSpaces(tk.Toplevel):
+    def __init__(self, parent, exclusions, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.grab_set()
+
+        self.exclusions = exclusions
+
+        self.title("Choose exclusions")
+
+        self.combo_language_text = tk.StringVar()
+        self.combo_language = ttk.Combobox(self, values=list(self.exclusions), textvariable=self.combo_language_text)
+        self.combo_language.grid()
+        self.combo_language.current(0)
+
+        bt = ttk.Button(self, text='-- Remove selected --')
+        bt.grid(column=0, row=1, sticky=tk.N)
+
+        self.listbox_exclusions_var = tk.Variable()
+        self.listbox_exclusions = tk.Listbox(self, listvariable=self.listbox_exclusions_var)
+        self.listbox_exclusions.grid(sticky='NSWE')
+        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language_text.get()]))
+
+        self.entry_search = ttk.Entry(self)
+        self.entry_search.grid(column=1, row=0)
+
+        bt = ttk.Button(self, text='<< Add selected <<')
+        bt.grid(column=1, row=1, sticky=tk.N)
+
+        self.listbox_exclusions_hints_var = tk.Variable()
+        self.listbox_exclusions_hints = tk.Listbox(self, listvariable=self.listbox_exclusions_hints_var)
+        self.listbox_exclusions_hints.grid(column=1, row=2, sticky=tk.N + tk.S)
+
+        button = ttk.Button(self, text="OK", command=self.destroy)
+        button.grid(row=3, column=0)
+
+        def cancel(event):
+            self.exclusions = None
+            self.destroy()
+
+        button = ttk.Button(self, text="Cancel", command=cancel)
+        button.grid(row=3, column=1)
+
+
 class PatchExecutableFrame(tk.Frame):
+    def init_config(self):
+        config = self.app.config
+
+        if 'patch_executable' not in config:
+            config['patch_executable'] = dict()
+
+        config = config['patch_executable']
+
+        if 'fix_space_exclusions' not in config:
+            config['fix_space_exclusions'] = dict(ru=['Histories of '])
+
+        return config
+
     def bt_browse_executable(self, event):
         file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
         if file_path:
@@ -205,12 +261,15 @@ class PatchExecutableFrame(tk.Frame):
             pass
     
     def bt_exclusions(self, event):
-        messagebox.showinfo('Sorry', 'Not implemented yet')
+        dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'])
+        self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
     
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
         self.app = app
+
+        self.config = self.init_config()
         
         label = tk.Label(self, text='DF executable file:')
         label.grid()
