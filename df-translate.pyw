@@ -366,11 +366,11 @@ class App(tk.Tk):
         f1 = PatchExecutableFrame(notebook, self)
         notebook.add(f1, text='Patch executable file')
         
-        f1 = tk.Frame(notebook)
-        notebook.add(f1, text='Translate external text files')
+        # f1 = tk.Frame(notebook)
+        # notebook.add(f1, text='Translate external text files')
         
-        f1 = tk.Frame(notebook)
-        notebook.add(f1, text='Translate packed files')
+        # f1 = tk.Frame(notebook)
+        # notebook.add(f1, text='Translate packed files')
 
 
 app = App()
