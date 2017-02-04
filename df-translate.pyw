@@ -26,7 +26,9 @@ class DownloadTranslationsFrame(tk.Frame):
         
         if 'download_to' not in config:
             config['download_to'] = None
-        
+
+        config['language'] = config.get('language', None)
+
         return config
     
     def bt_connect(self, _):
@@ -45,7 +47,8 @@ class DownloadTranslationsFrame(tk.Frame):
             messagebox.showerror('Unexpected error', repr(sys.exc_info()[0]))
         else:
             self.combo_languages['values'] = tuple(languages)
-            self.combo_languages.current(0)  # Todo: remember chosen language, store it in settings
+            last_language = self.config['language']
+            self.combo_languages.current(languages.index(last_language) if last_language in languages else 0)
             
             self.listbox_resources.delete(0, tk.END)
             self.listbox_resources_var.set(tuple(res['name'] for res in self.resources))
@@ -57,7 +60,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 if project in recent_projects:
                     recent_projects.remove(project)
                 recent_projects.insert(0, project)
-            self.combo_projects.configure(values=tuple(recent_projects))
+            self.combo_projects['values'] = tuple(recent_projects)
     
     def bt_download(self, _):
         if self.tx and self.resources:
@@ -106,7 +109,9 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.listbox_resources_var.set(tuple(resource_names))
                 self.progressbar.step()
                 self.app.update()
-            
+
+            self.config['language'] = language
+
             if sys.platform == 'win32':
                 subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
             else:
