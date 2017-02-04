@@ -379,6 +379,4 @@ class App(tk.Tk):
         # f1 = tk.Frame(notebook)
         # notebook.add(f1, text='Translate packed files')
 
-
-app = App()
-app.mainloop()
+App().mainloop()
