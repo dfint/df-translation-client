@@ -343,7 +343,7 @@ class PatchExecutableFrame(tk.Frame):
 class App(tk.Tk):
     def save_settings(self, _=None):
         with open(self.config_path, 'w', encoding='utf-8') as config_file:
-            json.dump(self.config, config_file, indent=4)
+            json.dump(self.config, config_file, indent=4, sort_keys=True)
 
     def save_settings_repeatedly(self, delay=500):
         self.after(ms=delay, func=self.save_settings_repeatedly)
