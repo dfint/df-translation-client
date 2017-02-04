@@ -51,6 +51,13 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources_var.set(tuple(res['name'] for res in self.resources))
             
             self.config['username'] = username
+
+            recent_projects = self.config['recent_projects']
+            if recent_projects or project != recent_projects[0]:
+                if project in recent_projects:
+                    recent_projects.remove(project)
+                recent_projects.insert(0, project)
+            self.combo_projects.configure(values=tuple(recent_projects))
     
     def bt_download(self, _):
         if self.tx and self.resources:
@@ -120,8 +127,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         label = tk.Label(self, text='Transifex project:')
         label.grid()
-        
-        # Todo: remember a list of recently used projects and the last used one
+
         self.combo_projects = ttk.Combobox(self, values=self.config['recent_projects'])
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0)
