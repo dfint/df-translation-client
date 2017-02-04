@@ -29,7 +29,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         return config
     
-    def bt_connect(self, event):
+    def bt_connect(self, _):
         username = self.entry_username.get()
         password = self.entry_password.get()  # DO NOT remember password (not safe)
         project = self.combo_projects.get()
@@ -52,7 +52,7 @@ class DownloadTranslationsFrame(tk.Frame):
             
             self.config['username'] = username
     
-    def bt_download(self, event):
+    def bt_download(self, _):
         if self.tx and self.resources:
             self.progressbar['maximum'] = len(self.resources) * 1.001
             self.progressbar['value'] = 0
@@ -105,7 +105,7 @@ class DownloadTranslationsFrame(tk.Frame):
             else:
                 pass  # Todo: open the directory in a file manager on linux
     
-    def bt_choose_directory(self, event):
+    def bt_choose_directory(self, _):
         download_path = filedialog.askdirectory()
         if download_path:
             self.entry_download_to.set(download_path)
@@ -186,7 +186,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
 
 class DialogDontFixSpaces(tk.Toplevel):
-    def combo_language_change_selection(self, event):
+    def combo_language_change_selection(self, _):
         self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language_text.get()]))
 
     def __init__(self, parent, exclusions, *args, **kwargs):
@@ -224,7 +224,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         button = ttk.Button(self, text="OK", command=self.destroy)
         button.grid(row=3, column=0)
 
-        def cancel(event):
+        def cancel(_):
             self.exclusions = None
             self.destroy()
 
@@ -246,12 +246,12 @@ class PatchExecutableFrame(tk.Frame):
 
         return config
 
-    def bt_browse_executable(self, event):
+    def bt_browse_executable(self, _):
         file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
         if file_path:
             self.entry_executable_file.set(file_path)
     
-    def bt_browse_translation(self, event):
+    def bt_browse_translation(self, _):
         file_path = filedialog.askopenfilename(filetypes=[
             ("Hardcoded strings' translation", '*hardcoded*.po'),
             ('Translation files', '*.po'),
@@ -260,7 +260,7 @@ class PatchExecutableFrame(tk.Frame):
         if file_path:
             self.entry_translation_file.set(file_path)
     
-    def bt_patch(self, event):
+    def bt_patch(self, _):
         executable_file = self.entry_executable_file.get()
         translation_file = self.entry_translation_file.get()
         
@@ -271,7 +271,7 @@ class PatchExecutableFrame(tk.Frame):
         else:
             pass
     
-    def bt_exclusions(self, event):
+    def bt_exclusions(self, _):
         dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'])
         self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
     
@@ -335,7 +335,7 @@ class PatchExecutableFrame(tk.Frame):
 
 
 class App(tk.Tk):
-    def save_settings(self, event=None):
+    def save_settings(self, _):
         with open(self.config_path, 'w', encoding='utf-8') as config_file:
             json.dump(self.config, config_file, indent=4)
 
