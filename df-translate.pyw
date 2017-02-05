@@ -293,7 +293,7 @@ class PatchExecutableFrame(tk.Frame):
         
         self.entry_executable_file = EntryCustom(self)
         self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
-        self.entry_executable_file.text = self.config['df_executable']
+        self.entry_executable_file.text = self.config['df_executable'] or ''
 
         button_browse_executable = ttk.Button(self, text='Browse...')
         button_browse_executable.grid(column=2, row=0)
