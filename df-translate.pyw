@@ -189,7 +189,7 @@ class DialogDontFixSpaces(tk.Toplevel):
     def combo_language_change_selection(self, _):
         self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
 
-    def __init__(self, parent, exclusions, languages: list, *args, **kwargs):
+    def __init__(self, parent, exclusions: dict, languages: list, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.grab_set()
 
