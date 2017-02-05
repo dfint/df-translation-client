@@ -10,7 +10,7 @@ from dfrus.patchdf import codepages
 from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
-from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom
+from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom
 
 
 class DownloadTranslationsFrame(tk.Frame):
@@ -50,8 +50,8 @@ class DownloadTranslationsFrame(tk.Frame):
             last_language = self.config['language']
             self.combo_languages.current(languages.index(last_language) if last_language in languages else 0)
             
-            self.listbox_resources.delete(0, tk.END)
-            self.listbox_resources_var.set(tuple(res['name'] for res in self.resources))
+            self.listbox_resources.clear()
+            self.listbox_resources.values = tuple(res['name'] for res in self.resources)
             
             self.config['username'] = username
 
@@ -80,10 +80,10 @@ class DownloadTranslationsFrame(tk.Frame):
             initial_names = [res['name'] for res in self.resources]
             resource_names = list(initial_names)
             
-            self.listbox_resources_var.set(tuple(resource_names))
+            self.listbox_resources.values = tuple(resource_names)
             for i, res in enumerate(self.resources):
                 resource_names[i] = initial_names[i] + ' - downloading...'
-                self.listbox_resources_var.set(tuple(resource_names))
+                self.listbox_resources.values = tuple(resource_names)
                 self.app.update()
                 
                 file_path = path.join(download_dir, '%s_%s.po' % (res['slug'], language))
@@ -95,18 +95,18 @@ class DownloadTranslationsFrame(tk.Frame):
                         break
                     except:
                         resource_names[i] = initial_names[i] + ' - retry... (%d)' % (10 - j)
-                        self.listbox_resources_var.set(tuple(resource_names))
+                        self.listbox_resources.values = tuple(resource_names)
                         self.app.update()
                         error = sys.exc_info()[0]
                 else:
                     resource_names[i] = initial_names[i] + ' - failed'
-                    self.listbox_resources_var.set(tuple(resource_names))
+                    self.listbox_resources.values = tuple(resource_names)
                     self.app.update()
                     messagebox.showerror('Downloading error', error)
                     break
                 
                 resource_names[i] = initial_names[i] + ' - ok!'
-                self.listbox_resources_var.set(tuple(resource_names))
+                self.listbox_resources.values = tuple(resource_names)
                 self.progressbar.step()
                 self.app.update()
 
@@ -181,9 +181,8 @@ class DownloadTranslationsFrame(tk.Frame):
         self.progressbar.grid(column=1, row=7, columnspan=2, sticky=tk.W + tk.E)
         
         tk.Label(self, text='Resources:').grid(columnspan=3)
-        
-        self.listbox_resources_var = tk.Variable()
-        self.listbox_resources = tk.Listbox(self, listvariable=self.listbox_resources_var)
+
+        self.listbox_resources = ListboxCustom(self)
         self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
         
         self.resources = None
@@ -192,7 +191,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
 class DialogDontFixSpaces(tk.Toplevel):
     def combo_language_change_selection(self, _):
-        self.listbox_exclusions_var.set(tuple(self.exclusions.get(self.combo_language.text, tuple())))
+        self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
 
     def __init__(self, parent, exclusions, languages: list, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -216,10 +215,9 @@ class DialogDontFixSpaces(tk.Toplevel):
         bt = ttk.Button(self, text='-- Remove selected --')
         bt.grid(column=0, row=1, sticky=tk.N)
 
-        self.listbox_exclusions_var = tk.Variable()
-        self.listbox_exclusions = tk.Listbox(self, listvariable=self.listbox_exclusions_var)
+        self.listbox_exclusions = ListboxCustom(self)
         self.listbox_exclusions.grid(sticky='NSWE')
-        self.listbox_exclusions_var.set(tuple(self.exclusions.get(self.combo_language.text, tuple())))
+        self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
 
         self.entry_search = ttk.Entry(self)
         self.entry_search.grid(column=1, row=0)
@@ -227,8 +225,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         bt = ttk.Button(self, text='<< Add selected <<')
         bt.grid(column=1, row=1, sticky=tk.N)
 
-        self.listbox_exclusions_hints_var = tk.Variable()
-        self.listbox_exclusions_hints = tk.Listbox(self, listvariable=self.listbox_exclusions_hints_var)
+        self.listbox_exclusions_hints = ListboxCustom(self)
         self.listbox_exclusions_hints.grid(column=1, row=2, sticky=tk.N + tk.S)
 
         button = ttk.Button(self, text="OK", command=self.destroy)
