@@ -20,6 +20,14 @@ class EntryCustom(ttk.Entry):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-    def set(self, value):
+    def _set(self, value):
         self.delete(0, tk.END)
         self.insert(0, value)
+
+    @property
+    def text(self):
+        return self.get()
+
+    @text.setter
+    def text(self, value: str):
+        self._set(value)

@@ -120,7 +120,7 @@ class DownloadTranslationsFrame(tk.Frame):
     def bt_choose_directory(self, _):
         download_path = filedialog.askdirectory()
         if download_path:
-            self.entry_download_to.set(download_path)
+            self.entry_download_to.text = download_path
             self.config['download_to'] = download_path
     
     def __init__(self, master=None, app=None):
@@ -139,7 +139,7 @@ class DownloadTranslationsFrame(tk.Frame):
         tk.Label(self, text='Username:').grid(column=0, row=1)
         
         self.entry_username = EntryCustom(self)
-        self.entry_username.set(self.config.get('username', ''))
+        self.entry_username.text = self.config.get('username', '')
         self.entry_username.grid(column=1, row=1, sticky=tk.W + tk.E)
         
         tk.Label(self, text='Password:').grid(column=0, row=2)
@@ -167,7 +167,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.entry_download_to = EntryCustom(self)
         self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
-        self.entry_download_to.set(self.config['download_to'] or '')
+        self.entry_download_to.text = self.config['download_to'] or ''
         
         button_choose_directory = ttk.Button(self, text='Choose directory...')
         button_choose_directory.grid(column=2, row=6)
@@ -249,6 +249,8 @@ class PatchExecutableFrame(tk.Frame):
         if 'fix_space_exclusions' not in config:
             config['fix_space_exclusions'] = dict(ru=['Histories of '])
 
+        config['df_executable'] = config.get('df_executable', None)
+
         return config
 
     def bt_browse_executable(self, _):
@@ -291,7 +293,8 @@ class PatchExecutableFrame(tk.Frame):
         
         self.entry_executable_file = EntryCustom(self)
         self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
-        
+        self.entry_executable_file.text = self.config['df_executable']
+
         button_browse_executable = ttk.Button(self, text='Browse...')
         button_browse_executable.grid(column=2, row=0)
         button_browse_executable.bind('<1>', self.bt_browse_executable)
