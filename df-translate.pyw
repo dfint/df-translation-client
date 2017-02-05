@@ -270,8 +270,8 @@ class PatchExecutableFrame(tk.Frame):
             self.config[key] = file_path
 
     def bt_patch(self, _):
-        executable_file = self.entry_executable_file.get()
-        translation_file = self.entry_translation_file.get()
+        executable_file = self.entry_executable_file.text
+        translation_file = self.entry_translation_file.text
         
         if not executable_file:
             messagebox.showerror('Error', 'Executable file path must be specified')
