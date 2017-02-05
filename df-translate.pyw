@@ -251,12 +251,15 @@ class PatchExecutableFrame(tk.Frame):
 
         config['df_executable'] = config.get('df_executable', None)
 
+        config['df_exe_translation_file'] = config.get('df_exe_translation_file', None)
+
         return config
 
     def bt_browse_executable(self, _):
         file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
         if file_path:
             self.entry_executable_file.set(file_path)
+            self.config['df_executable'] = file_path
     
     def bt_browse_translation(self, _):
         file_path = filedialog.askopenfilename(filetypes=[
@@ -266,7 +269,12 @@ class PatchExecutableFrame(tk.Frame):
         ])
         if file_path:
             self.entry_translation_file.set(file_path)
-    
+            self.config['df_exe_translation_file'] = file_path
+
+    def check_and_save_path(self, key, file_path):
+        if path.exists(file_path):
+            self.config[key] = file_path
+
     def bt_patch(self, _):
         executable_file = self.entry_executable_file.get()
         translation_file = self.entry_translation_file.get()
@@ -281,7 +289,7 @@ class PatchExecutableFrame(tk.Frame):
     def bt_exclusions(self, _):
         dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'])
         self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
-    
+
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -294,6 +302,9 @@ class PatchExecutableFrame(tk.Frame):
         self.entry_executable_file = EntryCustom(self)
         self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
         self.entry_executable_file.text = self.config['df_executable'] or ''
+        self.entry_executable_file.bind('<KeyPress>',
+                                        func=lambda event:
+                                            self.check_and_save_path('df_executable', event.widget.text))
 
         button_browse_executable = ttk.Button(self, text='Browse...')
         button_browse_executable.grid(column=2, row=0)
@@ -303,6 +314,10 @@ class PatchExecutableFrame(tk.Frame):
         
         self.entry_translation_file = EntryCustom(self)
         self.entry_translation_file.grid(column=1, row=1, sticky=tk.E + tk.W)
+        self.entry_translation_file.text = self.config['df_exe_translation_file'] or ''
+        self.entry_translation_file.bind('<KeyPress>',
+                                         func=lambda event:
+                                            self.check_and_save_path('df_exe_translation_file', event.widget.text))
         
         button_browse_translation = ttk.Button(self, text='Browse...')
         button_browse_translation.grid(column=2, row=1)
