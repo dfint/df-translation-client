@@ -11,6 +11,7 @@ from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom
+from collections import defaultdict
 
 
 class DownloadTranslationsFrame(tk.Frame):
@@ -18,16 +19,11 @@ class DownloadTranslationsFrame(tk.Frame):
         config = self.app.config
         
         if 'download_translations' not in config:
-            config['download_translations'] = dict()
+            config['download_translations'] = defaultdict(lambda: None)
         
         config = config['download_translations']
         if 'recent_projects' not in config:
             config['recent_projects'] = ['dwarf-fortress']
-        
-        if 'download_to' not in config:
-            config['download_to'] = None
-
-        config['language'] = config.get('language', None)
 
         return config
     
@@ -244,16 +240,12 @@ class PatchExecutableFrame(tk.Frame):
         config = self.app.config
 
         if 'patch_executable' not in config:
-            config['patch_executable'] = dict()
+            config['patch_executable'] = defaultdict(lambda: None)
 
         config = config['patch_executable']
 
         if 'fix_space_exclusions' not in config:
             config['fix_space_exclusions'] = dict(ru=['Histories of '])
-
-        config['df_executable'] = config.get('df_executable', None)
-
-        config['df_exe_translation_file'] = config.get('df_exe_translation_file', None)
 
         return config
 
