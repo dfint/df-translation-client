@@ -258,7 +258,7 @@ class PatchExecutableFrame(tk.Frame):
     def bt_browse_executable(self, _):
         file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
         if file_path:
-            self.entry_executable_file.set(file_path)
+            self.entry_executable_file.text = file_path
             self.config['df_executable'] = file_path
     
     def bt_browse_translation(self, _):
@@ -268,7 +268,7 @@ class PatchExecutableFrame(tk.Frame):
             ('csv file', '*.csv'),
         ])
         if file_path:
-            self.entry_translation_file.set(file_path)
+            self.entry_translation_file.text = file_path
             self.config['df_exe_translation_file'] = file_path
 
     def check_and_save_path(self, key, file_path):
