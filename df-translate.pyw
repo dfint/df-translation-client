@@ -192,9 +192,9 @@ class DownloadTranslationsFrame(tk.Frame):
 
 class DialogDontFixSpaces(tk.Toplevel):
     def combo_language_change_selection(self, _):
-        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language.text]))
+        self.listbox_exclusions_var.set(tuple(self.exclusions.get(self.combo_language.text, tuple())))
 
-    def __init__(self, parent, exclusions, *args, **kwargs):
+    def __init__(self, parent, exclusions, languages: list, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.grab_set()
 
@@ -202,7 +202,13 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         self.title("Choose exclusions")
 
-        self.combo_language = ComboboxCustom(self, values=list(self.exclusions))
+        language_list = list(self.exclusions)
+        if any(x in language_list for x in languages):
+            for item in languages:
+                language_list.remove(item)
+        language_list = languages + language_list
+
+        self.combo_language = ComboboxCustom(self, values=language_list)
         self.combo_language.grid()
         self.combo_language.current(0)
         self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
@@ -213,7 +219,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.listbox_exclusions_var = tk.Variable()
         self.listbox_exclusions = tk.Listbox(self, listvariable=self.listbox_exclusions_var)
         self.listbox_exclusions.grid(sticky='NSWE')
-        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language.text]))
+        self.listbox_exclusions_var.set(tuple(self.exclusions.get(self.combo_language.text, tuple())))
 
         self.entry_search = ttk.Entry(self)
         self.entry_search.grid(column=1, row=0)
@@ -286,7 +292,7 @@ class PatchExecutableFrame(tk.Frame):
             pass
     
     def bt_exclusions(self, _):
-        dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'])
+        dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'], [])
         self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
 
     def __init__(self, master=None, app=None):
