@@ -10,7 +10,7 @@ from dfrus.patchdf import codepages
 from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
-from custom_widgets import CheckbuttonVar, EntryCustom
+from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom
 
 
 class DownloadTranslationsFrame(tk.Frame):
@@ -32,9 +32,9 @@ class DownloadTranslationsFrame(tk.Frame):
         return config
     
     def bt_connect(self, _):
-        username = self.entry_username.get()
-        password = self.entry_password.get()  # DO NOT remember password (not safe)
-        project = self.combo_projects.get()
+        username = self.entry_username.text
+        password = self.entry_password.text  # DO NOT remember password (not safe)
+        project = self.combo_projects.text
         try:
             # Todo: make connection in separate thread
             self.tx = TransifexAPI(username, password, 'http://transifex.com')
@@ -46,7 +46,7 @@ class DownloadTranslationsFrame(tk.Frame):
         except:
             messagebox.showerror('Unexpected error', repr(sys.exc_info()[0]))
         else:
-            self.combo_languages['values'] = tuple(languages)
+            self.combo_languages.values = tuple(languages)
             last_language = self.config['language']
             self.combo_languages.current(languages.index(last_language) if last_language in languages else 0)
             
@@ -60,7 +60,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 if project in recent_projects:
                     recent_projects.remove(project)
                 recent_projects.insert(0, project)
-            self.combo_projects['values'] = tuple(recent_projects)
+            self.combo_projects.values = tuple(recent_projects)
     
     def bt_download(self, _):
         if self.tx and self.resources:
@@ -132,7 +132,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         tk.Label(self, text='Transifex project:').grid()
 
-        self.combo_projects = ttk.Combobox(self, values=self.config['recent_projects'])
+        self.combo_projects = ComboboxCustom(self, values=self.config['recent_projects'])
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0)
         
@@ -144,7 +144,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         tk.Label(self, text='Password:').grid(column=0, row=2)
         
-        self.entry_password = ttk.Entry(self, show='\u2022')  # 'bullet' symbol
+        self.entry_password = EntryCustom(self, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
         button_connect = ttk.Button(self, text='Connect...')
@@ -155,7 +155,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         tk.Label(self, text='Choose language:').grid(column=0)
         
-        self.combo_languages = ttk.Combobox(self)
+        self.combo_languages = ComboboxCustom(self)
         self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
         
         # self.chk_all_languages = CheckbuttonVar(self, text='All languages (backup)')
@@ -192,7 +192,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
 class DialogDontFixSpaces(tk.Toplevel):
     def combo_language_change_selection(self, _):
-        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language_text.get()]))
+        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language.text]))
 
     def __init__(self, parent, exclusions, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -202,8 +202,7 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         self.title("Choose exclusions")
 
-        self.combo_language_text = tk.StringVar()
-        self.combo_language = ttk.Combobox(self, values=list(self.exclusions), textvariable=self.combo_language_text)
+        self.combo_language = ComboboxCustom(self, values=list(self.exclusions))
         self.combo_language.grid()
         self.combo_language.current(0)
         self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
@@ -214,7 +213,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.listbox_exclusions_var = tk.Variable()
         self.listbox_exclusions = tk.Listbox(self, listvariable=self.listbox_exclusions_var)
         self.listbox_exclusions.grid(sticky='NSWE')
-        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language_text.get()]))
+        self.listbox_exclusions_var.set(tuple(self.exclusions[self.combo_language.text]))
 
         self.entry_search = ttk.Entry(self)
         self.entry_search.grid(column=1, row=0)
@@ -325,10 +324,10 @@ class PatchExecutableFrame(tk.Frame):
         
         tk.Label(self, text='Encoding:').grid()
         
-        self.combo_encoding = ttk.Combobox(self)
+        self.combo_encoding = ComboboxCustom(self)
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
         
-        self.combo_encoding['values'] = tuple(sorted(codepages.keys(),
+        self.combo_encoding.values = tuple(sorted(codepages.keys(),
                                                      key=lambda x: int(x.strip(string.ascii_letters))))
         self.combo_encoding.current(0)
         
