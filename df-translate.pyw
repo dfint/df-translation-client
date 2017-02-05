@@ -322,7 +322,7 @@ class PatchExecutableFrame(tk.Frame):
         self.entry_translation_file.text = self.config['df_exe_translation_file'] or ''
         self.entry_translation_file.bind('<KeyPress>',
                                          func=lambda event:
-                                            self.check_and_save_path('df_exe_translation_file', event.widget.text))
+                                             self.check_and_save_path('df_exe_translation_file', event.widget.text))
         
         button_browse_translation = ttk.Button(self, text='Browse...')
         button_browse_translation.grid(column=2, row=1)
@@ -334,7 +334,7 @@ class PatchExecutableFrame(tk.Frame):
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
         
         self.combo_encoding.values = tuple(sorted(codepages.keys(),
-                                                     key=lambda x: int(x.strip(string.ascii_letters))))
+                                                  key=lambda x: int(x.strip(string.ascii_letters))))
         self.combo_encoding.current(0)
         
         self.chk_dont_patch_charmap = CheckbuttonVar(self, text="Don't patch charmap table")
