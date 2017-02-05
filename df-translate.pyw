@@ -215,7 +215,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.listbox_exclusions.grid(sticky='NSWE')
         self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
 
-        self.entry_search = ttk.Entry(self)
+        self.entry_search = EntryCustom(self)
         self.entry_search.grid(column=1, row=0)
 
         bt = ttk.Button(self, text='<< Add selected <<')
