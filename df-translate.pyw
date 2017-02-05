@@ -130,22 +130,19 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.config = self.init_config()
         
-        label = tk.Label(self, text='Transifex project:')
-        label.grid()
+        tk.Label(self, text='Transifex project:').grid()
 
         self.combo_projects = ttk.Combobox(self, values=self.config['recent_projects'])
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0)
         
-        label = tk.Label(self, text='Username:')
-        label.grid(column=0, row=1)
+        tk.Label(self, text='Username:').grid(column=0, row=1)
         
         self.entry_username = EntryCustom(self)
         self.entry_username.set(self.config.get('username', ''))
         self.entry_username.grid(column=1, row=1, sticky=tk.W + tk.E)
         
-        label = tk.Label(self, text='Password:')
-        label.grid(column=0, row=2)
+        tk.Label(self, text='Password:').grid(column=0, row=2)
         
         self.entry_password = ttk.Entry(self, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
@@ -156,8 +153,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
         
-        label = tk.Label(self, text='Choose language:')
-        label.grid(column=0)
+        tk.Label(self, text='Choose language:').grid(column=0)
         
         self.combo_languages = ttk.Combobox(self)
         self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
@@ -167,8 +163,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
         
-        label = tk.Label(self, text='Download to:')
-        label.grid()
+        tk.Label(self, text='Download to:').grid()
         
         self.entry_download_to = EntryCustom(self)
         self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
@@ -185,8 +180,7 @@ class DownloadTranslationsFrame(tk.Frame):
         self.progressbar = ttk.Progressbar(self)
         self.progressbar.grid(column=1, row=7, columnspan=2, sticky=tk.W + tk.E)
         
-        label = tk.Label(self, text='Resources:')
-        label.grid(columnspan=3)
+        tk.Label(self, text='Resources:').grid(columnspan=3)
         
         self.listbox_resources_var = tk.Variable()
         self.listbox_resources = tk.Listbox(self, listvariable=self.listbox_resources_var)
@@ -293,8 +287,7 @@ class PatchExecutableFrame(tk.Frame):
 
         self.config = self.init_config()
         
-        label = tk.Label(self, text='DF executable file:')
-        label.grid()
+        tk.Label(self, text='DF executable file:').grid()
         
         self.entry_executable_file = EntryCustom(self)
         self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
@@ -303,8 +296,7 @@ class PatchExecutableFrame(tk.Frame):
         button_browse_executable.grid(column=2, row=0)
         button_browse_executable.bind('<1>', self.bt_browse_executable)
         
-        label = tk.Label(self, text='DF executable translation file:')
-        label.grid()
+        tk.Label(self, text='DF executable translation file:').grid()
         
         self.entry_translation_file = EntryCustom(self)
         self.entry_translation_file.grid(column=1, row=1, sticky=tk.E + tk.W)
@@ -313,8 +305,7 @@ class PatchExecutableFrame(tk.Frame):
         button_browse_translation.grid(column=2, row=1)
         button_browse_translation.bind('<1>', self.bt_browse_translation)
         
-        label = tk.Label(self, text='Encoding:')
-        label.grid()
+        tk.Label(self, text='Encoding:').grid()
         
         self.combo_encoding = ttk.Combobox(self)
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
