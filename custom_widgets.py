@@ -56,3 +56,20 @@ class ComboboxCustom(ttk.Combobox):
     @values.setter
     def values(self, values: tuple):
         self['values'] = values
+
+
+class ListboxCustom(tk.Listbox):
+    def __init__(self, *args, **kwargs):
+        self._var = tk.Variable()
+        super().__init__(*args, listvariable=self._var, **kwargs)
+
+    @property
+    def values(self):
+        return self._var.get()
+
+    @values.setter
+    def values(self, values: tuple):
+        self._var.set(values)
+
+    def clear(self):
+        self.delete(0, tk.END)
