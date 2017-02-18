@@ -70,6 +70,10 @@ class DownloadTranslationsFrame(tk.Frame):
             else:
                 self.config['download_to'] = download_dir
             
+            if not path.exists(download_dir):
+                messagebox.showerror('Directory does not exist', 'Specify existing directory first')
+                return
+            
             project = self.combo_projects.get()
             language = self.combo_languages.get()
             
