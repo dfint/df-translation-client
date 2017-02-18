@@ -1,4 +1,4 @@
--e git+https://github.com/insolor/python-transifex#egg=python-transifex
+https://github.com/insolor/python-transifex/archive/master.zip#egg=python-transifex
 https://bitbucket.org/dfint/dfrus-py/get/package.zip#egg=dfrus
 https://bitbucket.org/dfint/df-gettext-toolkit/get/default.zip#egg=df-gettext-toolkit
--e git+https://github.com/insolor/df_raw_decoder#egg=df-raw-decoder
+https://github.com/insolor/df_raw_decoder/archive/master.zip#egg=df-raw-decoder
