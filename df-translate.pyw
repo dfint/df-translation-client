@@ -5,6 +5,7 @@ import tkinter.ttk as ttk
 import string
 import subprocess
 import json
+import re
 
 from dfrus.patchdf import codepages
 from os import path
@@ -190,10 +191,15 @@ class DownloadTranslationsFrame(tk.Frame):
         self.tx = None
 
 
+def show_spaces(s):
+    parts = re.search(r'^(\s*)(.*?)(\s*)$', s)
+    return '\u2022' * len(parts.group(1)) + parts.group(2) + '\u2022' * len(parts.group(3))
+
+
 class DialogDontFixSpaces(tk.Toplevel):
     def update_listbox_exclusions(self):
         exclusions = self.exclusions.get(self.combo_language.text, tuple())
-        self.listbox_exclusions.values = tuple(item.replace(' ', '\u00b7') for item in exclusions)
+        self.listbox_exclusions.values = tuple(show_spaces(item) for item in exclusions)
 
     def combo_language_change_selection(self, _):
         self.update_listbox_exclusions()
@@ -201,7 +207,7 @@ class DialogDontFixSpaces(tk.Toplevel):
 
     def update_listbox_exclusions_hints(self):
         text = self.entry_search.text
-        values = ((key.replace(' ', '\u00b7') for key in self.strings if text.lower() in key.lower())
+        values = ((show_spaces(key) for key in self.strings if text.lower() in key.lower())
                   if self.language == self.combo_language.text else tuple())
         self.listbox_exclusions_hints.values = tuple(values)
 
