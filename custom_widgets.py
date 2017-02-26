@@ -59,14 +59,14 @@ class ComboboxCustom(ttk.Combobox):
 
 
 class ListboxCustom(tk.Frame):
-    def __init__(self, parent, width=None, height=None, *args, **kwargs):
-        super().__init__(parent, *args, **kwargs)
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent)
 
         scrollbar = ttk.Scrollbar(self)
         scrollbar.pack(side='right', fill='y')
 
         self._var = tk.Variable()
-        self._listbox = tk.Listbox(self, width=width, height=height, listvariable=self._var)
+        self._listbox = tk.Listbox(self, *args, listvariable=self._var, **kwargs)
         self._listbox.pack(fill='both', expand=1)
 
         scrollbar['command'] = self._listbox.yview
@@ -82,3 +82,6 @@ class ListboxCustom(tk.Frame):
 
     def clear(self):
         self._listbox.delete(0, tk.END)
+
+    def curselection(self):
+        return self._listbox.curselection()
