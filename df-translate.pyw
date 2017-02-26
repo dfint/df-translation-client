@@ -14,6 +14,7 @@ from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxC
 from collections import defaultdict
 from df_gettext_toolkit import po
 
+
 class DownloadTranslationsFrame(tk.Frame):
     def init_config(self):
         config = self.app.config
