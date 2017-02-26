@@ -189,6 +189,7 @@ class DownloadTranslationsFrame(tk.Frame):
         self.resources = None
         self.tx = None
 
+
 class DialogDontFixSpaces(tk.Toplevel):
     def update_listbox_exclusions(self):
         exclusions = self.exclusions.get(self.combo_language.text, tuple())
