@@ -131,12 +131,14 @@ class DownloadTranslationsFrame(tk.Frame):
         self.app = app
         
         self.config = self.init_config()
-        
+
+        self.grid_columnconfigure(1, weight=1)
+
         tk.Label(self, text='Transifex project:').grid()
 
         self.combo_projects = ComboboxCustom(self, values=self.config['recent_projects'])
         self.combo_projects.current(0)
-        self.combo_projects.grid(column=1, row=0)
+        self.combo_projects.grid(column=1, row=0, sticky=tk.W + tk.E)
         
         tk.Label(self, text='Username:').grid(column=0, row=1)
         
@@ -186,7 +188,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
         self.listbox_resources = ListboxCustom(self)
         self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W + tk.N + tk.S)
-        
+
         self.resources = None
         self.tx = None
 
