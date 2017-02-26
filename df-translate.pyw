@@ -293,7 +293,8 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.grid_rowconfigure(2, weight=1)
 
 
-def cleanup_dictionary(d: iter, exclusions: set):
+def cleanup_dictionary(d: iter, exclusions: iter):
+    exclusions = set(exclusions)
     for original_string, translation in d:
         if original_string and translation and original_string != translation and original_string not in exclusions:
             if original_string[0] == ' ' and translation[0] not in {' ', ','}:
