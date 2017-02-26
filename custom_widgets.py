@@ -76,6 +76,7 @@ class ListboxCustom(tk.Frame):
         xscrollbar['command'] = self._listbox.xview
 
         self.grid_columnconfigure(0, weight=1)  # the same effect as expand=1 for pack
+        self.grid_rowconfigure(0, weight=1)  # the same effect as expand=1 for pack
         self._listbox.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         xscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
