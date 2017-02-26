@@ -198,8 +198,9 @@ def show_spaces(s):
 
 class DialogDontFixSpaces(tk.Toplevel):
     def update_listbox_exclusions(self):
-        exclusions = self.exclusions.get(self.combo_language.text, tuple())
-        self.listbox_exclusions.values = tuple(show_spaces(item) for item in exclusions)
+        exclusions = self.exclusions.get(self.combo_language.text, list())
+        self.listbox_exclusions.values = tuple(sorted(show_spaces(item) for item in exclusions))
+        self.restore_strings.update({show_spaces(s): s for s in exclusions})
 
     def combo_language_change_selection(self, _):
         self.update_listbox_exclusions()
@@ -213,6 +214,20 @@ class DialogDontFixSpaces(tk.Toplevel):
 
     def entry_search_key_up(self, _):
         self.update_listbox_exclusions_hints()
+
+    def bt_remove_selected(self, _):
+        index = self.listbox_exclusions.curselection()
+        if index:
+            item = self.restore_strings[self.listbox_exclusions.values[index[0]]]
+            self.exclusions[self.combo_language.text].remove(item)
+            self.update_listbox_exclusions()
+
+    def bt_add_selected(self, _):
+        index = self.listbox_exclusions_hints.curselection()
+        if index:
+            item = self.restore_strings[self.listbox_exclusions_hints.values[index[0]]]
+            self.exclusions[self.combo_language.text].append(item)
+            self.update_listbox_exclusions()
 
     def __init__(self, parent, exclusions: dict, language: str, dictionary: dict, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -231,14 +246,17 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.dictionary = dictionary
         self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
+        self.restore_strings = {show_spaces(s): s for s in self.strings}
 
         self.combo_language = ComboboxCustom(self, values=language_list)
         self.combo_language.grid()
         self.combo_language.current(0)
         self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
+        self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
 
         bt = ttk.Button(self, text='-- Remove selected --')
         bt.grid(column=0, row=1, sticky=tk.N)
+        bt.bind('<1>', self.bt_remove_selected)
 
         self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions.grid(sticky='NSWE')
@@ -250,6 +268,7 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         bt = ttk.Button(self, text='<< Add selected <<')
         bt.grid(column=1, row=1, sticky=tk.N)
+        bt.bind('<1>', self.bt_add_selected)
 
         self.listbox_exclusions_hints = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions_hints.grid(column=1, row=2, sticky=tk.N + tk.S)
@@ -258,7 +277,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         button = ttk.Button(self, text="OK", command=self.destroy)
         button.grid(row=3, column=0)
 
-        def cancel(_):
+        def cancel():
             self.exclusions = None
             self.destroy()
 
