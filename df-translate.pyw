@@ -194,9 +194,12 @@ class DialogDontFixSpaces(tk.Toplevel):
     def combo_language_change_selection(self, _):
         self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
 
-    def entry_search_key_up(self, _):
+    def update_listbox_exclusions_hints(self):
         text = self.entry_search.text
         self.listbox_exclusions_hints.values = tuple(key for key in self.strings if text.lower() in key.lower())
+
+    def entry_search_key_up(self, _):
+        self.update_listbox_exclusions_hints()
 
     def __init__(self, parent, exclusions: dict, language: str, dictionary: dict, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -212,7 +215,8 @@ class DialogDontFixSpaces(tk.Toplevel):
         language_list = [language] + language_list
 
         self.dictionary = dictionary
-        self.strings = sorted(dictionary.keys())
+        self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
+                              key=lambda x: x.lower().strip())
 
         self.combo_language = ComboboxCustom(self, values=language_list)
         self.combo_language.grid()
@@ -222,7 +226,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         bt = ttk.Button(self, text='-- Remove selected --')
         bt.grid(column=0, row=1, sticky=tk.N)
 
-        self.listbox_exclusions = ListboxCustom(self)
+        self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions.grid(sticky='NSWE')
         self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
 
@@ -233,8 +237,9 @@ class DialogDontFixSpaces(tk.Toplevel):
         bt = ttk.Button(self, text='<< Add selected <<')
         bt.grid(column=1, row=1, sticky=tk.N)
 
-        self.listbox_exclusions_hints = ListboxCustom(self)
+        self.listbox_exclusions_hints = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions_hints.grid(column=1, row=2, sticky=tk.N + tk.S)
+        self.update_listbox_exclusions_hints()
 
         button = ttk.Button(self, text="OK", command=self.destroy)
         button.grid(row=3, column=0)
