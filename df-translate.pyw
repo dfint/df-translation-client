@@ -238,12 +238,13 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.title("Choose exclusions")
 
         language_list = list(self.exclusions)
-        if language in language_list:
-            language_list.remove(language)
-        language_list = [language] + language_list
+        if language:
+            if language in language_list:
+                language_list.remove(language)
+            language_list = [language] + language_list
         self.language = language
 
-        self.dictionary = dictionary
+        self.dictionary = dictionary or dict()
         self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
         self.restore_strings = {show_spaces(s): s for s in self.strings}
