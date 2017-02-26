@@ -189,14 +189,17 @@ class DownloadTranslationsFrame(tk.Frame):
         self.resources = None
         self.tx = None
 
-
 class DialogDontFixSpaces(tk.Toplevel):
+    def update_listbox_exclusions(self):
+        exclusions = self.exclusions.get(self.combo_language.text, tuple())
+        self.listbox_exclusions.values = tuple(item.replace(' ', '\u00b7') for item in exclusions)
+
     def combo_language_change_selection(self, _):
-        self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
+        self.update_listbox_exclusions()
 
     def update_listbox_exclusions_hints(self):
         text = self.entry_search.text
-        self.listbox_exclusions_hints.values = tuple(key for key in self.strings if text.lower() in key.lower())
+        self.listbox_exclusions_hints.values = tuple(key.replace(' ', '\u00b7') for key in self.strings if text.lower() in key.lower())
 
     def entry_search_key_up(self, _):
         self.update_listbox_exclusions_hints()
@@ -228,7 +231,7 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions.grid(sticky='NSWE')
-        self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
+        self.update_listbox_exclusions()
 
         self.entry_search = EntryCustom(self)
         self.entry_search.grid(column=1, row=0)
