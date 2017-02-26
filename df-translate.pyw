@@ -185,7 +185,7 @@ class DownloadTranslationsFrame(tk.Frame):
         tk.Label(self, text='Resources:').grid(columnspan=3)
 
         self.listbox_resources = ListboxCustom(self)
-        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W)
+        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W + tk.N + tk.S)
         
         self.resources = None
         self.tx = None
