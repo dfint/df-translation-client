@@ -62,15 +62,22 @@ class ListboxCustom(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent)
 
-        scrollbar = ttk.Scrollbar(self)
-        scrollbar.pack(side='right', fill='y')
+        yscrollbar = ttk.Scrollbar(self)
+        xscrollbar = ttk.Scrollbar(self, orient=tk.HORIZONTAL)
 
         self._var = tk.Variable()
-        self._listbox = tk.Listbox(self, *args, listvariable=self._var, **kwargs)
-        self._listbox.pack(fill='both', expand=1)
+        self._listbox = tk.Listbox(self, *args,
+                                   listvariable=self._var,
+                                   xscrollcommand=xscrollbar.set,
+                                   yscrollcommand=yscrollbar.set,
+                                   **kwargs)
 
-        scrollbar['command'] = self._listbox.yview
-        self._listbox['yscrollcommand'] = scrollbar.set
+        yscrollbar['command'] = self._listbox.yview
+        xscrollbar['command'] = self._listbox.xview
+
+        xscrollbar.pack(side='bottom', fill='x')
+        yscrollbar.pack(side='right', fill='y')
+        self._listbox.pack(fill='both', expand=1)
 
     @property
     def values(self):
