@@ -250,13 +250,13 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.restore_strings = {show_spaces(s): s for s in self.strings}
 
         self.combo_language = ComboboxCustom(self, values=language_list)
-        self.combo_language.grid()
+        self.combo_language.grid(sticky=tk.W+tk.E)
         self.combo_language.current(0)
         self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
         self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
 
         bt = ttk.Button(self, text='-- Remove selected --')
-        bt.grid(column=0, row=1, sticky=tk.N)
+        bt.grid(column=0, row=1, sticky=tk.W+tk.E)
         bt.bind('<1>', self.bt_remove_selected)
 
         self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
@@ -264,11 +264,11 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.update_listbox_exclusions()
 
         self.entry_search = EntryCustom(self)
-        self.entry_search.grid(column=1, row=0)
+        self.entry_search.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_up)
 
         bt = ttk.Button(self, text='<< Add selected <<')
-        bt.grid(column=1, row=1, sticky=tk.N)
+        bt.grid(column=1, row=1, sticky=tk.W+tk.E)
         bt.bind('<1>', self.bt_add_selected)
 
         self.listbox_exclusions_hints = ListboxCustom(self, width=40, height=20)
