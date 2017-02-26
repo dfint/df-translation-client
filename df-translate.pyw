@@ -12,7 +12,7 @@ from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom
 from collections import defaultdict
-
+from df_gettext_toolkit import po
 
 class DownloadTranslationsFrame(tk.Frame):
     def init_config(self):
@@ -193,7 +193,11 @@ class DialogDontFixSpaces(tk.Toplevel):
     def combo_language_change_selection(self, _):
         self.listbox_exclusions.values = tuple(self.exclusions.get(self.combo_language.text, tuple()))
 
-    def __init__(self, parent, exclusions: dict, languages: list, *args, **kwargs):
+    def entry_search_key_up(self, _):
+        text = self.entry_search.text
+        self.listbox_exclusions_hints.values = tuple(key for key in self.strings if text.lower() in key.lower())
+
+    def __init__(self, parent, exclusions: dict, language: str, dictionary: dict, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.grab_set()
 
@@ -202,10 +206,12 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.title("Choose exclusions")
 
         language_list = list(self.exclusions)
-        if any(x in language_list for x in languages):
-            for item in languages:
-                language_list.remove(item)
-        language_list = languages + language_list
+        if language in language_list:
+            language_list.remove(language)
+        language_list = [language] + language_list
+
+        self.dictionary = dictionary
+        self.strings = sorted(dictionary.keys())
 
         self.combo_language = ComboboxCustom(self, values=language_list)
         self.combo_language.grid()
@@ -221,6 +227,7 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         self.entry_search = EntryCustom(self)
         self.entry_search.grid(column=1, row=0)
+        self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_up)
 
         bt = ttk.Button(self, text='<< Add selected <<')
         bt.grid(column=1, row=1, sticky=tk.N)
@@ -285,7 +292,19 @@ class PatchExecutableFrame(tk.Frame):
             pass
     
     def bt_exclusions(self, _):
-        dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'], [])
+        translation_file = self.entry_translation_file.text
+        language = None
+        dictionary = None
+        if translation_file and path.exists(translation_file):
+            with open(translation_file, 'r', encoding='utf-8') as fn:
+                pofile = po.load_po(fn)
+                first_entry = next(pofile)
+                assert first_entry['msgid'] == ''
+                meta = po.get_metadata(first_entry)
+                language = meta['Language']
+                dictionary = {entry['msgid']: entry['msgstr'] for entry in pofile}
+
+        dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'], language, dictionary)
         self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
 
     def __init__(self, master=None, app=None):
