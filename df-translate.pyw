@@ -12,7 +12,7 @@ from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from df_gettext_toolkit import po
 
 
@@ -293,6 +293,20 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.grid_rowconfigure(2, weight=1)
 
 
+def cleanup_dictionary(d: iter, exclusions: set):
+    for original_string, translation in d:
+        if original_string and translation and original_string != translation and original_string not in exclusions:
+            if original_string[0] == ' ' and translation[0] not in {' ', ','}:
+                translation = ' ' + translation
+
+            if original_string[-1] == ' ' and translation[-1] != ' ':
+                translation += ' '
+
+            translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"'})
+
+            yield original_string, translation
+
+
 class PatchExecutableFrame(tk.Frame):
     def init_config(self):
         config = self.app.config
@@ -304,6 +318,8 @@ class PatchExecutableFrame(tk.Frame):
 
         if 'fix_space_exclusions' not in config:
             config['fix_space_exclusions'] = dict(ru=['Histories of '])
+
+        self.exclusions = config['fix_space_exclusions']
 
         return config
 
@@ -331,12 +347,21 @@ class PatchExecutableFrame(tk.Frame):
         executable_file = self.entry_executable_file.text
         translation_file = self.entry_translation_file.text
         
-        if not executable_file:
-            messagebox.showerror('Error', 'Executable file path must be specified')
-        elif not translation_file:
-            messagebox.showerror('Error', 'Translation file path must be specified')
+        if not executable_file or not path.exists(executable_file):
+            messagebox.showerror('Error', 'Valid path to an executable file must be specified')
+        elif not translation_file or not path.exists(translation_file):
+            messagebox.showerror('Error', 'Valid path to a translation file must be specified')
         else:
-            pass
+            with open(translation_file, 'r', encoding='utf-8') as fn:
+                pofile = po.load_po(fn)
+                meta = po.get_metadata(next(pofile))
+                dictionary = OrderedDict(
+                    cleanup_dictionary(((entry['msgid'], entry['msgstr']) for entry in pofile),
+                                       self.exclusions[meta['Language']])
+                )
+
+
+
     
     def bt_exclusions(self, _):
         translation_file = self.entry_translation_file.text
@@ -353,6 +378,7 @@ class PatchExecutableFrame(tk.Frame):
 
         dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'], language, dictionary)
         self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
+        self.exclusions = self.config['fix_space_exclusions']
 
     def __init__(self, master=None, app=None):
         super().__init__(master)
@@ -419,6 +445,8 @@ class PatchExecutableFrame(tk.Frame):
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(6, weight=1)
+
+        self.exclusions = None
 
 
 class App(tk.Tk):
