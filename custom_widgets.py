@@ -75,9 +75,10 @@ class ListboxCustom(tk.Frame):
         yscrollbar['command'] = self._listbox.yview
         xscrollbar['command'] = self._listbox.xview
 
-        xscrollbar.pack(side='bottom', fill='x')
-        yscrollbar.pack(side='right', fill='y')
-        self._listbox.pack(fill='both', expand=1)
+        self.grid_columnconfigure(0, weight=1)  # the same effect as expand=1 for pack
+        self._listbox.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+        yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
+        xscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
 
     @property
     def values(self):
