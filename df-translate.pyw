@@ -196,10 +196,13 @@ class DialogDontFixSpaces(tk.Toplevel):
 
     def combo_language_change_selection(self, _):
         self.update_listbox_exclusions()
+        self.update_listbox_exclusions_hints()
 
     def update_listbox_exclusions_hints(self):
         text = self.entry_search.text
-        self.listbox_exclusions_hints.values = tuple(key.replace(' ', '\u00b7') for key in self.strings if text.lower() in key.lower())
+        values = ((key.replace(' ', '\u00b7') for key in self.strings if text.lower() in key.lower())
+                  if self.language == self.combo_language.text else tuple())
+        self.listbox_exclusions_hints.values = tuple(values)
 
     def entry_search_key_up(self, _):
         self.update_listbox_exclusions_hints()
@@ -216,6 +219,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         if language in language_list:
             language_list.remove(language)
         language_list = [language] + language_list
+        self.language = language
 
         self.dictionary = dictionary
         self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
