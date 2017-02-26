@@ -132,8 +132,6 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.config = self.init_config()
 
-        self.grid_columnconfigure(1, weight=1)
-
         tk.Label(self, text='Transifex project:').grid()
 
         self.combo_projects = ComboboxCustom(self, values=self.config['recent_projects'])
@@ -188,6 +186,9 @@ class DownloadTranslationsFrame(tk.Frame):
 
         self.listbox_resources = ListboxCustom(self)
         self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W + tk.N + tk.S)
+
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(9, weight=1)
 
         self.resources = None
         self.tx = None
@@ -274,7 +275,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         bt.bind('<1>', self.bt_add_selected)
 
         self.listbox_exclusions_hints = ListboxCustom(self, width=40, height=20)
-        self.listbox_exclusions_hints.grid(column=1, row=2, sticky=tk.N + tk.S)
+        self.listbox_exclusions_hints.grid(column=1, row=2, sticky='NSWE')
         self.update_listbox_exclusions_hints()
 
         button = ttk.Button(self, text="OK", command=self.destroy)
@@ -286,6 +287,10 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         button = ttk.Button(self, text="Cancel", command=cancel)
         button.grid(row=3, column=1)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
 
 
 class PatchExecutableFrame(tk.Frame):
@@ -410,7 +415,10 @@ class PatchExecutableFrame(tk.Frame):
         button_patch.bind('<1>', self.bt_patch)
         
         log_field = tk.Text(self, width=48, height=16)
-        log_field.grid(columnspan=3, sticky=tk.W + tk.E)
+        log_field.grid(columnspan=3, sticky='NSWE')
+
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(6, weight=1)
 
 
 class App(tk.Tk):
