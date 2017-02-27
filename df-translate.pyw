@@ -8,6 +8,7 @@ import json
 import re
 
 from dfrus.patchdf import codepages
+from dfrus import dfrus
 from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
@@ -361,7 +362,7 @@ class PatchExecutableFrame(tk.Frame):
                                        self.exclusions[meta['Language']])
                 )
 
-
+            dfrus.run(executable_file, '', dictionary, None, self.combo_encoding.text)
 
     
     def bt_exclusions(self, _):
