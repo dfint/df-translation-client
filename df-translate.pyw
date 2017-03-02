@@ -387,6 +387,8 @@ class PatchExecutableFrame(tk.Frame):
         
         self.app = app
 
+        self.exclusions = None
+        
         self.config = self.init_config()
         
         tk.Label(self, text='DF executable file:').grid()
@@ -447,8 +449,6 @@ class PatchExecutableFrame(tk.Frame):
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(6, weight=1)
-
-        self.exclusions = None
 
 
 class App(tk.Tk):
