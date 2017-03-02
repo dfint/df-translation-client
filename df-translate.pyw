@@ -12,7 +12,7 @@ from dfrus import dfrus
 from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
-from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom
+from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom, CustomText
 from collections import defaultdict, OrderedDict
 from df_gettext_toolkit import po
 
@@ -442,7 +442,7 @@ class PatchExecutableFrame(tk.Frame):
         button_patch.grid(row=5, column=2)
         button_patch.bind('<1>', self.bt_patch)
         
-        log_field = tk.Text(self, width=48, height=16)
+        log_field = CustomText(self, width=48, height=16, enabled=False)
         log_field.grid(columnspan=3, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)

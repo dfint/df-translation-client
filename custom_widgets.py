@@ -94,3 +94,50 @@ class ListboxCustom(tk.Frame):
 
     def curselection(self):
         return self._listbox.curselection()
+
+
+class CustomText(tk.Frame):
+    def scrollbar_switcher(self, scrollbar, first, last):
+        scrollbar.set(first, last)
+        if first == '0.0' and last == '1.0':
+            scrollbar.grid_remove()
+            scrollbar.visible = False
+        elif not scrollbar.visible:
+            scrollbar.grid()
+            scrollbar.visible = True
+    
+    def __init__(self, parent, *args, enabled=True, **kwargs):
+        super().__init__(parent)
+
+        yscrollbar = ttk.Scrollbar(self)
+        xscrollbar = ttk.Scrollbar(self, orient=tk.HORIZONTAL)
+
+        self.enabled = enabled
+        self._text = tk.Text(self, *args,
+                                xscrollcommand=lambda first, last: self.scrollbar_switcher(xscrollbar, first, last),
+                                yscrollcommand=lambda first, last: self.scrollbar_switcher(yscrollbar, first, last),
+                                state=tk.NORMAL if enabled else tk.DISABLED,
+                                **kwargs)
+
+        yscrollbar['command'] = self._text.yview
+        xscrollbar['command'] = self._text.xview
+
+        self.grid_columnconfigure(0, weight=1)  # the same effect as expand=1 for pack
+        self.grid_rowconfigure(0, weight=1)  # the same effect as expand=1 for pack
+        self._text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+        yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
+        xscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
+        yscrollbar.visible = True
+        xscrollbar.visible = False
+    
+    def write(self, s):
+        self._text.configure(state=tk.NORMAL)
+        self._text.insert(END, s)
+        if not self.enabled:
+            self._text.configure(state=tk.DISABLED)
+
+    def clear(self):
+        self._text.configure(state=tk.NORMAL)
+        self._text.delete(0.0, END)
+        if not self.enabled:
+            self._text.configure(state=tk.DISABLED)
