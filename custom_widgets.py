@@ -132,12 +132,17 @@ class CustomText(tk.Frame):
     
     def write(self, s):
         self._text.configure(state=tk.NORMAL)
-        self._text.insert(END, s)
+        self._text.insert(tk.END, s)
         if not self.enabled:
             self._text.configure(state=tk.DISABLED)
+        self.update()
 
     def clear(self):
         self._text.configure(state=tk.NORMAL)
-        self._text.delete(0.0, END)
+        self._text.delete(0.0, tk.END)
         if not self.enabled:
             self._text.configure(state=tk.DISABLED)
+        self.update()
+    
+    def flush(self):
+        self.update()

@@ -361,8 +361,12 @@ class PatchExecutableFrame(tk.Frame):
                     cleanup_dictionary(((entry['msgid'], entry['msgstr']) for entry in pofile),
                                        self.exclusions[meta['Language']])
                 )
-
+            
+            self.log_field.clear()
+            real_stdout = sys.stdout
+            sys.stdout = self.log_field
             dfrus.run(executable_file, '', dictionary, None, self.combo_encoding.text)
+            sys.stdout = real_stdout
 
     
     def bt_exclusions(self, _):
@@ -444,8 +448,8 @@ class PatchExecutableFrame(tk.Frame):
         button_patch.grid(row=5, column=2)
         button_patch.bind('<1>', self.bt_patch)
         
-        log_field = CustomText(self, width=48, height=16, enabled=False)
-        log_field.grid(columnspan=3, sticky='NSWE')
+        self.log_field = CustomText(self, width=48, height=16, enabled=False)
+        self.log_field.grid(columnspan=3, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(6, weight=1)
