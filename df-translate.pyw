@@ -414,6 +414,16 @@ class PatchExecutableFrame(tk.Frame):
         self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
         self.exclusions = self.config['fix_space_exclusions']
 
+    def setup_checkbutton(self, text, config_key, default_state):
+        config = self.config
+        def save_checkbox_state(event, option_name):
+            config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
+        
+        check = CheckbuttonVar(self, text=text)
+        check.bind('<1>', lambda event: save_checkbox_state(event, config_key))
+        check.is_checked = config[config_key] = config.get(config_key, default_state)
+        return check
+
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -467,27 +477,29 @@ class PatchExecutableFrame(tk.Frame):
         
         self.combo_encoding.bind('<<ComboboxSelected>>', func=save_encoding_into_config)
         
-        def save_checkbox_state(event, option_name):
-            config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
+        self.chk_dont_patch_charmap = self.setup_checkbutton(
+            text="Don't patch charmap table",
+            config_key='dont_patch_charmap',
+            default_state=False)
         
-        self.chk_dont_patch_charmap = CheckbuttonVar(self, text="Don't patch charmap table")
         self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
-        self.chk_dont_patch_charmap.bind('<1>', lambda event: save_checkbox_state(event, 'dont_patch_charmap'))
-        self.chk_dont_patch_charmap.is_checked = config['dont_patch_charmap'] = config.get('dont_patch_charmap', False)
         
-        self.chk_add_leading_trailing_spaces = CheckbuttonVar(self, text='Add necessary leading/trailing spaces')
+        self.chk_add_leading_trailing_spaces = self.setup_checkbutton(
+            text='Add necessary leading/trailing spaces',
+            config_key='add_leading_trailing_spaces',
+            default_state=True)
+        
         self.chk_add_leading_trailing_spaces.grid(columnspan=2, sticky=tk.W)
-        self.chk_add_leading_trailing_spaces.bind('<1>', lambda event: save_checkbox_state(event, 'add_leading_trailing_spaces'))
-        config['add_leading_trailing_spaces'] = config.get('add_leading_trailing_spaces', True)
-        self.chk_add_leading_trailing_spaces.is_checked = config['add_leading_trailing_spaces']
         
         button_exclusions = ttk.Button(self, text='Exclusions...', command=self.bt_exclusions)
         button_exclusions.grid(row=4, column=2)
 
-        self.chk_debug_output = CheckbuttonVar(self, text='Enable debugging output')
+        self.chk_debug_output = self.setup_checkbutton(
+            text='Enable debugging output',
+            config_key='debug_output',
+            default_state=False)
+        
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
-        self.chk_debug_output.bind('<1>', lambda event: save_checkbox_state(event, 'debug_output'))
-        self.chk_debug_output.is_checked = config['debug_output'] = config.get('debug_output', False)
         
         button_patch = ttk.Button(self, text='Patch!', command=self.bt_patch)
         button_patch.grid(row=5, column=2)
