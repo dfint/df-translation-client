@@ -19,9 +19,7 @@ from df_gettext_toolkit import po
 
 
 class DownloadTranslationsFrame(tk.Frame):
-    def init_config(self):
-        config = self.app.config
-        
+    def init_config(self, config):
         if 'download_translations' not in config:
             config['download_translations'] = defaultdict(lambda: None)
         
@@ -132,7 +130,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.app = app
         
-        self.config = self.init_config()
+        self.config = self.init_config(self.app.config)
 
         tk.Label(self, text='Transifex project:').grid()
 
@@ -325,9 +323,7 @@ class ConnectionWrapper:
 
 
 class PatchExecutableFrame(tk.Frame):
-    def init_config(self):
-        config = self.app.config
-
+    def init_config(self, config):
         if 'patch_executable' not in config:
             config['patch_executable'] = defaultdict(lambda: None)
 
@@ -335,8 +331,6 @@ class PatchExecutableFrame(tk.Frame):
 
         if 'fix_space_exclusions' not in config:
             config['fix_space_exclusions'] = dict(ru=['Histories of '])
-
-        self.exclusions = config['fix_space_exclusions']
 
         return config
 
@@ -427,10 +421,9 @@ class PatchExecutableFrame(tk.Frame):
         super().__init__(master)
         
         self.app = app
-
-        self.exclusions = None
         
-        self.config = self.init_config()
+        self.config = self.init_config(self.app.config)
+        self.exclusions = self.config['fix_space_exclusions']
         
         self.dfrus_process = None
         
