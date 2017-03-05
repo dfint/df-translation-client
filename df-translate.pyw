@@ -9,6 +9,7 @@ import re
 
 from dfrus.patchdf import codepages
 from dfrus import dfrus
+from multiprocessing import Process, Pipe
 from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
@@ -309,6 +310,17 @@ def cleanup_dictionary(d: iter, exclusions: iter):
             yield original_string, translation
 
 
+class ConnectionWrapper:
+    def __init__(self, connection):
+        self._connection = connection
+    
+    def write(self, s):
+        self._connection.send(s)
+    
+    def flush(self):
+        pass  # stub method
+
+
 class PatchExecutableFrame(tk.Frame):
     def init_config(self):
         config = self.app.config
@@ -345,6 +357,15 @@ class PatchExecutableFrame(tk.Frame):
         if path.exists(file_path):
             self.config[key] = file_path
 
+    def update_log(self, connection):
+        try:
+            if connection.poll():
+                self.log_field.write(connection.recv())
+            
+            self.after(100, self.update_log, connection)
+        except (EOFError, BrokenPipeError):
+            pass
+    
     def bt_patch(self, _):
         executable_file = self.entry_executable_file.text
         translation_file = self.entry_translation_file.text
@@ -362,12 +383,13 @@ class PatchExecutableFrame(tk.Frame):
                                        self.exclusions[meta['Language']])
                 )
             
+            parent_conn, child_conn = Pipe()
+            self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
-            real_stdout = sys.stdout
-            sys.stdout = self.log_field
-            dfrus.run(executable_file, '', dictionary, None, self.combo_encoding.text)
-            sys.stdout = real_stdout
-
+            dfrus_process = Process(target=dfrus.run,
+                                    args=(executable_file, '', dictionary, None, self.combo_encoding.text),
+                                    kwargs=dict(stdout=ConnectionWrapper(child_conn)))
+            dfrus_process.start()
     
     def bt_exclusions(self, _):
         translation_file = self.entry_translation_file.text
@@ -500,4 +522,5 @@ class App(tk.Tk):
         # f1 = tk.Frame(notebook)
         # notebook.add(f1, text='Translate packed files')
 
-App().mainloop()
+if __name__ == '__main__':
+    App().mainloop()
