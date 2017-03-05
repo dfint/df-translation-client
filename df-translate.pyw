@@ -362,12 +362,15 @@ class PatchExecutableFrame(tk.Frame):
 
     def update_log(self, connection):
         try:
-            if connection.poll():
+            while connection.poll():
                 self.log_field.write(connection.recv())
             
-            self.after(100, self.update_log, connection)
+            if not self.dfrus_process.is_alive():
+                self.log_field.write('\n[PROCESS FINISHED]')
+            else:
+                self.after(100, self.update_log, connection)
         except (EOFError, BrokenPipeError):
-            pass
+            self.log_field.write('\n[PIPE BROKEN]')
     
     def bt_patch(self, _):
         executable_file = self.entry_executable_file.text
@@ -389,7 +392,7 @@ class PatchExecutableFrame(tk.Frame):
             parent_conn, child_conn = Pipe()
             self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
-            dfrus_process = Process(target=dfrus.run,
+            self.dfrus_process = Process(target=dfrus.run,
                                     kwargs=dict(
                                         path=executable_file,
                                         dest='',
@@ -398,7 +401,7 @@ class PatchExecutableFrame(tk.Frame):
                                         debug=self.chk_debug_output.is_checked,
                                         stdout=ConnectionWrapper(child_conn)
                                     ))
-            dfrus_process.start()
+            self.dfrus_process.start()
     
     def bt_exclusions(self, _):
         translation_file = self.entry_translation_file.text
