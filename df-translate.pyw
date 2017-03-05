@@ -314,6 +314,7 @@ class ConnectionWrapper:
     _chunk_size = 1024
     def __init__(self, connection):
         self._connection = connection
+        self.encoding = 'utf-8'
     
     def write(self, s):
         for i in range(0, len(s), self._chunk_size):
