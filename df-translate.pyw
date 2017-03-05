@@ -389,8 +389,14 @@ class PatchExecutableFrame(tk.Frame):
             self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
             dfrus_process = Process(target=dfrus.run,
-                                    args=(executable_file, '', dictionary, None, self.combo_encoding.text),
-                                    kwargs=dict(stdout=ConnectionWrapper(child_conn)))
+                                    kwargs=dict(
+                                        path=executable_file,
+                                        dest='',
+                                        trans_table=dictionary,
+                                        codepage=self.combo_encoding.text,
+                                        debug=self.chk_debug_output.is_checked,
+                                        stdout=ConnectionWrapper(child_conn)
+                                    ))
             dfrus_process.start()
     
     def bt_exclusions(self, _):
