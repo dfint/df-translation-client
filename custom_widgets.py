@@ -135,6 +135,7 @@ class CustomText(tk.Frame):
         self._text.insert(tk.END, s)
         if not self.enabled:
             self._text.configure(state=tk.DISABLED)
+        self._text.yview_moveto('1.0')
         self.update()
 
     def clear(self):
