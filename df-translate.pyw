@@ -500,6 +500,10 @@ class App(tk.Tk):
             json.dump(self.config, config_file, indent=4, sort_keys=True)
 
     def save_settings_repeatedly(self, delay=500):
+        nb = self.notebook
+        if nb.tabs():
+            self.config['last_tab_opened'] = nb.tabs().index(nb.select())
+        
         self.after(ms=delay, func=self.save_settings_repeatedly)
         self.save_settings()
 
@@ -513,18 +517,23 @@ class App(tk.Tk):
                 self.config = json.load(config_file)
         except (FileNotFoundError, ValueError):
             self.config = default_config
-
+        
+        if 'last_tab_opened' not in self.config:
+            self.config['last_tab_opened'] = 0
+        
         self.bind('<Destroy>', self.save_settings)  # Save settings on quit
         self.save_settings_repeatedly(delay=500)  # Save settings every 500 ms
 
     def __init__(self):
         super().__init__()
-
+        
+        self.notebook = ttk.Notebook()
+        
         self.config = None
         self.config_path = None
         self.init_config()
-
-        notebook = ttk.Notebook()
+        
+        notebook = self.notebook
         notebook.pack(fill='both', expand=1)
         
         f1 = DownloadTranslationsFrame(notebook, self)
@@ -538,6 +547,8 @@ class App(tk.Tk):
         
         # f1 = tk.Frame(notebook)
         # notebook.add(f1, text='Translate packed files')
+        
+        notebook.select(self.config['last_tab_opened'])
 
 if __name__ == '__main__':
     App().mainloop()
