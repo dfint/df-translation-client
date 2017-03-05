@@ -311,12 +311,14 @@ def cleanup_dictionary(d: iter, exclusions: iter):
 
 
 class ConnectionWrapper:
+    _chunk_size = 1024
     def __init__(self, connection):
         self._connection = connection
     
     def write(self, s):
-        self._connection.send(s)
-    
+        for i in range(0, len(s), self._chunk_size):
+            self._connection.send(s[i:i+self._chunk_size])
+            
     def flush(self):
         pass  # stub method
 
