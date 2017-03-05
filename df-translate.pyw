@@ -1,3 +1,4 @@
+import multiprocessing
 import requests
 import sys
 import tkinter as tk
@@ -568,4 +569,5 @@ class App(tk.Tk):
         notebook.select(self.config['last_tab_opened'])
 
 if __name__ == '__main__':
+    multiprocessing.freeze_support()
     App().mainloop()
