@@ -381,6 +381,8 @@ class PatchExecutableFrame(tk.Frame):
                                        self.exclusions[meta['Language']])
                 )
             
+            self.config['last_encoding']=self.combo_encoding.text
+            
             parent_conn, child_conn = Pipe()
             self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
@@ -453,7 +455,16 @@ class PatchExecutableFrame(tk.Frame):
         
         self.combo_encoding.values = tuple(sorted(codepages.keys(),
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
-        self.combo_encoding.current(0)
+        
+        if 'last_encoding' in self.config:
+            self.combo_encoding.text = self.config['last_encoding']
+        else:
+            self.combo_encoding.current(0)
+        
+        def save_encoding_into_config(event):
+            self.config['last_encoding'] = event.widget.text
+        
+        self.combo_encoding.bind('<<ComboboxSelected>>', func=save_encoding_into_config)
         
         self.chk_dont_patch_charmap = CheckbuttonVar(self, text="Don't patch charmap table")
         self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
