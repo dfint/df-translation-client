@@ -420,7 +420,8 @@ class PatchExecutableFrame(tk.Frame):
         self.app = app
         
         self.config = self.init_config(self.app.config)
-        self.exclusions = self.config['fix_space_exclusions']
+        config = self.config
+        self.exclusions = config['fix_space_exclusions']
         
         self.dfrus_process = None
         
@@ -428,7 +429,7 @@ class PatchExecutableFrame(tk.Frame):
         
         self.entry_executable_file = EntryCustom(self)
         self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
-        self.entry_executable_file.text = self.config['df_executable'] or ''
+        self.entry_executable_file.text = config['df_executable'] or ''
         self.entry_executable_file.bind('<KeyPress>',
                                         func=lambda event:
                                             self.check_and_save_path('df_executable', event.widget.text))
@@ -440,7 +441,7 @@ class PatchExecutableFrame(tk.Frame):
         
         self.entry_translation_file = EntryCustom(self)
         self.entry_translation_file.grid(column=1, row=1, sticky=tk.E + tk.W)
-        self.entry_translation_file.text = self.config['df_exe_translation_file'] or ''
+        self.entry_translation_file.text = config['df_exe_translation_file'] or ''
         self.entry_translation_file.bind('<KeyPress>',
                                          func=lambda event:
                                              self.check_and_save_path('df_exe_translation_file', event.widget.text))
@@ -456,28 +457,37 @@ class PatchExecutableFrame(tk.Frame):
         self.combo_encoding.values = tuple(sorted(codepages.keys(),
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
         
-        if 'last_encoding' in self.config:
-            self.combo_encoding.text = self.config['last_encoding']
+        if 'last_encoding' in config:
+            self.combo_encoding.text = config['last_encoding']
         else:
             self.combo_encoding.current(0)
         
         def save_encoding_into_config(event):
-            self.config['last_encoding'] = event.widget.text
+            config['last_encoding'] = event.widget.text
         
         self.combo_encoding.bind('<<ComboboxSelected>>', func=save_encoding_into_config)
         
+        def save_checkbox_state(event, option_name):
+            config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
+        
         self.chk_dont_patch_charmap = CheckbuttonVar(self, text="Don't patch charmap table")
         self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
+        self.chk_dont_patch_charmap.bind('<1>', lambda event: save_checkbox_state(event, 'dont_patch_charmap'))
+        self.chk_dont_patch_charmap.is_checked = config['dont_patch_charmap'] = config.get('dont_patch_charmap', False)
         
         self.chk_add_leading_trailing_spaces = CheckbuttonVar(self, text='Add necessary leading/trailing spaces')
         self.chk_add_leading_trailing_spaces.grid(columnspan=2, sticky=tk.W)
-        self.chk_add_leading_trailing_spaces.is_checked = True
+        self.chk_add_leading_trailing_spaces.bind('<1>', lambda event: save_checkbox_state(event, 'add_leading_trailing_spaces'))
+        config['add_leading_trailing_spaces'] = config.get('add_leading_trailing_spaces', True)
+        self.chk_add_leading_trailing_spaces.is_checked = config['add_leading_trailing_spaces']
         
         button_exclusions = ttk.Button(self, text='Exclusions...', command=self.bt_exclusions)
         button_exclusions.grid(row=4, column=2)
 
         self.chk_debug_output = CheckbuttonVar(self, text='Enable debugging output')
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
+        self.chk_debug_output.bind('<1>', lambda event: save_checkbox_state(event, 'debug_output'))
+        self.chk_debug_output.is_checked = config['debug_output'] = config.get('debug_output', False)
         
         button_patch = ttk.Button(self, text='Patch!', command=self.bt_patch)
         button_patch.grid(row=5, column=2)
