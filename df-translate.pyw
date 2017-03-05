@@ -373,6 +373,9 @@ class PatchExecutableFrame(tk.Frame):
             self.log_field.write('\n[PIPE BROKEN]')
     
     def bt_patch(self, _):
+        if self.dfrus_process is not None and self.dfrus_process.is_alive():
+            return
+        
         executable_file = self.entry_executable_file.text
         translation_file = self.entry_translation_file.text
         
@@ -428,6 +431,8 @@ class PatchExecutableFrame(tk.Frame):
         self.exclusions = None
         
         self.config = self.init_config()
+        
+        self.dfrus_process = None
         
         tk.Label(self, text='DF executable file:').grid()
         
