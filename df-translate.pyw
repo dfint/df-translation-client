@@ -14,14 +14,14 @@ from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom, CustomText
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 from df_gettext_toolkit import po
 
 
 class DownloadTranslationsFrame(tk.Frame):
     def init_config(self, config):
         if 'download_translations' not in config:
-            config['download_translations'] = defaultdict(lambda: None)
+            config['download_translations'] = dict()
         
         config = config['download_translations']
         if 'recent_projects' not in config:
@@ -320,7 +320,7 @@ class ConnectionWrapper:
 class PatchExecutableFrame(tk.Frame):
     def init_config(self, config):
         if 'patch_executable' not in config:
-            config['patch_executable'] = defaultdict(lambda: None)
+            config['patch_executable'] = dict()
 
         config = config['patch_executable']
 
