@@ -29,7 +29,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
         return config
     
-    def bt_connect(self, _):
+    def bt_connect(self):
         username = self.entry_username.text
         password = self.entry_password.text  # DO NOT remember password (not safe)
         project = self.combo_projects.text
@@ -60,7 +60,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 recent_projects.insert(0, project)
             self.combo_projects.values = tuple(recent_projects)
     
-    def bt_download(self, _):
+    def bt_download(self):
         if self.tx and self.resources:
             self.progressbar['maximum'] = len(self.resources) * 1.001
             self.progressbar['value'] = 0
@@ -119,7 +119,7 @@ class DownloadTranslationsFrame(tk.Frame):
             else:
                 pass  # Todo: open the directory in a file manager on linux
     
-    def bt_choose_directory(self, _):
+    def bt_choose_directory(self):
         download_path = filedialog.askdirectory()
         if download_path:
             self.entry_download_to.text = download_path
@@ -149,9 +149,8 @@ class DownloadTranslationsFrame(tk.Frame):
         self.entry_password = EntryCustom(self, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
-        button_connect = ttk.Button(self, text='Connect...')
+        button_connect = ttk.Button(self, text='Connect...', command=self.bt_connect)
         button_connect.grid(row=0, column=2, rowspan=3, sticky=tk.N + tk.S + tk.W + tk.E)
-        button_connect.bind('<1>', self.bt_connect)
         
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
         
@@ -171,12 +170,10 @@ class DownloadTranslationsFrame(tk.Frame):
         self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
         self.entry_download_to.text = self.config['download_to'] or ''
         
-        button_choose_directory = ttk.Button(self, text='Choose directory...')
+        button_choose_directory = ttk.Button(self, text='Choose directory...', command=self.bt_choose_directory)
         button_choose_directory.grid(column=2, row=6)
-        button_choose_directory.bind('<1>', self.bt_choose_directory)
         
-        self.button_download = ttk.Button(self, text='Download translations')
-        self.button_download.bind('<1>', self.bt_download)
+        self.button_download = ttk.Button(self, text='Download translations', command=self.bt_download)
         self.button_download.grid(sticky=tk.W + tk.E)
         
         self.progressbar = ttk.Progressbar(self)
@@ -218,14 +215,14 @@ class DialogDontFixSpaces(tk.Toplevel):
     def entry_search_key_up(self, _):
         self.update_listbox_exclusions_hints()
 
-    def bt_remove_selected(self, _):
+    def bt_remove_selected(self):
         index = self.listbox_exclusions.curselection()
         if index:
             item = self.restore_strings[self.listbox_exclusions.values[index[0]]]
             self.exclusions[self.combo_language.text].remove(item)
             self.update_listbox_exclusions()
 
-    def bt_add_selected(self, _):
+    def bt_add_selected(self):
         index = self.listbox_exclusions_hints.curselection()
         if index:
             item = self.restore_strings[self.listbox_exclusions_hints.values[index[0]]]
@@ -258,9 +255,8 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
         self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
 
-        bt = ttk.Button(self, text='-- Remove selected --')
+        bt = ttk.Button(self, text='-- Remove selected --', command=self.bt_remove_selected)
         bt.grid(column=0, row=1, sticky=tk.W+tk.E)
-        bt.bind('<1>', self.bt_remove_selected)
 
         self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions.grid(sticky='NSWE')
@@ -270,9 +266,8 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.entry_search.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_up)
 
-        bt = ttk.Button(self, text='<< Add selected <<')
+        bt = ttk.Button(self, text='<< Add selected <<', command=self.bt_add_selected)
         bt.grid(column=1, row=1, sticky=tk.W+tk.E)
-        bt.bind('<1>', self.bt_add_selected)
 
         self.listbox_exclusions_hints = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions_hints.grid(column=1, row=2, sticky='NSWE')
@@ -334,13 +329,13 @@ class PatchExecutableFrame(tk.Frame):
 
         return config
 
-    def bt_browse_executable(self, _):
+    def bt_browse_executable(self):
         file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
         if file_path:
             self.entry_executable_file.text = file_path
             self.config['df_executable'] = file_path
     
-    def bt_browse_translation(self, _):
+    def bt_browse_translation(self):
         file_path = filedialog.askopenfilename(filetypes=[
             ("Hardcoded strings' translation", '*hardcoded*.po'),
             ('Translation files', '*.po'),
@@ -366,7 +361,7 @@ class PatchExecutableFrame(tk.Frame):
         except (EOFError, BrokenPipeError):
             self.log_field.write('\n[PIPE BROKEN]')
     
-    def bt_patch(self, _):
+    def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
             return
         
@@ -400,7 +395,7 @@ class PatchExecutableFrame(tk.Frame):
                                     ))
             self.dfrus_process.start()
     
-    def bt_exclusions(self, _):
+    def bt_exclusions(self):
         translation_file = self.entry_translation_file.text
         language = None
         dictionary = None
@@ -436,9 +431,8 @@ class PatchExecutableFrame(tk.Frame):
                                         func=lambda event:
                                             self.check_and_save_path('df_executable', event.widget.text))
 
-        button_browse_executable = ttk.Button(self, text='Browse...')
+        button_browse_executable = ttk.Button(self, text='Browse...', command=self.bt_browse_executable)
         button_browse_executable.grid(column=2, row=0)
-        button_browse_executable.bind('<1>', self.bt_browse_executable)
         
         tk.Label(self, text='DF executable translation file:').grid()
         
@@ -449,9 +443,8 @@ class PatchExecutableFrame(tk.Frame):
                                          func=lambda event:
                                              self.check_and_save_path('df_exe_translation_file', event.widget.text))
         
-        button_browse_translation = ttk.Button(self, text='Browse...')
+        button_browse_translation = ttk.Button(self, text='Browse...', command=self.bt_browse_translation)
         button_browse_translation.grid(column=2, row=1)
-        button_browse_translation.bind('<1>', self.bt_browse_translation)
         
         tk.Label(self, text='Encoding:').grid()
         
@@ -469,16 +462,14 @@ class PatchExecutableFrame(tk.Frame):
         self.chk_add_leading_trailing_spaces.grid(columnspan=2, sticky=tk.W)
         self.chk_add_leading_trailing_spaces.is_checked = True
         
-        button_exclusions = ttk.Button(self, text='Exclusions...')
+        button_exclusions = ttk.Button(self, text='Exclusions...', command=self.bt_exclusions)
         button_exclusions.grid(row=4, column=2)
-        button_exclusions.bind('<1>', self.bt_exclusions)
 
         self.chk_debug_output = CheckbuttonVar(self, text='Enable debugging output')
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
         
-        button_patch = ttk.Button(self, text='Patch!')
+        button_patch = ttk.Button(self, text='Patch!', command=self.bt_patch)
         button_patch.grid(row=5, column=2)
-        button_patch.bind('<1>', self.bt_patch)
         
         self.log_field = CustomText(self, width=48, height=16, enabled=False)
         self.log_field.grid(columnspan=3, sticky='NSWE')
