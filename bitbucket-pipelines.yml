@@ -10,4 +10,4 @@ pipelines:
           - pip install -r requirements.txt
           - pip install -r requirements.test.txt
           - pyinstaller -D -F -n df-translate -w "df-translate.pyw"
-          - ls
+          - ls build
