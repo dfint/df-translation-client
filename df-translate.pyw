@@ -13,7 +13,7 @@ from dfrus import dfrus
 from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
-from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom, CustomText
+from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom, CustomText, FileEntry
 from collections import OrderedDict
 from df_gettext_toolkit import po
 
@@ -566,6 +566,13 @@ class TranslateExternalFiles(tk.Frame):
         self.app = app
         self.config = self.init_config(self.app.config, section_name='translate_external_files')
         config = self.config
+
+        tk.Label(self, text='Root path:').grid()
+
+        self.file_entry = FileEntry(self, dialogtype='askdirectory')
+        self.file_entry.grid(row=0, column=1, sticky='WE')
+
+        self.grid_columnconfigure(1, weight=1)
 
 
 class App(tk.Tk):
