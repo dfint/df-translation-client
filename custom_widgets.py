@@ -157,8 +157,9 @@ class FileEntry(tk.Frame):
     def bt_browse(self):
         file_path = ''
 
-        if self.dialogtype == 'askopenfilename':
+        self.default_path = self.default_path or self.entry.text
 
+        if self.dialogtype == 'askopenfilename':
             if path.isfile(self.default_path):
                 initialdir = None
                 initialfile = self.default_path
@@ -193,7 +194,7 @@ class FileEntry(tk.Frame):
         self.button.pack(side='right')
 
         self.entry = EntryCustom(self)
-        self.entry.text = default_path or ''
+        self.entry.text = self.default_path
         self.entry.pack(fill='x', expand=1)
         if self.on_change is not None:
             self.entry.bind('<KeyPress>', func=lambda event: self.on_change(self))
