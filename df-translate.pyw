@@ -342,6 +342,7 @@ def cleanup_dictionary(d: iter, exclusions: iter):
 
 class ConnectionWrapper:
     _chunk_size = 1024
+
     def __init__(self, connection):
         self._connection = connection
         self.encoding = 'utf-8'
@@ -355,7 +356,8 @@ class ConnectionWrapper:
 
 
 class PatchExecutableFrame(tk.Frame):
-    def init_config(self, config):
+    @staticmethod
+    def init_config(config):
         if 'patch_executable' not in config:
             config['patch_executable'] = dict()
 
@@ -418,20 +420,20 @@ class PatchExecutableFrame(tk.Frame):
                                        self.exclusions[meta['Language']])
                 )
             
-            self.config['last_encoding']=self.combo_encoding.text
+            self.config['last_encoding'] = self.combo_encoding.text
             
             parent_conn, child_conn = mp.Pipe()
             self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
-            self.dfrus_process = Process(target=dfrus.run,
-                                    kwargs=dict(
-                                        path=executable_file,
-                                        dest='',
-                                        trans_table=dictionary,
-                                        codepage=self.combo_encoding.text,
-                                        debug=self.chk_debug_output.is_checked,
-                                        stdout=ConnectionWrapper(child_conn)
-                                    ))
+            self.dfrus_process = mp.Process(target=dfrus.run,
+                                            kwargs=dict(
+                                                path=executable_file,
+                                                dest='',
+                                                trans_table=dictionary,
+                                                codepage=self.combo_encoding.text,
+                                                debug=self.chk_debug_output.is_checked,
+                                                stdout=ConnectionWrapper(child_conn)
+                                            ))
             self.dfrus_process.start()
     
     def bt_exclusions(self):
@@ -453,6 +455,7 @@ class PatchExecutableFrame(tk.Frame):
 
     def setup_checkbutton(self, text, config_key, default_state):
         config = self.config
+
         def save_checkbox_state(event, option_name):
             config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
         
