@@ -1,6 +1,9 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
+from tkinter import filedialog
+from os import path
+
 
 class CheckbuttonVar(ttk.Checkbutton):
     def __init__(self, *args, **kwargs):
@@ -148,3 +151,49 @@ class CustomText(tk.Frame):
     
     def flush(self):
         self.update()
+
+
+class FileEntry(tk.Frame):
+    def bt_browse(self):
+        file_path = ''
+
+        if self.dialogtype == 'askopenfilename':
+
+            if path.isfile(self.default_path):
+                initialdir = None
+                initialfile = self.default_path
+            else:
+                initialdir = self.default_path
+                initialfile = None
+
+            file_path = filedialog.askopenfilename(filetypes=self.filetypes,
+                                                   initialdir=initialdir, initialfile=initialfile)
+        elif self.dialogtype == 'askdirectory':
+            file_path = filedialog.askdirectory(initialdir=self.default_path)
+
+        if file_path:
+            self.entry.text = file_path
+
+        if self.on_change is not None:
+            self.on_change(self)
+
+    def __init__(self, *args, button_text=None, default_path=None, on_change=None, filetypes=None,
+                 dialogtype='askopenfilename', **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if button_text is None:
+            button_text = 'Browse...'
+
+        self.filetypes = filetypes or []
+        self.on_change = on_change
+        self.default_path = default_path or ''
+        self.dialogtype = dialogtype
+
+        self.button = ttk.Button(self, text=button_text, command=self.bt_browse)
+        self.button.pack(side='right')
+
+        self.entry = EntryCustom(self)
+        self.entry.text = default_path or ''
+        self.entry.pack(fill='x', expand=1)
+        if self.on_change is not None:
+            self.entry.bind('<KeyPress>', func=lambda event: self.on_change(self))
