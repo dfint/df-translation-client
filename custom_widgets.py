@@ -97,7 +97,8 @@ class ListboxCustom(tk.Frame):
 
 
 class CustomText(tk.Frame):
-    def scrollbar_switcher(self, scrollbar, first, last):
+    @staticmethod
+    def scrollbar_switcher(scrollbar, first, last):
         scrollbar.set(first, last)
         if first == '0.0' and last == '1.0':
             scrollbar.grid_remove()
@@ -114,10 +115,10 @@ class CustomText(tk.Frame):
 
         self.enabled = enabled
         self._text = tk.Text(self, *args,
-                                xscrollcommand=lambda first, last: self.scrollbar_switcher(xscrollbar, first, last),
-                                yscrollcommand=lambda first, last: self.scrollbar_switcher(yscrollbar, first, last),
-                                state=tk.NORMAL if enabled else tk.DISABLED,
-                                **kwargs)
+                             xscrollcommand=lambda first, last: self.scrollbar_switcher(xscrollbar, first, last),
+                             yscrollcommand=lambda first, last: self.scrollbar_switcher(yscrollbar, first, last),
+                             state=tk.NORMAL if enabled else tk.DISABLED,
+                             **kwargs)
 
         yscrollbar['command'] = self._text.yview
         xscrollbar['command'] = self._text.xview
