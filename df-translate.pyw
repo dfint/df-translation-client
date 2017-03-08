@@ -205,7 +205,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.entry_download_to = EntryCustom(self)
         self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
-        self.entry_download_to.text = self.config['download_to'] or ''
+        self.entry_download_to.text = self.config.get('download_to', '')
         
         button_choose_directory = ttk.Button(self, text='Choose directory...', command=self.bt_choose_directory)
         button_choose_directory.grid(column=2, row=6)
@@ -479,7 +479,7 @@ class PatchExecutableFrame(tk.Frame):
         
         self.entry_executable_file = EntryCustom(self)
         self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
-        self.entry_executable_file.text = config['df_executable'] or ''
+        self.entry_executable_file.text = config.get('df_executable', '')
         self.entry_executable_file.bind('<KeyPress>',
                                         func=lambda event:
                                             self.check_and_save_path('df_executable', event.widget.text))
@@ -491,7 +491,7 @@ class PatchExecutableFrame(tk.Frame):
         
         self.entry_translation_file = EntryCustom(self)
         self.entry_translation_file.grid(column=1, row=1, sticky=tk.E + tk.W)
-        self.entry_translation_file.text = config['df_exe_translation_file'] or ''
+        self.entry_translation_file.text = config.get('df_exe_translation_file', '')
         self.entry_translation_file.bind('<KeyPress>',
                                          func=lambda event:
                                              self.check_and_save_path('df_exe_translation_file', event.widget.text))
