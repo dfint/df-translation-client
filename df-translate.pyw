@@ -1,4 +1,4 @@
-import multiprocessing
+import multiprocessing as mp
 import requests
 import sys
 import tkinter as tk
@@ -10,7 +10,6 @@ import re
 
 from dfrus.patchdf import codepages
 from dfrus import dfrus
-from multiprocessing import Process, Pipe
 from os import path
 from tkinter import filedialog, messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
@@ -19,8 +18,25 @@ from collections import OrderedDict
 from df_gettext_toolkit import po
 
 
+def downloader(queue, tx, project, language, res, i, file_path):
+    exception_info = 'Everything is ok! (If you see this message, contact the developer)'
+    queue.put((i, 'downloading...'))
+    for j in range(10):
+        try:
+            tx.get_translation(project, res['slug'], language, file_path)
+            queue.put((i, 'ok!'))
+            return
+        except:
+            queue.put((i, 'retry... (%d)' % (10 - j)))
+            exception_info = sys.exc_info()[0]
+    else:
+        queue.put((i, 'failed'))
+        queue.put(exception_info)
+
+
 class DownloadTranslationsFrame(tk.Frame):
-    def init_config(self, config):
+    @staticmethod
+    def init_config(config):
         if 'download_translations' not in config:
             config['download_translations'] = dict()
         
@@ -60,6 +76,60 @@ class DownloadTranslationsFrame(tk.Frame):
                     recent_projects.remove(project)
                 recent_projects.insert(0, project)
             self.combo_projects.values = tuple(recent_projects)
+
+    def download_waiter(self, resources, language, project, download_dir, i=0, download_process=None, queue=None,
+                        initial_names=None, resource_names=None):
+        if i >= len(resources):
+            # Everything is downloaded
+            self.config['language'] = language
+
+            if sys.platform == 'win32':
+                subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
+            else:
+                pass  # Todo: open the directory in a file manager on linux
+
+            return
+        else:
+            if queue is None:
+                queue = mp.Queue()
+            
+            if initial_names is None:
+                initial_names = [res['name'] for res in self.resources]
+                resource_names = list(initial_names)
+
+            if download_process is None:
+                download_process = mp.Process(target=downloader, kwargs=dict(
+                    i=i,
+                    queue=queue,
+                    tx=self.tx,
+                    project=project,
+                    language=language,
+                    res=resources[i],
+                    file_path=path.join(download_dir, '%s_%s.po' % (resources[i]['slug'], language))
+                ))
+                download_process.start()
+
+            while not queue.empty():
+                j, message = queue.get()
+                resource_names[j] = initial_names[j] + ' - ' + message
+                self.listbox_resources.values = tuple(resource_names)
+                self.app.update()
+                
+                if message == 'ok!':
+                    self.progressbar.step()
+                    if download_process is not None:
+                        download_process.join()  # ensure process is terminated
+                        download_process = None
+                    i += 1
+                elif message == 'failed':
+                    error = queue.get()
+                    messagebox.showerror('Downloading error', error)
+                    return
+
+            self.after(100, self.download_waiter,
+                       resources, language, project, download_dir, i,
+                       download_process, queue,
+                       initial_names, resource_names)
     
     def bt_download(self):
         if self.tx and self.resources:
@@ -84,41 +154,7 @@ class DownloadTranslationsFrame(tk.Frame):
             resource_names = list(initial_names)
             
             self.listbox_resources.values = tuple(resource_names)
-            for i, res in enumerate(self.resources):
-                resource_names[i] = initial_names[i] + ' - downloading...'
-                self.listbox_resources.values = tuple(resource_names)
-                self.app.update()
-                
-                file_path = path.join(download_dir, '%s_%s.po' % (res['slug'], language))
-                
-                error = None
-                for j in range(10):
-                    try:
-                        self.tx.get_translation(project, res['slug'], language, file_path)
-                        break
-                    except:
-                        resource_names[i] = initial_names[i] + ' - retry... (%d)' % (10 - j)
-                        self.listbox_resources.values = tuple(resource_names)
-                        self.app.update()
-                        error = sys.exc_info()[0]
-                else:
-                    resource_names[i] = initial_names[i] + ' - failed'
-                    self.listbox_resources.values = tuple(resource_names)
-                    self.app.update()
-                    messagebox.showerror('Downloading error', error)
-                    break
-                
-                resource_names[i] = initial_names[i] + ' - ok!'
-                self.listbox_resources.values = tuple(resource_names)
-                self.progressbar.step()
-                self.app.update()
-
-            self.config['language'] = language
-
-            if sys.platform == 'win32':
-                subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
-            else:
-                pass  # Todo: open the directory in a file manager on linux
+            self.download_waiter(self.resources, language, project, download_dir)
     
     def bt_choose_directory(self):
         download_path = filedialog.askdirectory()
@@ -384,7 +420,7 @@ class PatchExecutableFrame(tk.Frame):
             
             self.config['last_encoding']=self.combo_encoding.text
             
-            parent_conn, child_conn = Pipe()
+            parent_conn, child_conn = mp.Pipe()
             self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
             self.dfrus_process = Process(target=dfrus.run,
@@ -569,5 +605,5 @@ class App(tk.Tk):
         notebook.select(self.config['last_tab_opened'])
 
 if __name__ == '__main__':
-    multiprocessing.freeze_support()
+    mp.freeze_support()
     App().mainloop()
