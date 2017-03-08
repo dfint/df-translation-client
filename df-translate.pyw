@@ -551,6 +551,23 @@ class PatchExecutableFrame(tk.Frame):
         self.grid_rowconfigure(6, weight=1)
 
 
+class TranslateExternalFiles(tk.Frame):
+    @staticmethod
+    def init_config(config, section_name):
+        if section_name not in config:
+            config[section_name] = dict()
+
+        config = config[section_name]
+
+        return config
+
+    def __init__(self, master, app=None, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        self.app = app
+        self.config = self.init_config(self.app.config, section_name='translate_external_files')
+        config = self.config
+
+
 class App(tk.Tk):
     def save_settings(self, _=None):
         with open(self.config_path, 'w', encoding='utf-8') as config_file:
@@ -599,8 +616,8 @@ class App(tk.Tk):
         f1 = PatchExecutableFrame(notebook, self)
         notebook.add(f1, text='Patch executable file')
         
-        # f1 = tk.Frame(notebook)
-        # notebook.add(f1, text='Translate external text files')
+        f1 = TranslateExternalFiles(notebook, self)
+        notebook.add(f1, text='Translate external text files')
         
         # f1 = tk.Frame(notebook)
         # notebook.add(f1, text='Translate packed files')
