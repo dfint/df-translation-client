@@ -34,6 +34,11 @@ def downloader(queue, tx, project, language, res, i, file_path):
         queue.put(exception_info)
 
 
+def check_and_save_path(config, key, file_path):
+    if path.exists(file_path):
+        config[key] = file_path
+
+
 class DownloadTranslationsFrame(tk.Frame):
     @staticmethod
     def init_config(config):
@@ -156,12 +161,6 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources.values = tuple(resource_names)
             self.download_waiter(self.resources, language, project, download_dir)
     
-    def bt_choose_directory(self):
-        download_path = filedialog.askdirectory()
-        if download_path:
-            self.entry_download_to.text = download_path
-            self.config['download_to'] = download_path
-    
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -203,12 +202,14 @@ class DownloadTranslationsFrame(tk.Frame):
         
         tk.Label(self, text='Download to:').grid()
         
-        self.entry_download_to = EntryCustom(self)
-        self.entry_download_to.grid(column=1, row=6, sticky=tk.W + tk.E)
-        self.entry_download_to.text = self.config.get('download_to', '')
+        self.fileentry_download_to = FileEntry(
+            self,
+            dialogtype='askdirectory',
+            default_path=self.config.get('download_to', ''),
+            on_change=lambda text: check_and_save_path(self.config, 'download_to', text),
+        )
         
-        button_choose_directory = ttk.Button(self, text='Choose directory...', command=self.bt_choose_directory)
-        button_choose_directory.grid(column=2, row=6)
+        self.fileentry_download_to.grid(column=1, row=6, columnspan=2, sticky='WE')
         
         self.button_download = ttk.Button(self, text='Download translations', command=self.bt_download)
         self.button_download.grid(sticky=tk.W + tk.E)
@@ -371,26 +372,6 @@ class PatchExecutableFrame(tk.Frame):
 
         return config
 
-    def bt_browse_executable(self):
-        file_path = filedialog.askopenfilename(filetypes=[('Executable files', '*.exe')])
-        if file_path:
-            self.entry_executable_file.text = file_path
-            self.config['df_executable'] = file_path
-    
-    def bt_browse_translation(self):
-        file_path = filedialog.askopenfilename(filetypes=[
-            ("Hardcoded strings' translation", '*hardcoded*.po'),
-            ('Translation files', '*.po'),
-            ('csv file', '*.csv'),
-        ])
-        if file_path:
-            self.entry_translation_file.text = file_path
-            self.config['df_exe_translation_file'] = file_path
-
-    def check_and_save_path(self, key, file_path):
-        if path.exists(file_path):
-            self.config[key] = file_path
-
     def update_log(self, message_queue):
         try:
             if isinstance(message_queue, mp.connection.Connection):
@@ -411,8 +392,8 @@ class PatchExecutableFrame(tk.Frame):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
             return
         
-        executable_file = self.entry_executable_file.text
-        translation_file = self.entry_translation_file.text
+        executable_file = self.fileentry_executable_file.text
+        translation_file = self.fileentry_translation_file.text
         
         if not executable_file or not path.exists(executable_file):
             messagebox.showerror('Error', 'Valid path to an executable file must be specified')
@@ -444,7 +425,7 @@ class PatchExecutableFrame(tk.Frame):
             self.dfrus_process.start()
     
     def bt_exclusions(self):
-        translation_file = self.entry_translation_file.text
+        translation_file = self.fileentry_translation_file.text
         language = None
         dictionary = None
         if translation_file and path.exists(translation_file):
@@ -484,27 +465,29 @@ class PatchExecutableFrame(tk.Frame):
         
         tk.Label(self, text='DF executable file:').grid()
         
-        self.entry_executable_file = EntryCustom(self)
-        self.entry_executable_file.grid(column=1, row=0, sticky=tk.E + tk.W)
-        self.entry_executable_file.text = config.get('df_executable', '')
-        self.entry_executable_file.bind('<KeyPress>',
-                                        func=lambda event:
-                                            self.check_and_save_path('df_executable', event.widget.text))
-
-        button_browse_executable = ttk.Button(self, text='Browse...', command=self.bt_browse_executable)
-        button_browse_executable.grid(column=2, row=0)
+        self.fileentry_executable_file = FileEntry(
+            self,
+            dialogtype='askopenfilename',
+            filetypes=[('Executable files', '*.exe')],
+            default_path=config.get('df_executable', ''),
+            on_change=lambda text: check_and_save_path(self.config, 'df_executable', text),
+        )
+        self.fileentry_executable_file.grid(column=1, row=0, columnspan=2, sticky='EW')
         
         tk.Label(self, text='DF executable translation file:').grid()
         
-        self.entry_translation_file = EntryCustom(self)
-        self.entry_translation_file.grid(column=1, row=1, sticky=tk.E + tk.W)
-        self.entry_translation_file.text = config.get('df_exe_translation_file', '')
-        self.entry_translation_file.bind('<KeyPress>',
-                                         func=lambda event:
-                                             self.check_and_save_path('df_exe_translation_file', event.widget.text))
-        
-        button_browse_translation = ttk.Button(self, text='Browse...', command=self.bt_browse_translation)
-        button_browse_translation.grid(column=2, row=1)
+        self.fileentry_translation_file = FileEntry(
+            self,
+            dialogtype='askopenfilename',
+            filetypes=[
+                ("Hardcoded strings' translation", '*hardcoded*.po'),
+                ('Translation files', '*.po'),
+                # ('csv file', '*.csv'), # @TODO: Currently not supported 
+            ],
+            default_path=config.get('df_exe_translation_file', ''),
+            on_change=lambda text: check_and_save_path(self.config, 'df_exe_translation_file', text),
+        )
+        self.fileentry_translation_file.grid(column=1, row=1, columnspan=2, sticky='EW')
         
         tk.Label(self, text='Encoding:').grid()
         
