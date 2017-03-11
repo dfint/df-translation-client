@@ -340,16 +340,19 @@ def cleanup_dictionary(d: iter, exclusions: iter):
             yield original_string, translation
 
 
-class ConnectionWrapper:
+class ProcessMessageWrapper:
     _chunk_size = 1024
 
-    def __init__(self, connection):
-        self._connection = connection
+    def __init__(self, message_receiver):
+        self._message_receiver = message_receiver
         self.encoding = 'utf-8'
     
     def write(self, s):
         for i in range(0, len(s), self._chunk_size):
-            self._connection.send(s[i:i+self._chunk_size])
+            if isinstance(self._message_receiver, mp.connection.Connection):
+                self._message_receiver.send(s[i:i+self._chunk_size])
+            else:  # mp.Queue or queue.Queue
+                self._message_receiver.put(s[i:i+self._chunk_size])
             
     def flush(self):
         pass  # stub method
@@ -388,17 +391,21 @@ class PatchExecutableFrame(tk.Frame):
         if path.exists(file_path):
             self.config[key] = file_path
 
-    def update_log(self, connection):
+    def update_log(self, message_queue):
         try:
-            while connection.poll():
-                self.log_field.write(connection.recv())
+            if isinstance(message_queue, mp.connection.Connection):
+                while message_queue.poll():
+                    self.log_field.write(message_queue.recv())
+            else:
+                while not message_queue.empty():
+                    self.log_field.write(message_queue.get())
             
             if not self.dfrus_process.is_alive():
                 self.log_field.write('\n[PROCESS FINISHED]')
             else:
-                self.after(100, self.update_log, connection)
+                self.after(100, self.update_log, message_queue)
         except (EOFError, BrokenPipeError):
-            self.log_field.write('\n[PIPE BROKEN]')
+            self.log_field.write('\n[MESSAGE QUEUE/PIPE BROKEN]')
     
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
@@ -422,8 +429,8 @@ class PatchExecutableFrame(tk.Frame):
             
             self.config['last_encoding'] = self.combo_encoding.text
             
-            parent_conn, child_conn = mp.Pipe()
-            self.after(100, self.update_log, parent_conn)
+            queue = mp.Queue()
+            self.after(100, self.update_log, queue)
             self.log_field.clear()
             self.dfrus_process = mp.Process(target=dfrus.run,
                                             kwargs=dict(
@@ -432,7 +439,7 @@ class PatchExecutableFrame(tk.Frame):
                                                 trans_table=dictionary,
                                                 codepage=self.combo_encoding.text,
                                                 debug=self.chk_debug_output.is_checked,
-                                                stdout=ConnectionWrapper(child_conn)
+                                                stdout=ProcessMessageWrapper(queue)
                                             ))
             self.dfrus_process.start()
     
