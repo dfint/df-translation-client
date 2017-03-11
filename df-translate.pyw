@@ -336,9 +336,9 @@ def cleanup_dictionary(d: iter, exclusions: iter):
             if original_string[-1] == ' ' and translation[-1] != ' ':
                 translation += ' '
 
-            translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"'})
+        translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"'})
 
-            yield original_string, translation
+        yield original_string, translation
 
 
 class ProcessMessageWrapper:
