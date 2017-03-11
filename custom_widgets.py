@@ -176,7 +176,7 @@ class FileEntry(tk.Frame):
             self.entry.text = file_path
 
         if self.on_change is not None:
-            self.on_change(self)
+            self.on_change(file_path)
 
     def __init__(self, *args, button_text=None, default_path=None, on_change=None, filetypes=None,
                  dialogtype='askopenfilename', **kwargs):
@@ -197,4 +197,8 @@ class FileEntry(tk.Frame):
         self.entry.text = self.default_path
         self.entry.pack(fill='x', expand=1)
         if self.on_change is not None:
-            self.entry.bind('<KeyPress>', func=lambda event: self.on_change(self))
+            self.entry.bind('<KeyPress>', func=lambda event: self.on_change(event.widget.text))
+    
+    @property
+    def text(self):
+        return self.entry.text
