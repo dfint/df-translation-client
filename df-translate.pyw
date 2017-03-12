@@ -557,10 +557,28 @@ class TranslateExternalFiles(tk.Frame):
         self.config = self.init_config(self.app.config, section_name='translate_external_files')
         config = self.config
 
-        tk.Label(self, text='Root path:').grid()
+        tk.Label(self, text='Dwarf Fortress root path:').grid()
 
-        self.file_entry = FileEntry(self, dialogtype='askdirectory')
-        self.file_entry.grid(row=0, column=1, sticky='WE')
+        self.fileentry_df_root_path = FileEntry(
+            self,
+            dialogtype='askdirectory',
+            default_path=config.get('df_root_path', ''),
+            on_change=lambda text: check_and_save_path(self.config, 'df_root_path', text),
+        )
+        self.fileentry_df_root_path.grid(row=0, column=1, sticky='WE')
+        
+        tk.Label(self, text="Translation files' directory:").grid()
+        
+        self.fileentry_translation_files = FileEntry(
+            self,
+            dialogtype='askdirectory',
+            default_path=config.get('translation_files_path', ''),
+            on_change=lambda text: check_and_save_path(self.config, 'translation_files_path', text),
+        )
+        self.fileentry_translation_files.grid(row=1, column=1, sticky='WE')
+        
+        self.listbox_translation_files = ListboxCustom(self)
+        self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)
 
