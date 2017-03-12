@@ -401,8 +401,8 @@ class PatchExecutableFrame(tk.Frame):
             messagebox.showerror('Error', 'Valid path to a translation file must be specified')
         else:
             with open(translation_file, 'r', encoding='utf-8') as fn:
-                pofile = po.load_po(fn)
-                meta = po.get_metadata(next(pofile))
+                pofile = po.PoReader(fn)
+                meta = pofile.meta
                 dictionary = OrderedDict(
                     cleanup_dictionary(((entry['msgid'], entry['msgstr']) for entry in pofile),
                                        self.exclusions[meta['Language']])
@@ -430,10 +430,8 @@ class PatchExecutableFrame(tk.Frame):
         dictionary = None
         if translation_file and path.exists(translation_file):
             with open(translation_file, 'r', encoding='utf-8') as fn:
-                pofile = po.load_po(fn)
-                first_entry = next(pofile)
-                assert first_entry['msgid'] == ''
-                meta = po.get_metadata(first_entry)
+                pofile = po.PoReader(fn)
+                meta = pofile.meta
                 language = meta['Language']
                 dictionary = {entry['msgid']: entry['msgstr'] for entry in pofile}
 
