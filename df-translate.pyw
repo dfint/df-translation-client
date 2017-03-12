@@ -6,6 +6,7 @@ import tkinter.ttk as ttk
 import string
 import subprocess
 import json
+import os
 import re
 
 from dfrus.patchdf import codepages
@@ -550,6 +551,36 @@ class TranslateExternalFiles(tk.Frame):
 
         return config
 
+    @staticmethod
+    def get_languages(directory):
+        s = set()
+        for filename in os.listdir(directory):
+            if filename.endswith('.po'):
+                with open(path.join(directory, filename), encoding='utf-8') as file:
+                    s.add(po.PoReader(file).meta['Language'])
+
+        return sorted(s)
+
+    def on_change_translation_files_path(self, config, key, directory):
+        check_and_save_path(config, key, directory)
+        self.combo_language.values = tuple(self.get_languages(directory))
+        self.combo_language.current(0)
+
+    def on_change_language(self, event=None, widget=None):
+        def filter_files_by_language(directory, language):
+            for filename in os.listdir(directory):
+                if filename.endswith('.po'):
+                    with open(path.join(directory, filename), encoding='utf-8') as file:
+                        if po.PoReader(file).meta['Language'] == language:
+                            yield filename
+
+        if widget is None:
+            widget = event.widget
+
+        self.listbox_translation_files.values = tuple(
+            filter_files_by_language(self.fileentry_translation_files.text, widget.text)
+        )
+
     def __init__(self, master, app=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.app = app
@@ -572,12 +603,22 @@ class TranslateExternalFiles(tk.Frame):
             self,
             dialogtype='askdirectory',
             default_path=config.get('translation_files_path', ''),
-            on_change=lambda text: check_and_save_path(self.config, 'translation_files_path', text),
+            on_change=lambda text: self.on_change_translation_files_path(self.config, 'translation_files_path', text),
         )
         self.fileentry_translation_files.grid(row=1, column=1, sticky='WE')
-        
+
+        tk.Label(self, text="Language:").grid()
+
+        self.combo_language = ComboboxCustom(self)
+        self.combo_language.grid(row=2, column=1, sticky='WE')
+
+        self.combo_language.values = tuple(self.get_languages(self.fileentry_translation_files.text))
+        self.combo_language.current(0)
+        self.combo_language.bind('<<ComboboxSelected>>', self.on_change_language)
+
         self.listbox_translation_files = ListboxCustom(self)
         self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
+        self.on_change_language(widget=self.combo_language)
 
         self.grid_columnconfigure(1, weight=1)
 
