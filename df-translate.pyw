@@ -11,11 +11,12 @@ import re
 from dfrus.patchdf import codepages
 from dfrus import dfrus
 from os import path
-from tkinter import filedialog, messagebox
+from tkinter import messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom, CustomText, FileEntry
 from collections import OrderedDict
 from df_gettext_toolkit import po
+from multiprocessing import connection
 
 
 def downloader(queue, tx, project, language, res, i, file_path):
@@ -141,7 +142,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.progressbar['maximum'] = len(self.resources) * 1.001
             self.progressbar['value'] = 0
             
-            download_dir = self.entry_download_to.get()
+            download_dir = self.fileentry_download_to.text
             if not download_dir:
                 messagebox.showwarning('Directory not specified', 'Specify download directory first')
                 return
@@ -350,7 +351,7 @@ class ProcessMessageWrapper:
     
     def write(self, s):
         for i in range(0, len(s), self._chunk_size):
-            if isinstance(self._message_receiver, mp.connection.Connection):
+            if isinstance(self._message_receiver, connection.Connection):
                 self._message_receiver.send(s[i:i+self._chunk_size])
             else:  # mp.Queue or queue.Queue
                 self._message_receiver.put(s[i:i+self._chunk_size])
@@ -374,7 +375,7 @@ class PatchExecutableFrame(tk.Frame):
 
     def update_log(self, message_queue):
         try:
-            if isinstance(message_queue, mp.connection.Connection):
+            if isinstance(message_queue, connection.Connection):
                 while message_queue.poll():
                     self.log_field.write(message_queue.recv())
             else:
