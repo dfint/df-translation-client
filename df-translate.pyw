@@ -563,8 +563,12 @@ class TranslateExternalFiles(tk.Frame):
 
     def on_change_translation_files_path(self, config, key, directory):
         check_and_save_path(config, key, directory)
-        self.combo_language.values = tuple(self.get_languages(directory))
-        self.combo_language.current(0)
+        if path.exists(directory):
+            self.combo_language.values = tuple(self.get_languages(directory))
+            self.combo_language.current(0)
+        else:
+            self.combo_language.values = tuple()
+            self.combo_language.text = ''
 
     def on_change_language(self, event=None, widget=None):
         def filter_files_by_language(directory, language):
@@ -576,10 +580,10 @@ class TranslateExternalFiles(tk.Frame):
 
         if widget is None:
             widget = event.widget
-
-        self.listbox_translation_files.values = tuple(
-            filter_files_by_language(self.fileentry_translation_files.text, widget.text)
-        )
+        
+        directory = self.fileentry_translation_files.text
+        files = filter_files_by_language(directory, widget.text) if path.exists(directory) else tuple()
+        self.listbox_translation_files.values = tuple(files)
 
     def __init__(self, master, app=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
