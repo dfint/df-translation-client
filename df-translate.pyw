@@ -640,31 +640,36 @@ class App(tk.Tk):
         self.after(ms=delay, func=self.save_settings_repeatedly)
         self.save_settings()
 
-    def init_config(self):
+    def init_config(self, noconfig):
         config_name = '.df-translate.json'
         userdir = path.expanduser('~')
         self.config_path = path.join(userdir, config_name)
         default_config = dict()
-        try:
-            with open(self.config_path, encoding='utf-8') as config_file:
-                self.config = json.load(config_file)
-        except (FileNotFoundError, ValueError):
+        
+        if noconfig:
             self.config = default_config
+        else:
+            try:
+                with open(self.config_path, encoding='utf-8') as config_file:
+                    self.config = json.load(config_file)
+            except (FileNotFoundError, ValueError):
+                self.config = default_config
         
         if 'last_tab_opened' not in self.config:
             self.config['last_tab_opened'] = 0
         
-        self.bind('<Destroy>', self.save_settings)  # Save settings on quit
-        self.save_settings_repeatedly(delay=500)  # Save settings every 500 ms
+        if not noconfig:
+            self.bind('<Destroy>', self.save_settings)  # Save settings on quit
+            self.save_settings_repeatedly(delay=500)  # Save settings every 500 ms
 
-    def __init__(self):
+    def __init__(self, noconfig=False):
         super().__init__()
         
         self.notebook = ttk.Notebook()
         
         self.config = None
         self.config_path = None
-        self.init_config()
+        self.init_config(noconfig)
         
         notebook = self.notebook
         notebook.pack(fill='both', expand=1)
@@ -685,4 +690,4 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     mp.freeze_support()
-    App().mainloop()
+    App(noconfig='--noconfig' in sys.argv).mainloop()
