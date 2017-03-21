@@ -615,9 +615,12 @@ class TranslateExternalFiles(tk.Frame):
 
         self.combo_language = ComboboxCustom(self)
         self.combo_language.grid(row=2, column=1, sticky='WE')
-
-        self.combo_language.values = tuple(self.get_languages(self.fileentry_translation_files.text))
-        self.combo_language.current(0)
+        
+        directory = self.fileentry_translation_files.text
+        if path.exists(directory):
+            self.combo_language.values = tuple(self.get_languages(self.fileentry_translation_files.text))
+            self.combo_language.current(0)
+        
         self.combo_language.bind('<<ComboboxSelected>>', self.on_change_language)
 
         self.listbox_translation_files = ListboxCustom(self)
