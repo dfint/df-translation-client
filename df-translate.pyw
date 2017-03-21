@@ -95,7 +95,7 @@ class DownloadTranslationsFrame(tk.Frame):
             else:
                 pass  # Todo: open the directory in a file manager on linux
 
-            return
+            self.download_started = False
         else:
             if queue is None:
                 queue = mp.Queue()
@@ -139,7 +139,7 @@ class DownloadTranslationsFrame(tk.Frame):
                        initial_names, resource_names)
     
     def bt_download(self):
-        if self.tx and self.resources:
+        if self.tx and self.resources and not self.download_started:
             self.progressbar['maximum'] = len(self.resources) * 1.001
             self.progressbar['value'] = 0
             
@@ -161,6 +161,7 @@ class DownloadTranslationsFrame(tk.Frame):
             resource_names = list(initial_names)
             
             self.listbox_resources.values = tuple(resource_names)
+            self.download_started = True
             self.download_waiter(self.resources, language, project, download_dir)
     
     def __init__(self, master=None, app=None):
@@ -229,6 +230,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
         self.resources = None
         self.tx = None
+        self.download_started = False
 
 
 def show_spaces(s):
