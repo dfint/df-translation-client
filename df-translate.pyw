@@ -334,16 +334,17 @@ class DialogDontFixSpaces(tk.Toplevel):
 def cleanup_dictionary(d: iter, exclusions: iter):
     exclusions = set(exclusions)
     for original_string, translation in d:
-        if original_string and translation and original_string != translation and original_string not in exclusions:
-            if original_string[0] == ' ' and translation[0] not in {' ', ','}:
-                translation = ' ' + translation
+        if original_string and translation and original_string != translation:
+            if original_string not in exclusions:
+                if original_string[0] == ' ' and translation[0] not in {' ', ','}:
+                    translation = ' ' + translation
 
-            if original_string[-1] == ' ' and translation[-1] != ' ':
-                translation += ' '
+                if original_string[-1] == ' ' and translation[-1] != ' ':
+                    translation += ' '
 
-        translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"'})
+            translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"'})
 
-        yield original_string, translation
+            yield original_string, translation
 
 
 class ProcessMessageWrapper:
