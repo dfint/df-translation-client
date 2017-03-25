@@ -701,7 +701,7 @@ class App(tk.Tk):
         notebook.add(f1, text='Patch executable file')
         
         f1 = TranslateExternalFiles(notebook, self)
-        notebook.add(f1, text='Translate external text files')
+        # notebook.add(f1, text='Translate external text files')
         
         # f1 = tk.Frame(notebook)
         # notebook.add(f1, text='Translate packed files')
