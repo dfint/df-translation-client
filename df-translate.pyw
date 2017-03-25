@@ -16,6 +16,7 @@ from os import path
 from tkinter import messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxCustom, CustomText, FileEntry
+from custom_widgets import TwoStateButton
 from collections import OrderedDict
 from df_gettext_toolkit import po
 from multiprocessing import connection
@@ -396,7 +397,7 @@ class PatchExecutableFrame(tk.Frame):
     
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
-            return
+            return False
         
         executable_file = self.fileentry_executable_file.text
         translation_file = self.fileentry_translation_file.text
@@ -429,7 +430,18 @@ class PatchExecutableFrame(tk.Frame):
                                                 stdout=ProcessMessageWrapper(queue)
                                             ))
             self.dfrus_process.start()
-    
+            return True
+
+        return False
+
+    def bt_stop(self):
+        r = messagebox.showwarning('Are you sure?', 'Stop the patching process?', type=messagebox.OKCANCEL)
+        if r == 'cancel':
+            return False
+        else:
+            self.dfrus_process.terminate()
+            return True
+
     def bt_exclusions(self):
         translation_file = self.fileentry_translation_file.text
         language = None
@@ -534,8 +546,8 @@ class PatchExecutableFrame(tk.Frame):
             default_state=False)
         
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
-        
-        button_patch = ttk.Button(self, text='Patch!', command=self.bt_patch)
+
+        button_patch = TwoStateButton(self, text='Patch!', command=self.bt_patch, text2='Stop!', command2=self.bt_stop)
         button_patch.grid(row=5, column=2)
         
         self.log_field = CustomText(self, width=48, height=16, enabled=False)

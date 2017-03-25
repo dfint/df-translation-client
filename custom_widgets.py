@@ -3,6 +3,7 @@ import tkinter.ttk as ttk
 
 from tkinter import filedialog
 from os import path
+from collections import namedtuple
 
 
 class CheckbuttonVar(ttk.Checkbutton):
@@ -202,3 +203,19 @@ class FileEntry(tk.Frame):
     @property
     def text(self):
         return self.entry.text
+
+
+class TwoStateButton(ttk.Button):
+    def _action(self):
+        command = self._state[0].command
+        if command():
+            self.swap_state()
+
+    def swap_state(self):
+        self._state.reverse()
+        self['text'] = self._state[0].text
+
+    def __init__(self, parent, text, command, text2, command2, **kwargs):
+        TextCommand = namedtuple('TextCommand', 'text,command')
+        self._state = [TextCommand(text, command), TextCommand(text2, command2)]
+        super().__init__(parent, text=text, command=self._action, **kwargs)
