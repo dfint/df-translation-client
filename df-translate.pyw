@@ -632,6 +632,23 @@ class TranslateExternalFiles(tk.Frame):
         self.grid_columnconfigure(1, weight=1)
 
 
+class StderrHandler:
+    def __init__(self):
+        self._message = ''
+
+    def write(self, s):
+        self._message += s
+
+    def flush(self):
+        pass
+
+    def getvalue(self):
+        return self._message
+
+    def clear(self):
+        self._message = ''
+
+
 class App(tk.Tk):
     def save_settings(self, _=None):
         with open(self.config_path, 'w', encoding='utf-8') as config_file:
@@ -642,8 +659,14 @@ class App(tk.Tk):
         if nb.tabs():
             self.config['last_tab_opened'] = nb.tabs().index(nb.select())
         
-        self.after(ms=delay, func=self.save_settings_repeatedly)
+        self.after(delay, self.save_settings_repeatedly, delay)
         self.save_settings()
+
+    def check_for_errors(self, delay=100):
+        if self.stderr.getvalue():
+            messagebox.showerror('Unhandled Exception', self.stderr.getvalue())
+            self.stderr.clear()
+        self.after(delay, self.check_for_errors, delay)
 
     def init_config(self, noconfig):
         config_name = '.df-translate.json'
@@ -669,7 +692,13 @@ class App(tk.Tk):
 
     def __init__(self, noconfig=False):
         super().__init__()
-        
+
+        executable = path.split(sys.executable)[1]
+        if executable.startswith('pythonw') or not executable.startswith('python'):
+            self.stderr = StderrHandler()
+            sys.stderr = self.stderr
+            self.check_for_errors()
+
         self.notebook = ttk.Notebook()
         
         self.config = None
