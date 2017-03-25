@@ -86,7 +86,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 recent_projects.insert(0, project)
             self.combo_projects.values = tuple(recent_projects)
 
-    def download_waiter(self, resources, language, project, download_dir, i=0, download_process=None, queue=None,
+    def download_waiter(self, resources, language, project, download_dir, i=0, queue=None,
                         initial_names=None, resource_names=None):
         if i >= len(resources):
             # Everything is downloaded
@@ -106,8 +106,8 @@ class DownloadTranslationsFrame(tk.Frame):
                 initial_names = [res['name'] for res in self.resources]
                 resource_names = list(initial_names)
 
-            if download_process is None:
-                download_process = mp.Process(target=downloader, kwargs=dict(
+            if self.download_process is None:
+                self.download_process = mp.Process(target=downloader, kwargs=dict(
                     i=i,
                     queue=queue,
                     tx=self.tx,
@@ -116,7 +116,9 @@ class DownloadTranslationsFrame(tk.Frame):
                     res=resources[i],
                     file_path=path.join(download_dir, '%s_%s.po' % (resources[i]['slug'], language))
                 ))
-                download_process.start()
+                self.download_process.start()
+            elif not self.download_process.is_alive() and queue.empty():
+                queue.put((i, 'stopped'))
 
             while not queue.empty():
                 j, message = queue.get()
@@ -126,9 +128,9 @@ class DownloadTranslationsFrame(tk.Frame):
                 
                 if message == 'ok!':
                     self.progressbar.step()
-                    if download_process is not None:
-                        download_process.join()  # ensure process is terminated
-                        download_process = None
+                    if self.download_process is not None:
+                        self.download_process.join()  # ensure process is terminated
+                        self.download_process = None
                     i += 1
                 elif message == 'failed':
                     error = queue.get()
@@ -137,8 +139,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
             self.after(100, self.download_waiter,
                        resources, language, project, download_dir, i,
-                       download_process, queue,
-                       initial_names, resource_names)
+                       queue, initial_names, resource_names)
     
     def bt_download(self):
         if self.tx and self.resources and not self.download_started:
@@ -165,7 +166,16 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources.values = tuple(resource_names)
             self.download_started = True
             self.download_waiter(self.resources, language, project, download_dir)
-    
+            return True
+
+    def bt_stop_downloading(self):
+        r = messagebox.showwarning('Are you sure?', 'Stop downloading?', type=messagebox.OKCANCEL)
+        if r == 'cancel':
+            return False
+        else:
+            self.download_process.terminate()
+            return True
+
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -216,7 +226,8 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.fileentry_download_to.grid(column=1, row=6, columnspan=2, sticky='WE')
         
-        self.button_download = ttk.Button(self, text='Download translations', command=self.bt_download)
+        self.button_download = TwoStateButton(self, text='Download translations', command=self.bt_download,
+                                              text2='Stop', command2=self.bt_stop_downloading)
         self.button_download.grid(sticky=tk.W + tk.E)
         
         self.progressbar = ttk.Progressbar(self)
@@ -233,6 +244,7 @@ class DownloadTranslationsFrame(tk.Frame):
         self.resources = None
         self.tx = None
         self.download_started = False
+        self.download_process = None
 
 
 def show_spaces(s):
