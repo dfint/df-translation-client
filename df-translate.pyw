@@ -72,7 +72,10 @@ class DownloadTranslationsFrame(tk.Frame):
         else:
             self.combo_languages.values = tuple(languages)
             last_language = self.config.get('language', None)
-            self.combo_languages.current(languages.index(last_language) if last_language in languages else 0)
+            if last_language and last_language in languages:
+                self.combo_languages.text = last_language
+            else:
+                self.combo_languages.current(0)
             
             self.listbox_resources.clear()
             self.listbox_resources.values = tuple(res['name'] for res in self.resources)
