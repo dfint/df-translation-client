@@ -139,6 +139,9 @@ class DownloadTranslationsFrame(tk.Frame):
                     self.download_started = False
                     self.button_download.swap_state()
                     return
+                elif message == 'stopped':
+                    self.download_started = False
+                    return
 
             self.after(100, self.download_waiter,
                        resources, language, project, download_dir, i,
