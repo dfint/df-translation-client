@@ -604,14 +604,16 @@ class PatchExecutableFrame(tk.Frame):
                 config['language_codepages'][self.translation_file_language] = event.widget.text
         
         self.combo_encoding.bind('<<ComboboxSelected>>', func=save_encoding_into_config)
-        
+
+        # FIXME: chk_dont_patch_charmap does nothing
         self.chk_dont_patch_charmap = self.setup_checkbutton(
             text="Don't patch charmap table",
             config_key='dont_patch_charmap',
             default_state=False)
         
         self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
-        
+
+        # FIXME: chk_add_leading_trailing_spaces does nothing
         self.chk_add_leading_trailing_spaces = self.setup_checkbutton(
             text='Add necessary leading/trailing spaces',
             config_key='add_leading_trailing_spaces',
