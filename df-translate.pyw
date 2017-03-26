@@ -19,23 +19,25 @@ from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxC
 from custom_widgets import TwoStateButton
 from collections import OrderedDict
 from df_gettext_toolkit import po
-from multiprocessing import connection
 
 
-def downloader(queue, tx, project, language, res, i, file_path):
+def downloader(conn, tx, project, language, resources, file_path_pattern):
     exception_info = 'Everything is ok! (If you see this message, contact the developer)'
-    queue.put((i, 'downloading...'))
-    for j in range(10):
-        try:
-            tx.get_translation(project, res['slug'], language, file_path)
-            queue.put((i, 'ok!'))
+    for i, res in enumerate(resources):
+        conn.send((i, 'downloading...'))
+        for j in range(10):
+            try:
+                tx.get_translation(project, res['slug'], language, file_path_pattern % res['slug'])
+                break
+            except:
+                conn.send((i, 'retry... (%d)' % (10 - j)))
+                exception_info = sys.exc_info()[0]
+        else:
+            conn.send((i, 'failed'))
+            conn.send(exception_info)
             return
-        except:
-            queue.put((i, 'retry... (%d)' % (10 - j)))
-            exception_info = sys.exc_info()[0]
-    else:
-        queue.put((i, 'failed'))
-        queue.put(exception_info)
+        conn.send((i, 'ok!'))
+    conn.send((None, 'completed'))
 
 
 def check_and_save_path(config, key, file_path):
@@ -89,70 +91,71 @@ class DownloadTranslationsFrame(tk.Frame):
                 recent_projects.insert(0, project)
             self.combo_projects.values = tuple(recent_projects)
 
-    def download_waiter(self, resources, language, project, download_dir, i=0, queue=None,
-                        initial_names=None, resource_names=None):
-        if i >= len(resources):
-            # Everything is downloaded
-            self.config['language'] = language
+    def download_waiter(self, resources, language, project, download_dir, parent_conn=None,
+                        initial_names=None, resource_names=None, i=0):
+        if initial_names is None:
+            initial_names = [res['name'] for res in self.resources]
+            resource_names = list(initial_names)
 
-            if sys.platform == 'win32':
-                subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
+        if self.download_process is None:
+            parent_conn, child_conn = mp.Pipe()
+
+            self.download_process = mp.Process(target=downloader, kwargs=dict(
+                conn=child_conn,
+                tx=self.tx,
+                project=project,
+                language=language,
+                resources=resources,
+                file_path_pattern=path.join(download_dir, '%s_' + language + '.po')
+            ))
+            self.download_process.start()
+
+        while parent_conn.poll() or not self.download_process.is_alive():
+            if not self.download_process.is_alive():
+                i, message = i, 'stopped'
             else:
-                pass  # Todo: open the directory in a file manager on linux
+                i, message = parent_conn.recv()
 
-            self.download_started = False
-            self.button_download.reset_state()
-        else:
-            if queue is None:
-                queue = mp.Queue()
-            
-            if initial_names is None:
-                initial_names = [res['name'] for res in self.resources]
-                resource_names = list(initial_names)
+            if message == 'completed':
+                # Everything is downloaded
+                self.download_process.join()
+                self.download_process = None
+                self.button_download.reset_state()
+                self.download_started = False
 
-            if self.download_process is None:
-                self.download_process = mp.Process(target=downloader, kwargs=dict(
-                    i=i,
-                    queue=queue,
-                    tx=self.tx,
-                    project=project,
-                    language=language,
-                    res=resources[i],
-                    file_path=path.join(download_dir, '%s_%s.po' % (resources[i]['slug'], language))
-                ))
-                self.download_process.start()
-            elif not self.download_process.is_alive() and queue.empty():
-                queue.put((i, 'stopped'))
+                self.config['language'] = language
 
-            while not queue.empty():
-                j, message = queue.get()
-                resource_names[j] = initial_names[j] + ' - ' + message
-                self.listbox_resources.values = tuple(resource_names)
-                self.app.update()
-                
-                if message == 'ok!':
-                    self.progressbar.step()
-                    if self.download_process is not None:
-                        self.download_process.join()  # ensure process is terminated
-                        self.download_process = None
-                    i += 1
-                elif message == 'failed':
-                    error = queue.get()
-                    messagebox.showerror('Downloading error', error)
-                    self.download_started = False
-                    self.button_download.reset_state()
-                    if self.download_process is not None:
-                        self.download_process.join()
-                        self.download_process = None
-                    return
-                elif message == 'stopped':
-                    self.download_started = False
-                    self.download_process = None
-                    return
+                if sys.platform == 'win32':
+                    subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
+                else:
+                    pass  # Todo: open the directory in a file manager on linux
 
-            self.after(100, self.download_waiter,
-                       resources, language, project, download_dir, i,
-                       queue, initial_names, resource_names)
+                return
+
+            resource_names[i] = initial_names[i] + ' - ' + message
+            self.listbox_resources.values = tuple(resource_names)
+            self.app.update()
+
+            if message == 'ok!':
+                self.progressbar.step()
+                break
+            elif message == 'failed':
+                error = parent_conn.recv()
+                self.download_process.join()
+                self.download_process = None
+                self.button_download.reset_state()
+                self.download_started = False
+                messagebox.showerror('Downloading error', error)
+                return
+            elif message == 'stopped':
+                self.download_process = None
+                self.button_download.reset_state()
+                self.download_started = False
+                return
+
+        self.after(100, self.download_waiter,
+                   resources, language, project, download_dir,
+                   parent_conn, initial_names, resource_names, i)
     
     def bt_download(self):
         if self.tx and self.resources and not self.download_started:
@@ -392,10 +395,7 @@ class ProcessMessageWrapper:
     
     def write(self, s):
         for i in range(0, len(s), self._chunk_size):
-            if isinstance(self._message_receiver, connection.Connection):
-                self._message_receiver.send(s[i:i+self._chunk_size])
-            else:  # mp.Queue or queue.Queue
-                self._message_receiver.put(s[i:i+self._chunk_size])
+            self._message_receiver.send(s[i:i+self._chunk_size])
             
     def flush(self):
         pass  # stub method
@@ -419,12 +419,8 @@ class PatchExecutableFrame(tk.Frame):
 
     def update_log(self, message_queue):
         try:
-            if isinstance(message_queue, connection.Connection):
-                while message_queue.poll():
-                    self.log_field.write(message_queue.recv())
-            else:
-                while not message_queue.empty():
-                    self.log_field.write(message_queue.get())
+            while message_queue.poll():
+                self.log_field.write(message_queue.recv())
             
             if not self.dfrus_process.is_alive():
                 self.log_field.write('\n[PROCESS FINISHED]')
@@ -456,9 +452,10 @@ class PatchExecutableFrame(tk.Frame):
                 )
             
             self.config['last_encoding'] = self.combo_encoding.text
-            
-            queue = mp.Queue()
-            self.after(100, self.update_log, queue)
+
+            parent_conn, child_conn = mp.Pipe()
+
+            self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
             self.dfrus_process = mp.Process(target=dfrus.run,
                                             kwargs=dict(
@@ -467,7 +464,7 @@ class PatchExecutableFrame(tk.Frame):
                                                 trans_table=dictionary,
                                                 codepage=self.combo_encoding.text,
                                                 debug=self.chk_debug_output.is_checked,
-                                                stdout=ProcessMessageWrapper(queue)
+                                                stdout=ProcessMessageWrapper(child_conn)
                                             ))
             self.dfrus_process.start()
             return True
