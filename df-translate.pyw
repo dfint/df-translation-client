@@ -9,6 +9,7 @@ import subprocess
 import json
 import os
 import re
+import traceback
 
 from dfrus.patchdf import get_codepages
 from dfrus import dfrus
@@ -31,7 +32,7 @@ def downloader(conn, tx, project, language, resources, file_path_pattern):
                 break
             except:
                 conn.send((i, 'retry... (%d)' % (10 - j)))
-                exception_info = sys.exc_info()[0]
+                exception_info = traceback.format_exc()
         else:
             conn.send((i, 'failed'))
             conn.send(exception_info)
@@ -70,7 +71,7 @@ class DownloadTranslationsFrame(tk.Frame):
         except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
             messagebox.showerror('Error', err)
         except:
-            messagebox.showerror('Unexpected error', repr(sys.exc_info()[0]))
+            messagebox.showerror('Unexpected error', traceback.format_exc())
         else:
             self.combo_languages.values = tuple(sorted(languages))
             last_language = self.config.get('language', None)
