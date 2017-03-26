@@ -98,6 +98,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 pass  # Todo: open the directory in a file manager on linux
 
             self.download_started = False
+            self.button_download.swap_state()
         else:
             if queue is None:
                 queue = mp.Queue()
@@ -135,6 +136,8 @@ class DownloadTranslationsFrame(tk.Frame):
                 elif message == 'failed':
                     error = queue.get()
                     messagebox.showerror('Downloading error', error)
+                    self.download_started = False
+                    self.button_download.swap_state()
                     return
 
             self.after(100, self.download_waiter,
@@ -402,10 +405,12 @@ class PatchExecutableFrame(tk.Frame):
             
             if not self.dfrus_process.is_alive():
                 self.log_field.write('\n[PROCESS FINISHED]')
+                self.button_patch.swap_state()
             else:
                 self.after(100, self.update_log, message_queue)
         except (EOFError, BrokenPipeError):
             self.log_field.write('\n[MESSAGE QUEUE/PIPE BROKEN]')
+            self.button_patch.swap_state()
     
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
@@ -559,8 +564,8 @@ class PatchExecutableFrame(tk.Frame):
         
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
 
-        button_patch = TwoStateButton(self, text='Patch!', command=self.bt_patch, text2='Stop!', command2=self.bt_stop)
-        button_patch.grid(row=5, column=2)
+        self.button_patch = TwoStateButton(self, text='Patch!', command=self.bt_patch, text2='Stop!', command2=self.bt_stop)
+        self.button_patch.grid(row=5, column=2)
         
         self.log_field = CustomText(self, width=48, height=16, enabled=False)
         self.log_field.grid(columnspan=3, sticky='NSWE')
