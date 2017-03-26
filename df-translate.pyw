@@ -10,7 +10,7 @@ import json
 import os
 import re
 
-from dfrus.patchdf import codepages
+from dfrus.patchdf import get_codepages
 from dfrus import dfrus
 from os import path
 from tkinter import messagebox
