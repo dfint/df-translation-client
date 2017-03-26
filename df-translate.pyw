@@ -98,7 +98,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 pass  # Todo: open the directory in a file manager on linux
 
             self.download_started = False
-            self.button_download.swap_state()
+            self.button_download.reset_state()
         else:
             if queue is None:
                 queue = mp.Queue()
@@ -137,7 +137,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     error = queue.get()
                     messagebox.showerror('Downloading error', error)
                     self.download_started = False
-                    self.button_download.swap_state()
+                    self.button_download.reset_state()
                     return
                 elif message == 'stopped':
                     self.download_started = False
@@ -419,12 +419,12 @@ class PatchExecutableFrame(tk.Frame):
             
             if not self.dfrus_process.is_alive():
                 self.log_field.write('\n[PROCESS FINISHED]')
-                self.button_patch.swap_state()
+                self.button_patch.reset_state()
             else:
                 self.after(100, self.update_log, message_queue)
         except (EOFError, BrokenPipeError):
             self.log_field.write('\n[MESSAGE QUEUE/PIPE BROKEN]')
-            self.button_patch.swap_state()
+            self.button_patch.reset_state()
     
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
