@@ -176,8 +176,15 @@ class FileEntry(tk.Frame):
         if file_path:
             self.entry.text = file_path
 
-        if self.on_change is not None:
+        if self.on_change is not None and file_path != self._prev_value:
             self.on_change(file_path)
+
+        self._prev_value = file_path
+
+    def on_entry_keyup(self, event):
+        if event.widget.text != self._prev_value:
+            self.on_change(event.widget.text)
+            self._prev_value = event.widget.text
 
     def __init__(self, *args, button_text=None, default_path=None, on_change=None, filetypes=None,
                  dialogtype='askopenfilename', **kwargs):
@@ -196,9 +203,10 @@ class FileEntry(tk.Frame):
 
         self.entry = EntryCustom(self)
         self.entry.text = self.default_path
+        self._prev_value = self.default_path
         self.entry.pack(fill='x', expand=1)
         if self.on_change is not None:
-            self.entry.bind('<KeyPress>', func=lambda event: self.on_change(event.widget.text))
+            self.entry.bind('<KeyRelease>', func=self.on_entry_keyup)
     
     @property
     def text(self):
