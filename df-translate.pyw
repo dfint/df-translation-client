@@ -141,6 +141,9 @@ class DownloadTranslationsFrame(tk.Frame):
                     messagebox.showerror('Downloading error', error)
                     self.download_started = False
                     self.button_download.reset_state()
+                    if self.download_process is not None:
+                        self.download_process.join()
+                        self.download_process = None
                     return
                 elif message == 'stopped':
                     self.download_started = False
