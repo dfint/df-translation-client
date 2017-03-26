@@ -631,7 +631,9 @@ class PatchExecutableFrame(tk.Frame):
         
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
 
-        self.button_patch = TwoStateButton(self, text='Patch!', command=self.bt_patch, text2='Stop!', command2=self.bt_stop)
+        self.button_patch = TwoStateButton(self,
+                                           text='Patch!', command=self.bt_patch,
+                                           text2='Stop!', command2=self.bt_stop)
         self.button_patch.grid(row=5, column=2)
         
         self.log_field = CustomText(self, width=48, height=16, enabled=False)
@@ -672,19 +674,20 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_language.values = tuple()
             self.combo_language.text = ''
 
-    def on_change_language(self, event=None, widget=None):
-        def filter_files_by_language(directory, language):
-            for filename in os.listdir(directory):
-                if filename.endswith('.po'):
-                    with open(path.join(directory, filename), encoding='utf-8') as file:
-                        if po.PoReader(file).meta['Language'] == language:
-                            yield filename
+    @staticmethod
+    def filter_files_by_language(directory, language):
+        for filename in os.listdir(directory):
+            if filename.endswith('.po'):
+                with open(path.join(directory, filename), encoding='utf-8') as file:
+                    if po.PoReader(file).meta['Language'] == language:
+                        yield filename
 
+    def on_change_language(self, event=None, widget=None):
         if widget is None:
             widget = event.widget
         
         directory = self.fileentry_translation_files.text
-        files = filter_files_by_language(directory, widget.text) if path.exists(directory) else tuple()
+        files = self.filter_files_by_language(directory, widget.text) if path.exists(directory) else tuple()
         self.listbox_translation_files.values = tuple(files)
 
     def __init__(self, master, app=None, *args, **kwargs):
