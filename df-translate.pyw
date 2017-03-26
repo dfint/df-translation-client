@@ -537,7 +537,7 @@ class PatchExecutableFrame(tk.Frame):
         self.combo_encoding = ComboboxCustom(self)
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
         
-        self.combo_encoding.values = tuple(sorted(codepages.keys(),
+        self.combo_encoding.values = tuple(sorted(get_codepages().keys(),
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
         
         if 'last_encoding' in config:
