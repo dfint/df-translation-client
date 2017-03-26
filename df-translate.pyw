@@ -70,7 +70,7 @@ class DownloadTranslationsFrame(tk.Frame):
         except:
             messagebox.showerror('Unexpected error', repr(sys.exc_info()[0]))
         else:
-            self.combo_languages.values = tuple(languages)
+            self.combo_languages.values = tuple(sorted(languages))
             last_language = self.config.get('language', None)
             if last_language and last_language in languages:
                 self.combo_languages.text = last_language
