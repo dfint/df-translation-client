@@ -353,8 +353,12 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.grid_rowconfigure(2, weight=1)
 
 
-def cleanup_dictionary(d: iter, exclusions: iter):
-    exclusions = set(exclusions)
+def cleanup_dictionary(d: iter, exclusions=None):
+    if not exclusions:
+        exclusions = set()
+    else:
+        exclusions = set(exclusions)
+
     for original_string, translation in d:
         if original_string and translation and original_string != translation:
             if original_string not in exclusions:
@@ -364,7 +368,7 @@ def cleanup_dictionary(d: iter, exclusions: iter):
                 if original_string[-1] == ' ' and translation[-1] != ' ':
                     translation += ' '
 
-            translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"'})
+            translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"', 0x2014: '-'})
 
             yield original_string, translation
 
@@ -495,6 +499,32 @@ class PatchExecutableFrame(tk.Frame):
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
 
+    def filter_codepages(self, codepages):
+        translation_file = self.fileentry_translation_file.text
+        with open(translation_file, 'r', encoding='utf-8') as fn:
+            pofile = po.PoReader(fn)
+            dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
+
+        for codepage in codepages:
+            try:
+                for _, item in dictionary:
+                    item.encode(codepage)
+                yield codepage
+            except UnicodeEncodeError:
+                pass
+
+    def on_translation_path_change(self, text):
+        check_and_save_path(self.config, 'df_exe_translation_file', text)
+
+        # Update codepage combobox
+        # TODO: Cache supported codepages' list + remember last chosen codepage for each language
+        codepages = get_codepages().keys()
+        if self.fileentry_translation_file.path_is_valid():
+            codepages = self.filter_codepages(codepages)
+        self.combo_encoding.values = tuple(sorted(codepages,
+                                                  key=lambda x: int(x.strip(string.ascii_letters))))
+        self.combo_encoding.current(0)
+
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -528,7 +558,7 @@ class PatchExecutableFrame(tk.Frame):
                 # ('csv file', '*.csv'), # @TODO: Currently not supported 
             ],
             default_path=config.get('df_exe_translation_file', ''),
-            on_change=lambda text: check_and_save_path(self.config, 'df_exe_translation_file', text),
+            on_change=self.on_translation_path_change,
         )
         self.fileentry_translation_file.grid(column=1, row=1, columnspan=2, sticky='EW')
         
@@ -536,8 +566,11 @@ class PatchExecutableFrame(tk.Frame):
         
         self.combo_encoding = ComboboxCustom(self)
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
-        
-        self.combo_encoding.values = tuple(sorted(get_codepages().keys(),
+
+        codepages = get_codepages().keys()
+        if self.fileentry_translation_file.path_is_valid():
+            codepages = self.filter_codepages(codepages)
+        self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
         
         if 'last_encoding' in config:
