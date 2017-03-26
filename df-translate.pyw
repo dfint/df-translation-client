@@ -141,6 +141,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     return
                 elif message == 'stopped':
                     self.download_started = False
+                    self.download_process = None
                     return
 
             self.after(100, self.download_waiter,
