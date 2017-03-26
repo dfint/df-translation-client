@@ -204,6 +204,9 @@ class FileEntry(tk.Frame):
     def text(self):
         return self.entry.text
 
+    def path_is_valid(self):
+        return self.text and path.exists(self.text)
+
 
 class TwoStateButton(ttk.Button):
     def _action(self):
