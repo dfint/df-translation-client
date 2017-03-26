@@ -406,6 +406,9 @@ class PatchExecutableFrame(tk.Frame):
         if 'fix_space_exclusions' not in config:
             config['fix_space_exclusions'] = dict(ru=['Histories of '])
 
+        if 'language_codepages' not in config:
+            config['language_codepages'] = dict()
+
         return config
 
     def update_log(self, message_queue):
@@ -507,6 +510,7 @@ class PatchExecutableFrame(tk.Frame):
         translation_file = self.fileentry_translation_file.text
         with open(translation_file, 'r', encoding='utf-8') as fn:
             pofile = po.PoReader(fn)
+            self.translation_file_language = pofile.meta['Language']
             dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
 
         for codepage in codepages:
@@ -521,13 +525,17 @@ class PatchExecutableFrame(tk.Frame):
         check_and_save_path(self.config, 'df_exe_translation_file', text)
 
         # Update codepage combobox
-        # TODO: Cache supported codepages' list + remember last chosen codepage for each language
+        # TODO: Cache supported codepages' list
         codepages = get_codepages().keys()
         if self.fileentry_translation_file.path_is_valid():
             codepages = self.filter_codepages(codepages)
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
-        self.combo_encoding.current(0)
+
+        if self.translation_file_language not in self.config['language_codepages']:
+            self.combo_encoding.current(0)
+        else:
+            self.combo_encoding.text = self.config['language_codepages'][self.translation_file_language]
 
     def __init__(self, master=None, app=None):
         super().__init__(master)
@@ -565,7 +573,12 @@ class PatchExecutableFrame(tk.Frame):
             on_change=self.on_translation_path_change,
         )
         self.fileentry_translation_file.grid(column=1, row=1, columnspan=2, sticky='EW')
-        
+        if self.fileentry_translation_file.path_is_valid():
+            with open(self.fileentry_translation_file.text, 'r', encoding='utf-8') as fn:
+                self.translation_file_language = po.PoReader(fn).meta['Language']
+        else:
+            self.translation_file_language = None
+
         tk.Label(self, text='Encoding:').grid()
         
         self.combo_encoding = ComboboxCustom(self)
@@ -581,9 +594,11 @@ class PatchExecutableFrame(tk.Frame):
             self.combo_encoding.text = config['last_encoding']
         else:
             self.combo_encoding.current(0)
-        
+
         def save_encoding_into_config(event):
             config['last_encoding'] = event.widget.text
+            if self.translation_file_language:
+                config['language_codepages'][self.translation_file_language] = event.widget.text
         
         self.combo_encoding.bind('<<ComboboxSelected>>', func=save_encoding_into_config)
         
