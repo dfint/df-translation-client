@@ -179,6 +179,10 @@ class DownloadTranslationsFrame(tk.Frame):
             self.download_process.terminate()
             return True
 
+    def kill_processes(self, _):
+        if self.download_process and self.download_process.is_alive():
+            self.download_process.terminate()
+
     def __init__(self, master=None, app=None):
         super().__init__(master)
         
@@ -248,6 +252,8 @@ class DownloadTranslationsFrame(tk.Frame):
         self.tx = None
         self.download_started = False
         self.download_process = None
+
+        self.bind('<Destroy>', self.kill_processes)
 
 
 def show_spaces(s):
@@ -459,6 +465,10 @@ class PatchExecutableFrame(tk.Frame):
             self.dfrus_process.terminate()
             return True
 
+    def kill_processes(self, _):
+        if self.dfrus_process and self.dfrus_process.is_alive():
+            self.dfrus_process.terminate()
+
     def bt_exclusions(self):
         translation_file = self.fileentry_translation_file.text
         language = None
@@ -572,6 +582,8 @@ class PatchExecutableFrame(tk.Frame):
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(6, weight=1)
+
+        self.bind('<Destroy>', self.kill_processes)
 
 
 class TranslateExternalFiles(tk.Frame):
