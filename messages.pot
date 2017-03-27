@@ -1,0 +1,233 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2017-03-27 21:12+RTZ 2 (ceia)\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=cp1251\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: df-translate.pyw:27
+msgid "Everything is ok! (If you see this message, contact the developer)"
+msgstr ""
+
+#: df-translate.pyw:29
+msgid "downloading..."
+msgstr ""
+
+#: df-translate.pyw:35
+msgid "retry... (%d)"
+msgstr ""
+
+#: df-translate.pyw:38 df-translate.pyw:144
+msgid "failed"
+msgstr ""
+
+#: df-translate.pyw:41 df-translate.pyw:141
+msgid "ok!"
+msgstr ""
+
+#: df-translate.pyw:42 df-translate.pyw:121
+msgid "completed"
+msgstr ""
+
+#: df-translate.pyw:69
+msgid "Project %r does not exist"
+msgstr ""
+
+#: df-translate.pyw:73 df-translate.pyw:444 df-translate.pyw:446
+msgid "Error"
+msgstr ""
+
+#: df-translate.pyw:75
+msgid "Unexpected error"
+msgstr ""
+
+#: df-translate.pyw:117 df-translate.pyw:152
+msgid "stopped"
+msgstr ""
+
+#: df-translate.pyw:150
+msgid "Downloading error"
+msgstr ""
+
+#: df-translate.pyw:169
+msgid "Directory not specified"
+msgstr ""
+
+#: df-translate.pyw:169
+msgid "Specify download directory first"
+msgstr ""
+
+#: df-translate.pyw:175
+msgid "Directory does not exist"
+msgstr ""
+
+#: df-translate.pyw:175
+msgid "Specify existing directory first"
+msgstr ""
+
+#: df-translate.pyw:190
+msgid "Stop downloading?"
+msgstr ""
+
+#: df-translate.pyw:190 df-translate.pyw:477
+msgid "Are you sure?"
+msgstr ""
+
+#: df-translate.pyw:208
+msgid "Transifex project:"
+msgstr ""
+
+#: df-translate.pyw:214
+msgid "Username:"
+msgstr ""
+
+#: df-translate.pyw:220
+msgid "Password:"
+msgstr ""
+
+#: df-translate.pyw:225
+msgid "Connect..."
+msgstr ""
+
+#: df-translate.pyw:230
+msgid "Choose language:"
+msgstr ""
+
+#: df-translate.pyw:240
+msgid "Download to:"
+msgstr ""
+
+#: df-translate.pyw:251 df-translate.pyw:801
+msgid "Download translations"
+msgstr ""
+
+#: df-translate.pyw:252
+msgid "Stop"
+msgstr ""
+
+#: df-translate.pyw:258
+msgid "Resources:"
+msgstr ""
+
+#: df-translate.pyw:318
+msgid "Choose exclusions"
+msgstr ""
+
+#: df-translate.pyw:338
+msgid "-- Remove selected --"
+msgstr ""
+
+#: df-translate.pyw:349
+msgid "<< Add selected <<"
+msgstr ""
+
+#: df-translate.pyw:356
+msgid "OK"
+msgstr ""
+
+#: df-translate.pyw:363
+msgid "Cancel"
+msgstr ""
+
+#: df-translate.pyw:428
+msgid ""
+"\n"
+"[PROCESS FINISHED]"
+msgstr ""
+
+#: df-translate.pyw:433
+msgid ""
+"\n"
+"[MESSAGE QUEUE/PIPE BROKEN]"
+msgstr ""
+
+#: df-translate.pyw:444
+msgid "Valid path to an executable file must be specified"
+msgstr ""
+
+#: df-translate.pyw:446
+msgid "Valid path to a translation file must be specified"
+msgstr ""
+
+#: df-translate.pyw:477
+msgid "Stop the patching process?"
+msgstr ""
+
+#: df-translate.pyw:556
+msgid "DF executable file:"
+msgstr ""
+
+#: df-translate.pyw:561
+msgid "Executable files"
+msgstr ""
+
+#: df-translate.pyw:567
+msgid "DF executable translation file:"
+msgstr ""
+
+#: df-translate.pyw:573
+msgid "Hardcoded strings' translation"
+msgstr ""
+
+#: df-translate.pyw:574
+msgid "Translation files"
+msgstr ""
+
+#: df-translate.pyw:587
+msgid "Encoding:"
+msgstr ""
+
+#: df-translate.pyw:612
+msgid "Don't patch charmap table"
+msgstr ""
+
+#: df-translate.pyw:620
+msgid "Add necessary leading/trailing spaces"
+msgstr ""
+
+#: df-translate.pyw:626
+msgid "Exclusions..."
+msgstr ""
+
+#: df-translate.pyw:630
+msgid "Enable debugging output"
+msgstr ""
+
+#: df-translate.pyw:637
+msgid "Patch!"
+msgstr ""
+
+#: df-translate.pyw:638
+msgid "Stop!"
+msgstr ""
+
+#: df-translate.pyw:701
+msgid "Dwarf Fortress root path:"
+msgstr ""
+
+#: df-translate.pyw:711
+msgid "Translation files' directory:"
+msgstr ""
+
+#: df-translate.pyw:721
+msgid "Language:"
+msgstr ""
+
+#: df-translate.pyw:755
+msgid "Unhandled Exception"
+msgstr ""
+
+#: df-translate.pyw:804
+msgid "Patch executable file"
+msgstr ""
+
