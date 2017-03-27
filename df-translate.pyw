@@ -1,5 +1,6 @@
 import gettext
 import io
+import locale
 import multiprocessing as mp
 import requests
 import sys
@@ -39,7 +40,7 @@ def downloader(conn, tx, project, language, resources, file_path_pattern):
             conn.send(exception_info)
             return
         conn.send((i, _('ok!')))
-    conn.send((None, _('completed')))
+    conn.send((None, 'completed'))  # internal message, do not translate it
 
 
 def check_and_save_path(config, key, file_path):
@@ -814,7 +815,9 @@ class App(tk.Tk):
 if __name__ == '__main__':
     mp.freeze_support()
     
-    _ = gettext.lgettext
+    loc, _ = locale.getdefaultlocale()
+    os.environ['LANGUAGE'] = loc
+    _ = gettext.gettext
     mydir = os.path.realpath(os.path.dirname(sys.argv[0]))
     localedir = os.path.join(mydir, "locale")
     gettext.bindtextdomain('df-translate', localedir)
