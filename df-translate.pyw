@@ -1,3 +1,4 @@
+import gettext
 import io
 import multiprocessing as mp
 import requests
@@ -23,22 +24,22 @@ from df_gettext_toolkit import po
 
 
 def downloader(conn, tx, project, language, resources, file_path_pattern):
-    exception_info = 'Everything is ok! (If you see this message, contact the developer)'
+    exception_info = _('Everything is ok! (If you see this message, contact the developer)')
     for i, res in enumerate(resources):
-        conn.send((i, 'downloading...'))
+        conn.send((i, _('downloading...')))
         for j in range(10):
             try:
                 tx.get_translation(project, res['slug'], language, file_path_pattern % res['slug'])
                 break
             except:
-                conn.send((i, 'retry... (%d)' % (10 - j)))
+                conn.send((i, _('retry... (%d)') % (10 - j)))
                 exception_info = traceback.format_exc()
         else:
-            conn.send((i, 'failed'))
+            conn.send((i, _('failed')))
             conn.send(exception_info)
             return
-        conn.send((i, 'ok!'))
-    conn.send((None, 'completed'))
+        conn.send((i, _('ok!')))
+    conn.send((None, _('completed')))
 
 
 def check_and_save_path(config, key, file_path):
@@ -65,13 +66,13 @@ class DownloadTranslationsFrame(tk.Frame):
         try:
             # Todo: make connection in separate thread
             self.tx = TransifexAPI(username, password, 'http://transifex.com')
-            assert self.tx.project_exists(project), "Project %r does not exist" % project
+            assert self.tx.project_exists(project), _("Project %r does not exist") % project
             self.resources = self.tx.list_resources(project)
             languages = self.tx.list_languages(project, resource_slug=self.resources[0]['slug'])
         except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
-            messagebox.showerror('Error', err)
+            messagebox.showerror(_('Error'), err)
         except:
-            messagebox.showerror('Unexpected error', traceback.format_exc())
+            messagebox.showerror(_('Unexpected error'), traceback.format_exc())
         else:
             self.combo_languages.values = tuple(sorted(languages))
             last_language = self.config.get('language', None)
@@ -113,11 +114,11 @@ class DownloadTranslationsFrame(tk.Frame):
 
         while parent_conn.poll() or not self.download_process.is_alive():
             if not self.download_process.is_alive():
-                i, message = i, 'stopped'
+                i, message = i, _('stopped')
             else:
                 i, message = parent_conn.recv()
 
-            if message == 'completed':
+            if message == _('completed'):
                 # Everything is downloaded
                 self.download_process.join()
                 self.download_process = None
@@ -137,18 +138,18 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources.values = tuple(resource_names)
             self.app.update()
 
-            if message == 'ok!':
+            if message == _('ok!'):
                 self.progressbar.step()
                 break
-            elif message == 'failed':
+            elif message == _('failed'):
                 error = parent_conn.recv()
                 self.download_process.join()
                 self.download_process = None
                 self.button_download.reset_state()
                 self.download_started = False
-                messagebox.showerror('Downloading error', error)
+                messagebox.showerror(_('Downloading error'), error)
                 return
-            elif message == 'stopped':
+            elif message == _('stopped'):
                 self.download_process = None
                 self.button_download.reset_state()
                 self.download_started = False
@@ -165,13 +166,13 @@ class DownloadTranslationsFrame(tk.Frame):
             
             download_dir = self.fileentry_download_to.text
             if not download_dir:
-                messagebox.showwarning('Directory not specified', 'Specify download directory first')
+                messagebox.showwarning(_('Directory not specified'), _('Specify download directory first'))
                 return
             else:
                 self.config['download_to'] = download_dir
             
             if not path.exists(download_dir):
-                messagebox.showerror('Directory does not exist', 'Specify existing directory first')
+                messagebox.showerror(_('Directory does not exist'), _('Specify existing directory first'))
                 return
             
             project = self.combo_projects.get()
@@ -186,7 +187,7 @@ class DownloadTranslationsFrame(tk.Frame):
             return True
 
     def bt_stop_downloading(self):
-        r = messagebox.showwarning('Are you sure?', 'Stop downloading?', type=messagebox.OKCANCEL)
+        r = messagebox.showwarning(_('Are you sure?'), _('Stop downloading?'), type=messagebox.OKCANCEL)
         if r == 'cancel':
             return False
         else:
@@ -204,39 +205,39 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.config = self.init_config(self.app.config)
 
-        tk.Label(self, text='Transifex project:').grid()
+        tk.Label(self, text=_('Transifex project:')).grid()
 
         self.combo_projects = ComboboxCustom(self, values=self.config['recent_projects'])
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0, sticky=tk.W + tk.E)
         
-        tk.Label(self, text='Username:').grid(column=0, row=1)
+        tk.Label(self, text=_('Username:')).grid(column=0, row=1)
         
         self.entry_username = EntryCustom(self)
         self.entry_username.text = self.config.get('username', '')
         self.entry_username.grid(column=1, row=1, sticky=tk.W + tk.E)
         
-        tk.Label(self, text='Password:').grid(column=0, row=2)
+        tk.Label(self, text=_('Password:')).grid(column=0, row=2)
         
         self.entry_password = EntryCustom(self, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
-        button_connect = ttk.Button(self, text='Connect...', command=self.bt_connect)
+        button_connect = ttk.Button(self, text=_('Connect...'), command=self.bt_connect)
         button_connect.grid(row=0, column=2, rowspan=3, sticky=tk.N + tk.S + tk.W + tk.E)
         
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
         
-        tk.Label(self, text='Choose language:').grid(column=0)
+        tk.Label(self, text=_('Choose language:')).grid(column=0)
         
         self.combo_languages = ComboboxCustom(self)
         self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
         
-        # self.chk_all_languages = CheckbuttonVar(self, text='All languages (backup)')
+        # self.chk_all_languages = CheckbuttonVar(self, text=_('All languages (backup)'))
         # self.chk_all_languages.grid(column=1)
         
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
         
-        tk.Label(self, text='Download to:').grid()
+        tk.Label(self, text=_('Download to:')).grid()
         
         self.fileentry_download_to = FileEntry(
             self,
@@ -247,14 +248,14 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.fileentry_download_to.grid(column=1, row=6, columnspan=2, sticky='WE')
         
-        self.button_download = TwoStateButton(self, text='Download translations', command=self.bt_download,
-                                              text2='Stop', command2=self.bt_stop_downloading)
+        self.button_download = TwoStateButton(self, text=_('Download translations'), command=self.bt_download,
+                                              text2=_('Stop'), command2=self.bt_stop_downloading)
         self.button_download.grid(sticky=tk.W + tk.E)
         
         self.progressbar = ttk.Progressbar(self)
         self.progressbar.grid(column=1, row=7, columnspan=2, sticky=tk.W + tk.E)
         
-        tk.Label(self, text='Resources:').grid(columnspan=3)
+        tk.Label(self, text=_('Resources:')).grid(columnspan=3)
 
         self.listbox_resources = ListboxCustom(self)
         self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W + tk.N + tk.S)
@@ -314,7 +315,7 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         self.exclusions = exclusions
 
-        self.title("Choose exclusions")
+        self.title(_("Choose exclusions"))
 
         language_list = list(self.exclusions)
         if language:
@@ -334,7 +335,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
         self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
 
-        bt = ttk.Button(self, text='-- Remove selected --', command=self.bt_remove_selected)
+        bt = ttk.Button(self, text=_('-- Remove selected --'), command=self.bt_remove_selected)
         bt.grid(column=0, row=1, sticky=tk.W+tk.E)
 
         self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
@@ -345,21 +346,21 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.entry_search.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_up)
 
-        bt = ttk.Button(self, text='<< Add selected <<', command=self.bt_add_selected)
+        bt = ttk.Button(self, text=_('<< Add selected <<'), command=self.bt_add_selected)
         bt.grid(column=1, row=1, sticky=tk.W+tk.E)
 
         self.listbox_exclusions_hints = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions_hints.grid(column=1, row=2, sticky='NSWE')
         self.update_listbox_exclusions_hints()
 
-        button = ttk.Button(self, text="OK", command=self.destroy)
+        button = ttk.Button(self, text=_("OK"), command=self.destroy)
         button.grid(row=3, column=0)
 
         def cancel():
             self.exclusions = None
             self.destroy()
 
-        button = ttk.Button(self, text="Cancel", command=cancel)
+        button = ttk.Button(self, text=_("Cancel"), command=cancel)
         button.grid(row=3, column=1)
 
         self.grid_columnconfigure(0, weight=1)
@@ -424,12 +425,12 @@ class PatchExecutableFrame(tk.Frame):
                 self.log_field.write(message_queue.recv())
             
             if not self.dfrus_process.is_alive():
-                self.log_field.write('\n[PROCESS FINISHED]')
+                self.log_field.write(_('\n[PROCESS FINISHED]'))
                 self.button_patch.reset_state()
             else:
                 self.after(100, self.update_log, message_queue)
         except (EOFError, BrokenPipeError):
-            self.log_field.write('\n[MESSAGE QUEUE/PIPE BROKEN]')
+            self.log_field.write(_('\n[MESSAGE QUEUE/PIPE BROKEN]'))
             self.button_patch.reset_state()
     
     def bt_patch(self):
@@ -440,9 +441,9 @@ class PatchExecutableFrame(tk.Frame):
         translation_file = self.fileentry_translation_file.text
         
         if not executable_file or not path.exists(executable_file):
-            messagebox.showerror('Error', 'Valid path to an executable file must be specified')
+            messagebox.showerror(_('Error'), _('Valid path to an executable file must be specified'))
         elif not translation_file or not path.exists(translation_file):
-            messagebox.showerror('Error', 'Valid path to a translation file must be specified')
+            messagebox.showerror(_('Error'), _('Valid path to a translation file must be specified'))
         else:
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
@@ -473,7 +474,7 @@ class PatchExecutableFrame(tk.Frame):
         return False
 
     def bt_stop(self):
-        r = messagebox.showwarning('Are you sure?', 'Stop the patching process?', type=messagebox.OKCANCEL)
+        r = messagebox.showwarning(_('Are you sure?'), _('Stop the patching process?'), type=messagebox.OKCANCEL)
         if r == 'cancel':
             return False
         else:
@@ -552,26 +553,26 @@ class PatchExecutableFrame(tk.Frame):
         
         self.dfrus_process = None
         
-        tk.Label(self, text='DF executable file:').grid()
+        tk.Label(self, text=_('DF executable file:')).grid()
         
         self.fileentry_executable_file = FileEntry(
             self,
             dialogtype='askopenfilename',
-            filetypes=[('Executable files', '*.exe')],
+            filetypes=[(_('Executable files'), '*.exe')],
             default_path=config.get('df_executable', ''),
             on_change=lambda text: check_and_save_path(self.config, 'df_executable', text),
         )
         self.fileentry_executable_file.grid(column=1, row=0, columnspan=2, sticky='EW')
         
-        tk.Label(self, text='DF executable translation file:').grid()
+        tk.Label(self, text=_('DF executable translation file:')).grid()
         
         self.fileentry_translation_file = FileEntry(
             self,
             dialogtype='askopenfilename',
             filetypes=[
-                ("Hardcoded strings' translation", '*hardcoded*.po'),
-                ('Translation files', '*.po'),
-                # ('csv file', '*.csv'), # @TODO: Currently not supported 
+                (_("Hardcoded strings' translation"), '*hardcoded*.po'),
+                (_('Translation files'), '*.po'),
+                # (_('csv file'), '*.csv'), # @TODO: Currently not supported 
             ],
             default_path=config.get('df_exe_translation_file', ''),
             on_change=self.on_translation_path_change,
@@ -583,7 +584,7 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.translation_file_language = None
 
-        tk.Label(self, text='Encoding:').grid()
+        tk.Label(self, text=_('Encoding:')).grid()
         
         self.combo_encoding = ComboboxCustom(self)
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
@@ -608,7 +609,7 @@ class PatchExecutableFrame(tk.Frame):
 
         # FIXME: chk_dont_patch_charmap does nothing
         self.chk_dont_patch_charmap = self.setup_checkbutton(
-            text="Don't patch charmap table",
+            text=_("Don't patch charmap table"),
             config_key='dont_patch_charmap',
             default_state=False)
         
@@ -616,25 +617,25 @@ class PatchExecutableFrame(tk.Frame):
 
         # FIXME: chk_add_leading_trailing_spaces does nothing
         self.chk_add_leading_trailing_spaces = self.setup_checkbutton(
-            text='Add necessary leading/trailing spaces',
+            text=_('Add necessary leading/trailing spaces'),
             config_key='add_leading_trailing_spaces',
             default_state=True)
         
         self.chk_add_leading_trailing_spaces.grid(columnspan=2, sticky=tk.W)
         
-        button_exclusions = ttk.Button(self, text='Exclusions...', command=self.bt_exclusions)
+        button_exclusions = ttk.Button(self, text=_('Exclusions...'), command=self.bt_exclusions)
         button_exclusions.grid(row=4, column=2)
 
         self.chk_debug_output = self.setup_checkbutton(
-            text='Enable debugging output',
+            text=_('Enable debugging output'),
             config_key='debug_output',
             default_state=False)
         
         self.chk_debug_output.grid(columnspan=2, sticky=tk.W)
 
         self.button_patch = TwoStateButton(self,
-                                           text='Patch!', command=self.bt_patch,
-                                           text2='Stop!', command2=self.bt_stop)
+                                           text=_('Patch!'), command=self.bt_patch,
+                                           text2=_('Stop!'), command2=self.bt_stop)
         self.button_patch.grid(row=5, column=2)
         
         self.log_field = CustomText(self, width=48, height=16, enabled=False)
@@ -697,7 +698,7 @@ class TranslateExternalFiles(tk.Frame):
         self.config = self.init_config(self.app.config, section_name='translate_external_files')
         config = self.config
 
-        tk.Label(self, text='Dwarf Fortress root path:').grid()
+        tk.Label(self, text=_('Dwarf Fortress root path:')).grid()
 
         self.fileentry_df_root_path = FileEntry(
             self,
@@ -707,7 +708,7 @@ class TranslateExternalFiles(tk.Frame):
         )
         self.fileentry_df_root_path.grid(row=0, column=1, sticky='WE')
         
-        tk.Label(self, text="Translation files' directory:").grid()
+        tk.Label(self, text=_("Translation files' directory:")).grid()
         
         self.fileentry_translation_files = FileEntry(
             self,
@@ -717,7 +718,7 @@ class TranslateExternalFiles(tk.Frame):
         )
         self.fileentry_translation_files.grid(row=1, column=1, sticky='WE')
 
-        tk.Label(self, text="Language:").grid()
+        tk.Label(self, text=_("Language:")).grid()
 
         self.combo_language = ComboboxCustom(self)
         self.combo_language.grid(row=2, column=1, sticky='WE')
@@ -751,7 +752,7 @@ class App(tk.Tk):
 
     def check_for_errors(self, delay=100):
         if self.stderr.getvalue():
-            messagebox.showerror('Unhandled Exception', self.stderr.getvalue())
+            messagebox.showerror(_('Unhandled Exception'), self.stderr.getvalue())
             self.stderr.truncate(0)
             self.stderr.seek(0)
         self.after(delay, self.check_for_errors, delay)
@@ -797,19 +798,26 @@ class App(tk.Tk):
         notebook.pack(fill='both', expand=1)
         
         f1 = DownloadTranslationsFrame(notebook, self)
-        notebook.add(f1, text='Download translations')
+        notebook.add(f1, text=_('Download translations'))
         
         f1 = PatchExecutableFrame(notebook, self)
-        notebook.add(f1, text='Patch executable file')
+        notebook.add(f1, text=_('Patch executable file'))
         
         f1 = TranslateExternalFiles(notebook, self)
-        # notebook.add(f1, text='Translate external text files')
+        # notebook.add(f1, text=_('Translate external text files'))
         
         # f1 = tk.Frame(notebook)
-        # notebook.add(f1, text='Translate packed files')
+        # notebook.add(f1, text=_('Translate packed files'))
         
         notebook.select(self.config['last_tab_opened'])
 
 if __name__ == '__main__':
     mp.freeze_support()
+    
+    _ = gettext.lgettext
+    mydir = os.path.realpath(os.path.dirname(sys.argv[0]))
+    localedir = os.path.join(mydir, "locale")
+    gettext.bindtextdomain('df-translate', localedir)
+    gettext.textdomain('df-translate')
+    
     App(noconfig='--noconfig' in sys.argv).mainloop()
