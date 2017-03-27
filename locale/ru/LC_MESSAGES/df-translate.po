@@ -1,0 +1,238 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2017-03-27 21:20+0300\n"
+"PO-Revision-Date: 2017-03-27 21:30+0300\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 2.0beta5\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: ru\n"
+
+#: df-translate.pyw:27
+msgid "Everything is ok! (If you see this message, contact the developer)"
+msgstr "Все в порядке! (Если вы видите данное сообщение, сообщите об этом разработчику)"
+
+#: df-translate.pyw:29
+msgid "downloading..."
+msgstr "скачивание..."
+
+#: df-translate.pyw:35
+msgid "retry... (%d)"
+msgstr "повтор... (%d)"
+
+#: df-translate.pyw:38 df-translate.pyw:144
+msgid "failed"
+msgstr "неудачно"
+
+#: df-translate.pyw:41 df-translate.pyw:141
+msgid "ok!"
+msgstr "ок!"
+
+#: df-translate.pyw:42 df-translate.pyw:121
+msgid "completed"
+msgstr "завершено"
+
+#: df-translate.pyw:69
+msgid "Project %r does not exist"
+msgstr "Проект %r не существует"
+
+#: df-translate.pyw:73 df-translate.pyw:444 df-translate.pyw:446
+msgid "Error"
+msgstr "Ошибка"
+
+#: df-translate.pyw:75
+msgid "Unexpected error"
+msgstr "Неожиданная ошибка"
+
+#: df-translate.pyw:117 df-translate.pyw:152
+msgid "stopped"
+msgstr "остановлено"
+
+#: df-translate.pyw:150
+msgid "Downloading error"
+msgstr "Ошибка скачивания"
+
+#: df-translate.pyw:169
+msgid "Directory not specified"
+msgstr "Путь не указан"
+
+#: df-translate.pyw:169
+msgid "Specify download directory first"
+msgstr "Сначала укажите путь для скачивания"
+
+#: df-translate.pyw:175
+msgid "Directory does not exist"
+msgstr "Путь не существует"
+
+#: df-translate.pyw:175
+msgid "Specify existing directory first"
+msgstr "Сначала укажите существующую папку"
+
+#: df-translate.pyw:190
+msgid "Stop downloading?"
+msgstr "Остановить скачивание?"
+
+#: df-translate.pyw:190 df-translate.pyw:477
+msgid "Are you sure?"
+msgstr "Вы уверены?"
+
+#: df-translate.pyw:208
+msgid "Transifex project:"
+msgstr "Проект Transifex:"
+
+#: df-translate.pyw:214
+msgid "Username:"
+msgstr "Имя пользователя:"
+
+#: df-translate.pyw:220
+msgid "Password:"
+msgstr "Пароль:"
+
+#: df-translate.pyw:225
+msgid "Connect..."
+msgstr "Соединение..."
+
+#: df-translate.pyw:230
+msgid "Choose language:"
+msgstr "Выберите язык:"
+
+#: df-translate.pyw:240
+msgid "Download to:"
+msgstr "Куда скачивать:"
+
+#: df-translate.pyw:251 df-translate.pyw:801
+msgid "Download translations"
+msgstr "Скачать переводы"
+
+#: df-translate.pyw:252
+msgid "Stop"
+msgstr "Остановить"
+
+#: df-translate.pyw:258
+msgid "Resources:"
+msgstr "Ресурсы:"
+
+#: df-translate.pyw:318
+msgid "Choose exclusions"
+msgstr "Настройка исключений"
+
+#: df-translate.pyw:338
+msgid "-- Remove selected --"
+msgstr "-- Удалить выделенное --"
+
+#: df-translate.pyw:349
+msgid "<< Add selected <<"
+msgstr "<< Добавить выделенное <<"
+
+#: df-translate.pyw:356
+msgid "OK"
+msgstr "ОК"
+
+#: df-translate.pyw:363
+msgid "Cancel"
+msgstr "Отмена"
+
+#: df-translate.pyw:428
+msgid ""
+"\n"
+"[PROCESS FINISHED]"
+msgstr ""
+"\n"
+"[Процесс завершён]"
+
+#: df-translate.pyw:433
+msgid ""
+"\n"
+"[MESSAGE QUEUE/PIPE BROKEN]"
+msgstr ""
+"\n"
+"[Очередь сообщений закрыта]"
+
+#: df-translate.pyw:444
+msgid "Valid path to an executable file must be specified"
+msgstr "Сначала нужно указать корректный путь к исполняемому файлу"
+
+#: df-translate.pyw:446
+msgid "Valid path to a translation file must be specified"
+msgstr "Сначала нужно указать корректный путь к файлу перевода"
+
+#: df-translate.pyw:477
+msgid "Stop the patching process?"
+msgstr "Остановить процесс?"
+
+#: df-translate.pyw:556
+msgid "DF executable file:"
+msgstr "Исполняемый файл DF"
+
+#: df-translate.pyw:561
+msgid "Executable files"
+msgstr "Исполняемые файлы"
+
+#: df-translate.pyw:567
+msgid "DF executable translation file:"
+msgstr "Файл перевода исполняемого файла DF:"
+
+#: df-translate.pyw:573
+msgid "Hardcoded strings' translation"
+msgstr "Файл перевода вшитых строк"
+
+#: df-translate.pyw:574
+msgid "Translation files"
+msgstr "Файлы перевода"
+
+#: df-translate.pyw:587
+msgid "Encoding:"
+msgstr "Кодировка:"
+
+#: df-translate.pyw:612
+msgid "Don't patch charmap table"
+msgstr "Не исправлять таблицу перекодировки"
+
+#: df-translate.pyw:620
+msgid "Add necessary leading/trailing spaces"
+msgstr "Добавлять необходимые начальные/конечные пробелы"
+
+#: df-translate.pyw:626
+msgid "Exclusions..."
+msgstr "Исключения..."
+
+#: df-translate.pyw:630
+msgid "Enable debugging output"
+msgstr "Включить отладочный вывод"
+
+#: df-translate.pyw:637
+msgid "Patch!"
+msgstr "Патчить!"
+
+#: df-translate.pyw:638
+msgid "Stop!"
+msgstr "Остановить!"
+
+#: df-translate.pyw:701
+msgid "Dwarf Fortress root path:"
+msgstr "Корневая папка Dwarf Fortress:"
+
+#: df-translate.pyw:711
+msgid "Translation files' directory:"
+msgstr "Папка с файлами перевода:"
+
+#: df-translate.pyw:721
+msgid "Language:"
+msgstr "Язык:"
+
+#: df-translate.pyw:755
+msgid "Unhandled Exception"
+msgstr "Необработанное исключение"
+
+#: df-translate.pyw:804
+msgid "Patch executable file"
+msgstr "Патчить исполняемый файл"
