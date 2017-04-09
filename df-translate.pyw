@@ -805,7 +805,9 @@ class App(tk.Tk):
         f1 = TranslateExternalFiles(notebook, self)
         notebook.add(f1, text='Translate external text files')
         
-        notebook.select(self.config['last_tab_opened'])
+        tab = self.config['last_tab_opened']
+        if 0 <= tab < len(notebook.tabs()):
+            notebook.select(tab)
 
 if __name__ == '__main__':
     mp.freeze_support()
