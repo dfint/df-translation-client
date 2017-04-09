@@ -807,8 +807,10 @@ class App(tk.Tk):
         
         # f1 = tk.Frame(notebook)
         # notebook.add(f1, text='Translate packed files')
-        
-        notebook.select(self.config['last_tab_opened'])
+
+        tab = self.config['last_tab_opened']
+        if 0 <= tab < len(notebook.tabs()):
+            notebook.select(tab)
 
 if __name__ == '__main__':
     mp.freeze_support()
