@@ -173,13 +173,13 @@ class FileEntry(tk.Frame):
         elif self.dialogtype == 'askdirectory':
             file_path = filedialog.askdirectory(initialdir=self.default_path)
 
-        if file_path:
+        if file_path:  # if not cancelled
             self.entry.text = file_path
 
-        if self.on_change is not None and file_path != self._prev_value:
-            self.on_change(file_path)
+            if self.on_change is not None and file_path != self._prev_value:
+                self.on_change(file_path)
 
-        self._prev_value = file_path
+            self._prev_value = file_path
 
     def on_entry_keyup(self, event):
         if event.widget.text != self._prev_value:
