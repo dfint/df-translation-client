@@ -669,8 +669,15 @@ class TranslateExternalFiles(tk.Frame):
     def on_change_translation_files_path(self, config, key, directory):
         check_and_save_path(config, key, directory)
         if path.exists(directory):
-            self.combo_language.values = tuple(self.get_languages(directory))
-            self.combo_language.current(0)
+            languages = tuple(self.get_languages(directory))
+            self.combo_language.values = languages
+
+            if languages:
+                self.combo_language.current(0)
+            else:
+                self.combo_language.text = ''
+
+            self.on_change_language(widget=self.combo_language)
         else:
             self.combo_language.values = tuple()
             self.combo_language.text = ''
@@ -684,8 +691,7 @@ class TranslateExternalFiles(tk.Frame):
                         yield filename
 
     def on_change_language(self, event=None, widget=None):
-        if widget is None:
-            widget = event.widget
+        widget = event.widget if event is not None else widget
         
         directory = self.fileentry_translation_files.text
         files = self.filter_files_by_language(directory, widget.text) if path.exists(directory) else tuple()
@@ -724,8 +730,10 @@ class TranslateExternalFiles(tk.Frame):
         
         directory = self.fileentry_translation_files.text
         if path.exists(directory):
-            self.combo_language.values = tuple(self.get_languages(self.fileentry_translation_files.text))
-            self.combo_language.current(0)
+            languages = tuple(self.get_languages(self.fileentry_translation_files.text))
+            self.combo_language.values = languages
+            if languages:
+                self.combo_language.current(0)
         
         self.combo_language.bind('<<ComboboxSelected>>', self.on_change_language)
 
