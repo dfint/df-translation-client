@@ -157,9 +157,8 @@ class CustomText(tk.Frame):
 class FileEntry(tk.Frame):
     def bt_browse(self):
         file_path = ''
-
-        self.default_path = self.default_path or self.entry.text
-
+        # Use self.default_path only if self.entry.text is empty (Captain Obvious)
+        self.default_path = self.entry.text or self.default_path
         if self.dialogtype == 'askopenfilename':
             if path.isfile(self.default_path):
                 initialdir = None
