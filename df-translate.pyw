@@ -741,6 +741,11 @@ class TranslateExternalFiles(tk.Frame):
         self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
         self.on_change_language(widget=self.combo_language)
 
+        ttk.Button(self, text='Search').grid()
+
+        self.listbox_found_directories = ListboxCustom(self)
+        self.listbox_found_directories.grid(columnspan=2, sticky='NSWE')
+
         self.grid_columnconfigure(1, weight=1)
 
 
