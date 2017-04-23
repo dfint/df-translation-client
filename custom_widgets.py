@@ -106,10 +106,8 @@ class CustomText(tk.Frame):
         scrollbar.set(first, last)
         if first == '0.0' and last == '1.0':
             scrollbar.grid_remove()
-            scrollbar.visible = False
-        elif not scrollbar.visible:
+        elif not scrollbar.grid_info():
             scrollbar.grid()
-            scrollbar.visible = True
     
     def __init__(self, parent, *args, enabled=True, **kwargs):
         super().__init__(parent)
@@ -132,8 +130,6 @@ class CustomText(tk.Frame):
         self._text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         xscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
-        yscrollbar.visible = True
-        xscrollbar.visible = False
     
     def write(self, s):
         self._text.configure(state=tk.NORMAL)
