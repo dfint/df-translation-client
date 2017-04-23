@@ -84,6 +84,7 @@ class ListboxCustom(tk.Frame):
         self._listbox.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         xscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
+        self.insert = lambda index, *items: self._listbox.insert(index, *items)
 
     @property
     def values(self):
