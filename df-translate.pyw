@@ -11,7 +11,11 @@ import os
 import re
 import traceback
 
-from dfrus.patchdf import get_codepages
+try:
+    from dfrus.patchdf import get_codepages
+except ImportError:
+    from dfrus.patch_charmap import get_codepages
+
 from dfrus import dfrus
 from os import path
 from tkinter import messagebox
