@@ -11,7 +11,11 @@ import os
 import re
 import traceback
 
-from dfrus.patchdf import get_codepages
+try:
+    from dfrus.patchdf import get_codepages
+except ImportError:
+    from dfrus.patch_charmap import get_codepages
+
 from dfrus import dfrus
 from os import path
 from tkinter import messagebox
@@ -20,6 +24,8 @@ from custom_widgets import CheckbuttonVar, EntryCustom, ComboboxCustom, ListboxC
 from custom_widgets import TwoStateButton
 from collections import OrderedDict
 from df_gettext_toolkit import po
+from df_gettext_toolkit.translate_plain_text import translate_plain_text
+from df_gettext_toolkit.translate_raws import translate_raws
 
 
 def downloader(conn, tx, project, language, resources, file_path_pattern):
@@ -669,8 +675,15 @@ class TranslateExternalFiles(tk.Frame):
     def on_change_translation_files_path(self, config, key, directory):
         check_and_save_path(config, key, directory)
         if path.exists(directory):
-            self.combo_language.values = tuple(self.get_languages(directory))
-            self.combo_language.current(0)
+            languages = tuple(self.get_languages(directory))
+            self.combo_language.values = languages
+
+            if languages:
+                self.combo_language.current(0)
+            else:
+                self.combo_language.text = ''
+
+            self.on_change_language(widget=self.combo_language)
         else:
             self.combo_language.values = tuple()
             self.combo_language.text = ''
@@ -684,12 +697,43 @@ class TranslateExternalFiles(tk.Frame):
                         yield filename
 
     def on_change_language(self, event=None, widget=None):
-        if widget is None:
-            widget = event.widget
+        widget = event.widget if event is not None else widget
         
         directory = self.fileentry_translation_files.text
         files = self.filter_files_by_language(directory, widget.text) if path.exists(directory) else tuple()
         self.listbox_translation_files.values = tuple(files)
+
+    def bt_search(self):
+        patterns = {
+            r'raw\objects': dict(
+                po_filename='raw-objects',
+                func=translate_raws,
+            ),
+            r'data_src': dict(
+                po_filename='uncompressed',
+                func=lambda *args: translate_plain_text(*args, join_paragraphs=True),
+            ),
+            r'data\speech': dict(
+                po_filename='speech',
+                func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
+            ),
+            r'raw\objects\text': dict(
+                po_filename='text',
+                func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
+            ),
+        }
+
+        self.listbox_found_directories.clear()
+        for cur_dir, _, files in os.walk(self.fileentry_df_root_path.text):
+            for pattern in patterns:
+                if cur_dir.endswith(pattern):
+                    self.listbox_found_directories.insert(tk.END, cur_dir + ' (%s files)' % len(files))
+                    postfix = '_{}.po'.format(self.combo_language.text)
+                    po_filename = os.path.join(self.fileentry_translation_files.text,
+                                               patterns[pattern]['po_filename'] + postfix)
+                    func = patterns[pattern]['func']
+                    # self.listbox_found_directories.insert(tk.END, po_filename)
+                    # func(po_filename, cur_dir, encoding)
 
     def __init__(self, master, app=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
@@ -724,14 +768,21 @@ class TranslateExternalFiles(tk.Frame):
         
         directory = self.fileentry_translation_files.text
         if path.exists(directory):
-            self.combo_language.values = tuple(self.get_languages(self.fileentry_translation_files.text))
-            self.combo_language.current(0)
+            languages = tuple(self.get_languages(self.fileentry_translation_files.text))
+            self.combo_language.values = languages
+            if languages:
+                self.combo_language.current(0)
         
         self.combo_language.bind('<<ComboboxSelected>>', self.on_change_language)
 
         self.listbox_translation_files = ListboxCustom(self)
         self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
         self.on_change_language(widget=self.combo_language)
+
+        ttk.Button(self, text='Search', command=self.bt_search).grid()
+
+        self.listbox_found_directories = ListboxCustom(self)
+        self.listbox_found_directories.grid(columnspan=2, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)
 
@@ -803,11 +854,8 @@ class App(tk.Tk):
         notebook.add(f1, text='Patch executable file')
         
         f1 = TranslateExternalFiles(notebook, self)
-        # notebook.add(f1, text='Translate external text files')
+        notebook.add(f1, text='Translate external text files')
         
-        # f1 = tk.Frame(notebook)
-        # notebook.add(f1, text='Translate packed files')
-
         tab = self.config['last_tab_opened']
         if 0 <= tab < len(notebook.tabs()):
             notebook.select(tab)
