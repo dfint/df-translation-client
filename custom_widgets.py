@@ -84,6 +84,7 @@ class ListboxCustom(tk.Frame):
         self._listbox.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         xscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
+        self.insert = lambda index, *items: self._listbox.insert(index, *items)
 
     @property
     def values(self):
@@ -106,10 +107,8 @@ class CustomText(tk.Frame):
         scrollbar.set(first, last)
         if first == '0.0' and last == '1.0':
             scrollbar.grid_remove()
-            scrollbar.visible = False
-        elif not scrollbar.visible:
+        elif not scrollbar.grid_info():
             scrollbar.grid()
-            scrollbar.visible = True
     
     def __init__(self, parent, *args, enabled=True, **kwargs):
         super().__init__(parent)
@@ -132,8 +131,6 @@ class CustomText(tk.Frame):
         self._text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         xscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
-        yscrollbar.visible = True
-        xscrollbar.visible = False
     
     def write(self, s):
         self._text.configure(state=tk.NORMAL)
@@ -157,9 +154,8 @@ class CustomText(tk.Frame):
 class FileEntry(tk.Frame):
     def bt_browse(self):
         file_path = ''
-
-        self.default_path = self.default_path or self.entry.text
-
+        # Use self.default_path only if self.entry.text is empty (Captain Obvious)
+        self.default_path = self.entry.text or self.default_path
         if self.dialogtype == 'askopenfilename':
             if path.isfile(self.default_path):
                 initialdir = None
@@ -173,13 +169,13 @@ class FileEntry(tk.Frame):
         elif self.dialogtype == 'askdirectory':
             file_path = filedialog.askdirectory(initialdir=self.default_path)
 
-        if file_path:
+        if file_path:  # if not cancelled
             self.entry.text = file_path
 
-        if self.on_change is not None and file_path != self._prev_value:
-            self.on_change(file_path)
+            if self.on_change is not None and file_path != self._prev_value:
+                self.on_change(file_path)
 
-        self._prev_value = file_path
+            self._prev_value = file_path
 
     def on_entry_keyup(self, event):
         if event.widget.text != self._prev_value:
@@ -223,15 +219,15 @@ class TwoStateButton(ttk.Button):
             self.swap_state()
 
     def swap_state(self):
-        self._state = list(reversed(self._state))
+        self._state.reverse()
         self['text'] = self._state[0].text
 
     def reset_state(self):
-        self._state = self._initial_state
+        self._state = list(self._initial_state)
         self['text'] = self._state[0].text
 
     def __init__(self, parent, text, command, text2, command2, **kwargs):
         TextCommand = namedtuple('TextCommand', 'text,command')
-        self._initial_state = [TextCommand(text, command), TextCommand(text2, command2)]
-        self._state = self._initial_state
+        self._initial_state = (TextCommand(text, command), TextCommand(text2, command2))
+        self._state = list(self._initial_state)
         super().__init__(parent, text=text, command=self._action, **kwargs)
