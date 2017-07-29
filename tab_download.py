@@ -50,7 +50,8 @@ class DownloadTranslationsFrame(tk.Frame):
         project = self.combo_projects.text
         try:
             # Todo: make connection in separate thread
-            self.tx = TransifexAPI(username, password, 'http://transifex.com')
+            self.tx = TransifexAPI(username, password, 'https://www.transifex.com')
+            assert self.tx.ping(), 'No connection to the server'
             assert self.tx.project_exists(project), "Project %r does not exist" % project
             self.resources = self.tx.list_resources(project)
             languages = self.tx.list_languages(project, resource_slug=self.resources[0]['slug'])
