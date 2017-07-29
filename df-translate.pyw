@@ -374,10 +374,7 @@ class DialogDontFixSpaces(tk.Toplevel):
 
 
 def cleanup_dictionary(d: iter, exclusions=None):
-    if not exclusions:
-        exclusions = set()
-    else:
-        exclusions = set(exclusions)
+    exclusions = set(exclusions) if exclusions else set()
 
     for original_string, translation in d:
         if original_string and translation and original_string != translation:
