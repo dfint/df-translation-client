@@ -99,10 +99,10 @@ class DownloadTranslationsFrame(tk.Frame):
             self.download_process.start()
 
         while parent_conn.poll() or not self.download_process.is_alive():
-            if not self.download_process.is_alive():
-                i, message = i, 'stopped'
-            else:
+            if parent_conn.poll():
                 i, message = parent_conn.recv()
+            else:
+                i, message = i, 'stopped'
 
             if message == 'completed':
                 # Everything is downloaded
