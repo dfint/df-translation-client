@@ -450,7 +450,7 @@ class TranslateExternalFiles(tk.Frame):
         files = self.filter_files_by_language(directory, widget.text) if path.exists(directory) else tuple()
         self.listbox_translation_files.values = tuple(files)
 
-    def bt_search(self):
+    def bt_search(self, translate=False):
         patterns = {
             r'raw\objects': dict(
                 po_filename='raw-objects',
@@ -478,9 +478,10 @@ class TranslateExternalFiles(tk.Frame):
                     postfix = '_{}.po'.format(self.combo_language.text)
                     po_filename = os.path.join(self.fileentry_translation_files.text,
                                                patterns[pattern]['po_filename'] + postfix)
-                    func = patterns[pattern]['func']
-                    # self.listbox_found_directories.insert(tk.END, po_filename)
-                    # func(po_filename, cur_dir, encoding)
+
+                    if translate:
+                        func = patterns[pattern]['func']
+                        # func(po_filename, cur_dir, encoding)
 
     def __init__(self, master, app=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
@@ -527,6 +528,7 @@ class TranslateExternalFiles(tk.Frame):
         self.on_change_language(widget=self.combo_language)
 
         ttk.Button(self, text='Search', command=self.bt_search).grid()
+        ttk.Button(self, text='Translate', command=lambda: self.bt_search(translate=True)).grid(row=4, column=1)
 
         self.listbox_found_directories = ListboxCustom(self)
         self.listbox_found_directories.grid(columnspan=2, sticky='NSWE')
