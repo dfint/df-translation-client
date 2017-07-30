@@ -83,7 +83,7 @@ class DownloadTranslationsFrame(tk.Frame):
                         initial_names=None, resource_names=None, i=0):
         if initial_names is None:
             initial_names = [res['name'] for res in self.resources]
-            resource_names = list(initial_names)
+            resource_names = initial_names.copy()
 
         if self.download_process is None:
             parent_conn, child_conn = mp.Pipe()
@@ -120,7 +120,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
                 return
 
-            resource_names[i] = initial_names[i] + ' - ' + message
+            resource_names[i] = '{} - {}'.format(initial_names[i], message)
             self.listbox_resources.values = tuple(resource_names)
             self.app.update()
 
