@@ -140,6 +140,16 @@ def cleanup_dictionary(d: iter, exclusions=None):
             yield original_string, translation
 
 
+def filter_codepages(codepages, dictionary):
+    for codepage in codepages:
+        try:
+            for _, item in dictionary:
+                item.encode(codepage)
+            yield codepage
+        except UnicodeEncodeError:
+            pass
+
+
 class ProcessMessageWrapper:
     _chunk_size = 1024
 
@@ -263,21 +273,6 @@ class PatchExecutableFrame(tk.Frame):
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
 
-    def filter_codepages(self, codepages):
-        translation_file = self.fileentry_translation_file.text
-        with open(translation_file, 'r', encoding='utf-8') as fn:
-            pofile = po.PoReader(fn)
-            self.translation_file_language = pofile.meta['Language']
-            dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
-
-        for codepage in codepages:
-            try:
-                for _, item in dictionary:
-                    item.encode(codepage)
-                yield codepage
-            except UnicodeEncodeError:
-                pass
-
     def on_translation_path_change(self, text):
         check_and_save_path(self.config, 'df_exe_translation_file', text)
 
@@ -285,7 +280,12 @@ class PatchExecutableFrame(tk.Frame):
         # TODO: Cache supported codepages' list
         codepages = get_codepages().keys()
         if self.fileentry_translation_file.path_is_valid():
-            codepages = self.filter_codepages(codepages)
+            translation_file = self.fileentry_translation_file.text
+            with open(translation_file, 'r', encoding='utf-8') as fn:
+                pofile = po.PoReader(fn)
+                self.translation_file_language = pofile.meta['Language']
+                dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
+            codepages = filter_codepages(codepages, dictionary)
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
 
@@ -343,7 +343,12 @@ class PatchExecutableFrame(tk.Frame):
 
         codepages = get_codepages().keys()
         if self.fileentry_translation_file.path_is_valid():
-            codepages = self.filter_codepages(codepages)
+            translation_file = self.fileentry_translation_file.text
+            with open(translation_file, 'r', encoding='utf-8') as fn:
+                pofile = po.PoReader(fn)
+                self.translation_file_language = pofile.meta['Language']
+                dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
+            codepages = filter_codepages(codepages, dictionary)
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
         
