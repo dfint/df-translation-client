@@ -416,13 +416,13 @@ class TranslateExternalFiles(tk.Frame):
 
     @staticmethod
     def get_languages(directory):
-        s = set()
+        languages = set()
         for filename in os.listdir(directory):
             if filename.endswith('.po'):
                 with open(path.join(directory, filename), encoding='utf-8') as file:
-                    s.add(po.PoReader(file).meta['Language'])
+                    languages.add(po.PoReader(file).meta['Language'])
 
-        return sorted(s)
+        return sorted(languages)
 
     def on_change_translation_files_path(self, config, key, directory):
         check_and_save_path(config, key, directory)
