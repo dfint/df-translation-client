@@ -284,8 +284,8 @@ class PatchExecutableFrame(tk.Frame):
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
-                dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
-            codepages = filter_codepages(codepages, dictionary.values())
+                strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
+            codepages = filter_codepages(codepages, strings)
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
 
@@ -347,8 +347,8 @@ class PatchExecutableFrame(tk.Frame):
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
-                dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
-            codepages = filter_codepages(codepages, dictionary.values())
+                strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
+            codepages = filter_codepages(codepages, strings)
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
         
