@@ -514,7 +514,6 @@ class TranslateExternalFiles(tk.Frame):
         self.fileentry_translation_files.grid(row=1, column=1, sticky='WE')
 
         tk.Label(self, text="Language:").grid()
-
         self.combo_language = ComboboxCustom(self)
         self.combo_language.grid(row=2, column=1, sticky='WE')
         
@@ -524,15 +523,19 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_language.values = languages
             if languages:
                 self.combo_language.current(0)
-        
+
         self.combo_language.bind('<<ComboboxSelected>>', self.on_change_language)
+
+        tk.Label(self, text="Encoding:").grid()
+        self.combo_encoding = ComboboxCustom(self)
+        self.combo_encoding.grid(row=3, column=1, sticky='WE')
 
         self.listbox_translation_files = ListboxCustom(self)
         self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
         self.on_change_language(widget=self.combo_language)
 
         ttk.Button(self, text='Search', command=self.bt_search).grid()
-        ttk.Button(self, text='Translate', command=lambda: self.bt_search(translate=True)).grid(row=4, column=1)
+        ttk.Button(self, text='Translate', command=lambda: self.bt_search(translate=True)).grid(row=5, column=1)
 
         self.listbox_found_directories = ListboxCustom(self)
         self.listbox_found_directories.grid(columnspan=2, sticky='NSWE')
