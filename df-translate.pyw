@@ -330,11 +330,6 @@ class PatchExecutableFrame(tk.Frame):
             on_change=self.on_translation_path_change,
         )
         self.fileentry_translation_file.grid(column=1, row=1, columnspan=2, sticky='EW')
-        if self.fileentry_translation_file.path_is_valid():
-            with open(self.fileentry_translation_file.text, 'r', encoding='utf-8') as fn:
-                self.translation_file_language = po.PoReader(fn).meta['Language']
-        else:
-            self.translation_file_language = None
 
         tk.Label(self, text='Encoding:').grid()
         
@@ -342,13 +337,17 @@ class PatchExecutableFrame(tk.Frame):
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
 
         codepages = get_codepages().keys()
-        if self.fileentry_translation_file.path_is_valid():
+        
+        if not self.fileentry_translation_file.path_is_valid():
+            self.translation_file_language = None
+        else:
             translation_file = self.fileentry_translation_file.text
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
                 strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
             codepages = filter_codepages(codepages, strings)
+
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
         
