@@ -273,7 +273,7 @@ class PatchExecutableFrame(tk.Frame):
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
 
-    def on_translation_path_change(self, text):
+    def update_combo_encoding(self, text):
         check_and_save_path(self.config, 'df_exe_translation_file', text)
 
         # Update codepage combobox
@@ -327,7 +327,7 @@ class PatchExecutableFrame(tk.Frame):
                 # ('csv file', '*.csv'), # @TODO: Currently not supported 
             ],
             default_path=config.get('df_exe_translation_file', ''),
-            on_change=self.on_translation_path_change,
+            on_change=self.update_combo_encoding,
         )
         self.fileentry_translation_file.grid(column=1, row=1, columnspan=2, sticky='EW')
 
@@ -448,10 +448,27 @@ class TranslateExternalFiles(tk.Frame):
                         yield filename
 
     def update_listbox_translation_files(self, event=None, language=None):
-        language = event.widget.text if event else language
+        language = self.combo_language.text if not language else language
         directory = self.fileentry_translation_files.text
         files = self.filter_files_by_language(directory, language) if path.exists(directory) else tuple()
         self.listbox_translation_files.values = tuple(files)
+
+    def update_combo_encoding(self, _=None):
+        language = self.combo_language.text
+        directory = self.fileentry_translation_files.text
+        # TODO: Unify with PatchExecutableFrame.update_combo_encoding()
+        if path.exists(directory):
+            files = self.filter_files_by_language(directory, language)
+            codepages = get_codepages().keys()
+            for file in files:
+                with open(path.join(directory, file), 'r', encoding='utf-8') as fn:
+                    pofile = po.PoReader(fn)
+                    strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
+                codepages = filter_codepages(codepages, strings)
+            self.combo_encoding.values = tuple(sorted(codepages,
+                                                      key=lambda x: int(x.strip(string.ascii_letters))))
+
+        self.combo_encoding.current(0)
 
     def bt_search(self, translate=False):
         patterns = {
@@ -528,6 +545,8 @@ class TranslateExternalFiles(tk.Frame):
         tk.Label(self, text="Encoding:").grid()
         self.combo_encoding = ComboboxCustom(self)
         self.combo_encoding.grid(row=3, column=1, sticky='WE')
+        
+        self.update_combo_encoding()
 
         self.listbox_translation_files = ListboxCustom(self)
         self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
