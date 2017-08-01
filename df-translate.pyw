@@ -519,7 +519,7 @@ class TranslateExternalFiles(tk.Frame):
         
         directory = self.fileentry_translation_files.text
         if path.exists(directory):
-            languages = tuple(self.get_languages(self.fileentry_translation_files.text))
+            languages = tuple(self.get_languages(directory))
             self.combo_language.values = languages
             if languages:
                 self.combo_language.current(0)
