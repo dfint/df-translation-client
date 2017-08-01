@@ -434,7 +434,7 @@ class TranslateExternalFiles(tk.Frame):
             else:
                 self.combo_language.text = ''
 
-            self.on_change_language(widget=self.combo_language)
+            self.update_listbox_translation_files(language=self.combo_language.text)
         else:
             self.combo_language.values = tuple()
             self.combo_language.text = ''
@@ -447,11 +447,10 @@ class TranslateExternalFiles(tk.Frame):
                     if po.PoReader(file).meta['Language'] == language:
                         yield filename
 
-    def on_change_language(self, event=None, widget=None):
-        widget = event.widget if event is not None else widget
-        
+    def update_listbox_translation_files(self, event=None, language=None):
+        language = event.widget.text if event else language
         directory = self.fileentry_translation_files.text
-        files = self.filter_files_by_language(directory, widget.text) if path.exists(directory) else tuple()
+        files = self.filter_files_by_language(directory, language) if path.exists(directory) else tuple()
         self.listbox_translation_files.values = tuple(files)
 
     def bt_search(self, translate=False):
@@ -524,7 +523,7 @@ class TranslateExternalFiles(tk.Frame):
             if languages:
                 self.combo_language.current(0)
 
-        self.combo_language.bind('<<ComboboxSelected>>', self.on_change_language)
+        self.combo_language.bind('<<ComboboxSelected>>', self.update_listbox_translation_files)
 
         tk.Label(self, text="Encoding:").grid()
         self.combo_encoding = ComboboxCustom(self)
@@ -532,7 +531,7 @@ class TranslateExternalFiles(tk.Frame):
 
         self.listbox_translation_files = ListboxCustom(self)
         self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
-        self.on_change_language(widget=self.combo_language)
+        self.update_listbox_translation_files(language=self.combo_language.text)
 
         ttk.Button(self, text='Search', command=self.bt_search).grid()
         ttk.Button(self, text='Translate', command=lambda: self.bt_search(translate=True)).grid(row=5, column=1)
