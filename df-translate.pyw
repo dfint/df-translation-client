@@ -140,10 +140,10 @@ def cleanup_dictionary(d: iter, exclusions=None):
             yield original_string, translation
 
 
-def filter_codepages(codepages, dictionary):
+def filter_codepages(codepages, strings):
     for codepage in codepages:
         try:
-            for _, item in dictionary:
+            for item in strings:
                 item.encode(codepage)
             yield codepage
         except UnicodeEncodeError:
@@ -285,7 +285,7 @@ class PatchExecutableFrame(tk.Frame):
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
                 dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
-            codepages = filter_codepages(codepages, dictionary)
+            codepages = filter_codepages(codepages, dictionary.values())
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
 
@@ -348,7 +348,7 @@ class PatchExecutableFrame(tk.Frame):
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
                 dictionary = list(cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile))
-            codepages = filter_codepages(codepages, dictionary)
+            codepages = filter_codepages(codepages, dictionary.values())
         self.combo_encoding.values = tuple(sorted(codepages,
                                                   key=lambda x: int(x.strip(string.ascii_letters))))
         
