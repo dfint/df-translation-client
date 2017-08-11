@@ -77,14 +77,17 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.download_process is None:
             parent_conn, child_conn = mp.Pipe()
 
-            self.download_process = mp.Process(target=downloader, kwargs=dict(
-                conn=child_conn,
-                tx=self.tx,
-                project=project,
-                language=language,
-                resources=resources,
-                file_path_pattern=path.join(download_dir, '%s_' + language + '.po')
-            ))
+            self.download_process = mp.Process(
+                target=downloader,
+                kwargs=dict(
+                    conn=child_conn,
+                    tx=self.tx,
+                    project=project,
+                    language=language,
+                    resources=resources,
+                    file_path_pattern=path.join(download_dir, '%s_' + language + '.po')
+                )
+            )
             self.download_process.start()
 
         while parent_conn.poll() or not self.download_process.is_alive():
