@@ -58,8 +58,8 @@ class ComboboxCustom(ttk.Combobox):
         return self['values']
 
     @values.setter
-    def values(self, values: tuple):
-        self['values'] = values
+    def values(self, values):
+        self['values'] = tuple(values)
 
 
 class ListboxCustom(tk.Frame):
@@ -91,8 +91,8 @@ class ListboxCustom(tk.Frame):
         return self._var.get()
 
     @values.setter
-    def values(self, values: tuple):
-        self._var.set(values)
+    def values(self, values):
+        self._var.set(tuple(values))
 
     def clear(self):
         self._listbox.delete(0, tk.END)
