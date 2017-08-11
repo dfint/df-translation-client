@@ -566,18 +566,20 @@ class App(tk.Tk):
     def init_config(self, noconfig):
         config_name = '.df-translate.json'
         userdir = path.expanduser('~')
-        self.config_path = path.join(userdir, config_name)
-        self.config = dict(last_tab_opened=0)
+        config_path = path.join(userdir, config_name)
+        config = dict(last_tab_opened=0)
         
         if not noconfig:
             try:
-                with open(self.config_path, encoding='utf-8') as config_file:
+                with open(config_path, encoding='utf-8') as config_file:
                     self.config.update(json.load(config_file))
             except (FileNotFoundError, ValueError):
                 pass
 
             self.bind('<Destroy>', self.save_settings)  # Save settings on quit
             self.save_settings_repeatedly(delay=500)  # Save settings every 500 ms
+
+        return config, config_path
 
     def __init__(self, noconfig=False):
         super().__init__()
@@ -589,10 +591,8 @@ class App(tk.Tk):
             self.check_for_errors()
 
         self.notebook = ttk.Notebook()
-        
-        self.config = None
-        self.config_path = None
-        self.init_config(noconfig)
+
+        self.config, self.config_path = self.init_config(noconfig)
         
         notebook = self.notebook
         notebook.pack(fill='both', expand=1)
