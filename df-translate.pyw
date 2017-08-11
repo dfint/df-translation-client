@@ -585,21 +585,15 @@ class App(tk.Tk):
         config_name = '.df-translate.json'
         userdir = path.expanduser('~')
         self.config_path = path.join(userdir, config_name)
-        default_config = dict()
-        
-        if noconfig:
-            self.config = default_config
-        else:
-            try:
-                with open(self.config_path, encoding='utf-8') as config_file:
-                    self.config = json.load(config_file)
-            except (FileNotFoundError, ValueError):
-                self.config = default_config
-        
-        if 'last_tab_opened' not in self.config:
-            self.config['last_tab_opened'] = 0
+        self.config = dict(last_tab_opened=0)
         
         if not noconfig:
+            try:
+                with open(self.config_path, encoding='utf-8') as config_file:
+                    self.config.update(json.load(config_file))
+            except (FileNotFoundError, ValueError):
+                pass
+
             self.bind('<Destroy>', self.save_settings)  # Save settings on quit
             self.save_settings_repeatedly(delay=500)  # Save settings every 500 ms
 
