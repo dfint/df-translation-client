@@ -176,13 +176,11 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.download_process and self.download_process.is_alive():
             self.download_process.terminate()
 
-    def __init__(self, master=None, app=None):
+    def __init__(self, master=None, config=None):
         super().__init__(master)
         
-        self.app = app
-        
         self.config = init_section(
-            self.app.config, section_name='download_translations',
+            config, section_name='download_translations',
             defaults=dict(recent_projects=['dwarf-fortress'])
         )
 
