@@ -13,7 +13,7 @@ try:
 except ImportError:
     from dfrus.patch_charmap import get_codepages
 
-from config import check_and_save_path, init_section
+from config import check_and_save_path, init_section, save_settings
 from dfrus import dfrus
 from os import path
 from tkinter import messagebox
@@ -546,17 +546,14 @@ class TranslateExternalFiles(tk.Frame):
 
 
 class App(tk.Tk):
-    def save_settings(self, _=None):
-        with open(self.config_path, 'w', encoding='utf-8') as config_file:
-            json.dump(self.config, config_file, indent=4, sort_keys=True)
-
-    def save_settings_repeatedly(self, delay=500):
-        nb = self.notebook
-        if nb.tabs():
-            self.config['last_tab_opened'] = nb.tabs().index(nb.select())
+    def save_settings_repeatedly(self, config, config_path, delay=500):
+        if hasattr(self, 'notebook'):
+            nb = self.notebook
+            if nb.tabs():
+                self.config['last_tab_opened'] = nb.tabs().index(nb.select())
         
-        self.after(delay, self.save_settings_repeatedly, delay)
-        self.save_settings()
+        self.after(delay, self.save_settings_repeatedly, config, config_path, delay)
+        save_settings(config, config_path)
 
     def check_for_errors(self, delay=100):
         if self.stderr.getvalue():
@@ -574,12 +571,12 @@ class App(tk.Tk):
         if not noconfig:
             try:
                 with open(config_path, encoding='utf-8') as config_file:
-                    self.config.update(json.load(config_file))
+                    config.update(json.load(config_file))
             except (FileNotFoundError, ValueError):
                 pass
 
-            self.bind('<Destroy>', self.save_settings)  # Save settings on quit
-            self.save_settings_repeatedly(delay=500)  # Save settings every 500 ms
+            self.bind('<Destroy>', lambda _ : save_settings(self.config, self.config_path))  # Save settings on quit
+            self.save_settings_repeatedly(config, config_path, delay=500)  # Save settings every 500 ms
 
         return config, config_path
 

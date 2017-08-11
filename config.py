@@ -1,3 +1,4 @@
+import json
 import os.path
 
 
@@ -13,3 +14,8 @@ def init_section(config, section_name, defaults=None):
     section.update(config.get(section_name, dict()))
     config[section_name] = section
     return section
+
+
+def save_settings(config, config_path):
+    with open(config_path, 'w', encoding='utf-8') as config_file:
+        json.dump(config, config_file, indent=4, sort_keys=True)
