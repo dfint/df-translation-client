@@ -13,7 +13,7 @@ try:
 except ImportError:
     from dfrus.patch_charmap import get_codepages
 
-from config import check_and_save_path
+from config import check_and_save_path, init_section
 from dfrus import dfrus
 from os import path
 from tkinter import messagebox
@@ -166,21 +166,6 @@ class ProcessMessageWrapper:
 
 
 class PatchExecutableFrame(tk.Frame):
-    @staticmethod
-    def init_config(config):
-        if 'patch_executable' not in config:
-            config['patch_executable'] = dict()
-
-        config = config['patch_executable']
-
-        if 'fix_space_exclusions' not in config:
-            config['fix_space_exclusions'] = dict(ru=['Histories of '])
-
-        if 'language_codepages' not in config:
-            config['language_codepages'] = dict()
-
-        return config
-
     def update_log(self, message_queue):
         try:
             while message_queue.poll():
@@ -299,7 +284,13 @@ class PatchExecutableFrame(tk.Frame):
         
         self.app = app
         
-        self.config = self.init_config(self.app.config)
+        self.config = init_section(
+            self.app.config, section_name='patch_executable',
+            defaults=dict(
+                fix_space_exclusions=dict(ru=['Histories of ']),
+                language_codepages=dict(),
+            )
+        )
         config = self.config
         self.exclusions = config['fix_space_exclusions']
         
@@ -405,15 +396,6 @@ class PatchExecutableFrame(tk.Frame):
 
 class TranslateExternalFiles(tk.Frame):
     @staticmethod
-    def init_config(config, section_name):
-        if section_name not in config:
-            config[section_name] = dict()
-
-        config = config[section_name]
-
-        return config
-
-    @staticmethod
     def get_languages(directory):
         languages = set()
         for filename in os.listdir(directory):
@@ -506,7 +488,7 @@ class TranslateExternalFiles(tk.Frame):
     def __init__(self, master, app=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.app = app
-        self.config = self.init_config(self.app.config, section_name='translate_external_files')
+        self.config = init_section(self.app.config, section_name='translate_external_files')
         config = self.config
 
         tk.Label(self, text='Dwarf Fortress root path:').grid()
