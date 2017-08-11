@@ -281,7 +281,7 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = self.config['language_codepages'][self.translation_file_language]
 
-    def __init__(self, master=None, config=None):
+    def __init__(self, master, config):
         super().__init__(master)
         
         self.config = init_section(
@@ -485,7 +485,7 @@ class TranslateExternalFiles(tk.Frame):
                         func = patterns[pattern]['func']
                         # func(po_filename, cur_dir, encoding)
 
-    def __init__(self, master, config=None, *args, **kwargs):
+    def __init__(self, master, config, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.config = init_section(config, section_name='translate_external_files')
         config = self.config

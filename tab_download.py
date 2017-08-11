@@ -176,7 +176,7 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.download_process and self.download_process.is_alive():
             self.download_process.terminate()
 
-    def __init__(self, master=None, config=None):
+    def __init__(self, master, config):
         super().__init__(master)
         
         self.config = init_section(
