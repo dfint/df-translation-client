@@ -452,7 +452,7 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_encoding.values = tuple(sorted(codepages,
                                                       key=lambda x: int(x.strip(string.ascii_letters))))
 
-        self.combo_encoding.current(0)
+            self.combo_encoding.current(0)
 
     def bt_search(self, translate=False):
         patterns = {
