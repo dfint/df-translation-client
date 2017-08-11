@@ -34,7 +34,7 @@ def show_spaces(s):
 class DialogDontFixSpaces(tk.Toplevel):
     def update_listbox_exclusions(self):
         exclusions = self.exclusions.get(self.combo_language.text, list())
-        self.listbox_exclusions.values = tuple(sorted(show_spaces(item) for item in exclusions))
+        self.listbox_exclusions.values = sorted(show_spaces(item) for item in exclusions)
         self.restore_strings.update({show_spaces(s): s for s in exclusions})
 
     def combo_language_change_selection(self, _):
@@ -45,7 +45,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         text = self.entry_search.text
         values = ((show_spaces(key) for key in self.strings if text.lower() in key.lower())
                   if self.language == self.combo_language.text else tuple())
-        self.listbox_exclusions_hints.values = tuple(values)
+        self.listbox_exclusions_hints.values = values
 
     def entry_search_key_up(self, _):
         self.update_listbox_exclusions_hints()
@@ -273,8 +273,8 @@ class PatchExecutableFrame(tk.Frame):
                 self.translation_file_language = pofile.meta['Language']
                 strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
             codepages = filter_codepages(codepages, strings)
-        self.combo_encoding.values = tuple(sorted(codepages,
-                                                  key=lambda x: int(x.strip(string.ascii_letters))))
+        self.combo_encoding.values = sorted(codepages,
+                                            key=lambda x: int(x.strip(string.ascii_letters)))
 
         if self.translation_file_language not in self.config['language_codepages']:
             self.combo_encoding.current(0)
@@ -341,8 +341,8 @@ class PatchExecutableFrame(tk.Frame):
                 strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
             codepages = filter_codepages(codepages, strings)
 
-        self.combo_encoding.values = tuple(sorted(codepages,
-                                                  key=lambda x: int(x.strip(string.ascii_letters))))
+        self.combo_encoding.values = sorted(codepages,
+                                            key=lambda x: int(x.strip(string.ascii_letters)))
         
         if 'last_encoding' in config:
             self.combo_encoding.text = config['last_encoding']
@@ -410,7 +410,7 @@ class TranslateExternalFiles(tk.Frame):
     def on_change_translation_files_path(self, config, key, directory):
         check_and_save_path(config, key, directory)
         if path.exists(directory):
-            languages = tuple(self.get_languages(directory))
+            languages = self.get_languages(directory)
             self.combo_language.values = languages
 
             if languages:
@@ -435,7 +435,7 @@ class TranslateExternalFiles(tk.Frame):
         language = self.combo_language.text if not language else language
         directory = self.fileentry_translation_files.text
         files = self.filter_files_by_language(directory, language) if path.exists(directory) else tuple()
-        self.listbox_translation_files.values = tuple(files)
+        self.listbox_translation_files.values = files
 
     def update_combo_encoding(self, _=None):
         language = self.combo_language.text
@@ -449,8 +449,8 @@ class TranslateExternalFiles(tk.Frame):
                     pofile = po.PoReader(fn)
                     strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
                 codepages = filter_codepages(codepages, strings)
-            self.combo_encoding.values = tuple(sorted(codepages,
-                                                      key=lambda x: int(x.strip(string.ascii_letters))))
+            self.combo_encoding.values = sorted(codepages,
+                                                key=lambda x: int(x.strip(string.ascii_letters)))
 
             self.combo_encoding.current(0)
 
@@ -519,7 +519,7 @@ class TranslateExternalFiles(tk.Frame):
         
         directory = self.fileentry_translation_files.text
         if path.exists(directory):
-            languages = tuple(self.get_languages(directory))
+            languages = self.get_languages(directory)
             self.combo_language.values = languages
             if languages:
                 self.combo_language.current(0)

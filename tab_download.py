@@ -49,7 +49,7 @@ class DownloadTranslationsFrame(tk.Frame):
         except:
             messagebox.showerror('Unexpected error', traceback.format_exc())
         else:
-            self.combo_languages.values = tuple(sorted(languages))
+            self.combo_languages.values = sorted(languages)
             last_language = self.config.get('language', None)
             if last_language and last_language in languages:
                 self.combo_languages.text = last_language
@@ -66,7 +66,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 if project in recent_projects:
                     recent_projects.remove(project)
                 recent_projects.insert(0, project)
-            self.combo_projects.values = tuple(recent_projects)
+            self.combo_projects.values = recent_projects
 
     def download_waiter(self, resources, language, project, download_dir, parent_conn=None,
                         initial_names=None, resource_names=None, i=0):
@@ -113,8 +113,8 @@ class DownloadTranslationsFrame(tk.Frame):
                 return
 
             resource_names[i] = '{} - {}'.format(initial_names[i], message)
-            self.listbox_resources.values = tuple(resource_names)
-            self.app.update()
+            self.listbox_resources.values = resource_names
+            self.update()
 
             if message == 'ok!':
                 self.progressbar.step()
@@ -159,7 +159,7 @@ class DownloadTranslationsFrame(tk.Frame):
             initial_names = [res['name'] for res in self.resources]
             resource_names = list(initial_names)
             
-            self.listbox_resources.values = tuple(resource_names)
+            self.listbox_resources.values = resource_names
             self.download_started = True
             self.download_waiter(self.resources, language, project, download_dir)
             return True
