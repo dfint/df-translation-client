@@ -592,21 +592,20 @@ class App(tk.Tk):
             sys.stderr = self.stderr
             self.check_for_errors()
 
-        self.notebook = ttk.Notebook()
-
         self.config, self.config_path = self.init_config(noconfig)
-        
+
+        self.notebook = ttk.Notebook()
         notebook = self.notebook
         notebook.pack(fill='both', expand=1)
-        
-        f1 = DownloadTranslationsFrame(notebook, self)
-        notebook.add(f1, text='Download translations')
-        
-        f1 = PatchExecutableFrame(notebook, self)
-        notebook.add(f1, text='Patch executable file')
-        
-        f1 = TranslateExternalFiles(notebook, self)
-        notebook.add(f1, text='Translate external text files')
+
+        notebook.add(DownloadTranslationsFrame(notebook, self),
+                     text='Download translations')
+
+        notebook.add(PatchExecutableFrame(notebook, self),
+                     text='Patch executable file')
+
+        notebook.add(TranslateExternalFiles(notebook, self),
+                     text='Translate external text files')
         
         tab = self.config['last_tab_opened']
         if 0 <= tab < len(notebook.tabs()):
