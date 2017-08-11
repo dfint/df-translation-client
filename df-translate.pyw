@@ -583,7 +583,7 @@ class App(tk.Tk):
         super().__init__()
 
         executable = path.split(sys.executable)[1]
-        if executable.startswith('pythonw') or not executable.startswith('python'):
+        if executable.startswith('pythonw') or not executable.startswith('python'):  # if no console attached
             self.stderr = io.StringIO()
             sys.stderr = self.stderr
             self.check_for_errors()
