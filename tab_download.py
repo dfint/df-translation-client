@@ -6,7 +6,7 @@ import subprocess
 import sys
 import requests
 
-from config import check_and_save_path
+from config import check_and_save_path, init_section
 from custom_widgets import ComboboxCustom, EntryCustom, FileEntry, TwoStateButton, ListboxCustom
 from os import path
 from tkinter import messagebox
@@ -33,17 +33,6 @@ def downloader(conn, tx, project, language, resources, file_path_pattern):
 
 
 class DownloadTranslationsFrame(tk.Frame):
-    @staticmethod
-    def init_config(config):
-        if 'download_translations' not in config:
-            config['download_translations'] = dict()
-        
-        config = config['download_translations']
-        if 'recent_projects' not in config:
-            config['recent_projects'] = ['dwarf-fortress']
-
-        return config
-    
     def bt_connect(self):
         username = self.entry_username.text
         password = self.entry_password.text  # DO NOT remember password (not safe)
@@ -189,7 +178,10 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.app = app
         
-        self.config = self.init_config(self.app.config)
+        self.config = init_section(
+            self.app.config, section_name='download_translations',
+            defaults=dict(recent_projects=['dwarf-fortress'])
+        )
 
         tk.Label(self, text='Transifex project:').grid()
 
