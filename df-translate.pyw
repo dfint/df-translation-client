@@ -281,13 +281,11 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = self.config['language_codepages'][self.translation_file_language]
 
-    def __init__(self, master=None, app=None):
+    def __init__(self, master=None, config=None):
         super().__init__(master)
         
-        self.app = app
-        
         self.config = init_section(
-            self.app.config, section_name='patch_executable',
+            config, section_name='patch_executable',
             defaults=dict(
                 fix_space_exclusions=dict(ru=['Histories of ']),
                 language_codepages=dict(),
@@ -487,10 +485,9 @@ class TranslateExternalFiles(tk.Frame):
                         func = patterns[pattern]['func']
                         # func(po_filename, cur_dir, encoding)
 
-    def __init__(self, master, app=None, *args, **kwargs):
+    def __init__(self, master, config=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.app = app
-        self.config = init_section(self.app.config, section_name='translate_external_files')
+        self.config = init_section(config, section_name='translate_external_files')
         config = self.config
 
         tk.Label(self, text='Dwarf Fortress root path:').grid()
@@ -595,13 +592,13 @@ class App(tk.Tk):
         notebook = self.notebook
         notebook.pack(fill='both', expand=1)
 
-        notebook.add(DownloadTranslationsFrame(notebook, self),
+        notebook.add(DownloadTranslationsFrame(notebook, self.config),
                      text='Download translations')
 
-        notebook.add(PatchExecutableFrame(notebook, self),
+        notebook.add(PatchExecutableFrame(notebook, self.config),
                      text='Patch executable file')
 
-        notebook.add(TranslateExternalFiles(notebook, self),
+        notebook.add(TranslateExternalFiles(notebook, self.config),
                      text='Translate external text files')
         
         tab = self.config['last_tab_opened']
