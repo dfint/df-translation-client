@@ -206,15 +206,17 @@ class PatchExecutableFrame(tk.Frame):
 
             self.after(100, self.update_log, parent_conn)
             self.log_field.clear()
-            self.dfrus_process = mp.Process(target=dfrus.run,
-                                            kwargs=dict(
-                                                path=executable_file,
-                                                dest='',
-                                                trans_table=dictionary,
-                                                codepage=self.combo_encoding.text,
-                                                debug=self.chk_debug_output.is_checked,
-                                                stdout=ProcessMessageWrapper(child_conn)
-                                            ))
+            self.dfrus_process = mp.Process(
+                target=dfrus.run,
+                kwargs=dict(
+                    path=executable_file,
+                    dest='',
+                    trans_table=dictionary,
+                    codepage=self.combo_encoding.text,
+                    debug=self.chk_debug_output.is_checked,
+                    stdout=ProcessMessageWrapper(child_conn)
+                )
+            )
             self.dfrus_process.start()
             return True
 
