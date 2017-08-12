@@ -19,3 +19,18 @@ def init_section(config, section_name, defaults=None):
 def save_settings(config, config_path):
     with open(config_path, 'w', encoding='utf-8') as config_file:
         json.dump(config, config_file, indent=4, sort_keys=True)
+
+
+def load_settings(config_path, defaults=None):
+    if not defaults:
+        defaults = dict()
+
+    config = defaults
+
+    try:
+        with open(config_path, encoding='utf-8') as config_file:
+            config.update(json.load(config_file))
+    except (FileNotFoundError, ValueError):
+        pass
+
+    return config

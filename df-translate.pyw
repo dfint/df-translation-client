@@ -4,7 +4,6 @@ import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 import string
-import json
 import os
 import re
 
@@ -13,7 +12,7 @@ try:
 except ImportError:
     from dfrus.patch_charmap import get_codepages
 
-from config import check_and_save_path, init_section, save_settings
+from config import check_and_save_path, init_section, save_settings, load_settings
 from dfrus import dfrus
 from os import path
 from tkinter import messagebox
@@ -564,15 +563,10 @@ class App(tk.Tk):
         userdir = path.expanduser('~')
         config_path = path.join(userdir, config_name)
         config = dict(last_tab_opened=0)
-        
-        if not noconfig:
-            try:
-                with open(config_path, encoding='utf-8') as config_file:
-                    config.update(json.load(config_file))
-            except (FileNotFoundError, ValueError):
-                pass
 
-            self.bind('<Destroy>', lambda _ : save_settings(self.config, self.config_path))  # Save settings on quit
+        if not noconfig:
+            config = load_settings(config_path, defaults=config)
+            self.bind('<Destroy>', lambda _ : save_settings(config, config_path))  # Save settings on quit
             self.save_settings_repeatedly(config, config_path, delay=500)  # Save settings every 500 ms
 
         return config, config_path
@@ -600,7 +594,7 @@ class App(tk.Tk):
 
         notebook.add(TranslateExternalFiles(notebook, self.config),
                      text='Translate external text files')
-        
+
         tab = self.config['last_tab_opened']
         if 0 <= tab < len(notebook.tabs()):
             notebook.select(tab)
