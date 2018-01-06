@@ -82,9 +82,15 @@ class DialogDontFixSpaces(tk.Toplevel):
         self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
         self.restore_strings = {show_spaces(s): s for s in self.strings}
-
-        self.combo_language = ComboboxCustom(self, values=language_list)
-        self.combo_language.grid(sticky=tk.W+tk.E)
+        
+        parent_frame = tk.Frame(self)
+        tk.Label(parent_frame, text='Language:').pack(side=tk.LEFT)
+        
+        self.combo_language = ComboboxCustom(parent_frame, values=language_list)
+        
+        self.combo_language.pack(fill='both', expand=1)
+        parent_frame.grid(sticky=tk.W+tk.E)
+        
         self.combo_language.current(0)
         self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
         self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
@@ -94,11 +100,17 @@ class DialogDontFixSpaces(tk.Toplevel):
 
         self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
         self.listbox_exclusions.grid(sticky='NSWE')
+        
         self.update_listbox_exclusions()
-
-        self.entry_search = EntryCustom(self)
-        self.entry_search.grid(column=1, row=0, sticky=tk.W+tk.E)
+        
+        parent_frame = tk.Frame(self)
+        tk.Label(parent_frame, text='Filter:').pack(side=tk.LEFT)
+        
+        self.entry_search = EntryCustom(parent_frame)
         self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_up)
+        self.entry_search.pack(fill='both', expand=1)
+        
+        parent_frame.grid(column=1, row=0, sticky=tk.W+tk.E)
 
         bt = ttk.Button(self, text='<< Add selected <<', command=self.bt_add_selected)
         bt.grid(column=1, row=1, sticky=tk.W+tk.E)
