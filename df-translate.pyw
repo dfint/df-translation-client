@@ -75,7 +75,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         if language:
             if language in language_list:
                 language_list.remove(language)
-            language_list = [language] + language_list
+            language_list.insert(0, language)
         self.language = language
 
         self.dictionary = dictionary or dict()
