@@ -100,7 +100,7 @@ class PatchExecutableFrame(tk.Frame):
                 meta = pofile.meta
                 dictionary = OrderedDict(
                     cleanup_dictionary(((entry['msgid'], entry['msgstr']) for entry in pofile),
-                                       self.exclusions.get(meta['Language'], set()))
+                                       self.exclusions.get(meta['Language'], self.exclusions))
                 )
             
             self.config['last_encoding'] = self.combo_encoding.text
