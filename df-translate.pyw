@@ -38,6 +38,7 @@ def cleanup_dictionary(d: iter, exclusions=None):
                 if original_string[-1] == ' ' and translation[-1] != ' ':
                     translation += ' '
 
+            # TODO: Make this mapping customizable
             translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"', 0x2014: '-'})
 
             yield original_string, translation
