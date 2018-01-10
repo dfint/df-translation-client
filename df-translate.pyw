@@ -26,7 +26,7 @@ from df_gettext_toolkit.translate_raws import translate_raws
 from tab_download import DownloadTranslationsFrame
 
 
-def cleanup_dictionary(d: iter, exclusions=None):
+def cleanup_spaces(d: iter, exclusions=None):
     exclusions = set(exclusions) if exclusions else set()
 
     for original_string, translation in d:
@@ -38,10 +38,12 @@ def cleanup_dictionary(d: iter, exclusions=None):
                 if original_string[-1] == ' ' and translation[-1] != ' ':
                     translation += ' '
 
-            # TODO: Make this mapping customizable
-            translation = translation.translate({0xfeff: None, 0x2019: "'", 0x201d: '"', 0x2014: '-'})
-
             yield original_string, translation
+
+
+def cleanup_special_symbols(s):
+    # TODO: Make this mapping customizable
+    return s.translate({0xfeff: None, 0x2019: "'", 0x201d: '"', 0x2014: '-'})
 
 
 def filter_codepages(codepages, strings):
@@ -100,8 +102,8 @@ class PatchExecutableFrame(tk.Frame):
                 pofile = po.PoReader(fn)
                 meta = pofile.meta
                 dictionary = OrderedDict(
-                    cleanup_dictionary(((entry['msgid'], entry['msgstr']) for entry in pofile),
-                                       self.exclusions.get(meta['Language'], self.exclusions))
+                    cleanup_spaces(((entry['msgid'], cleanup_special_symbols(entry['msgstr'])) for entry in pofile),
+                                   self.exclusions.get(meta['Language'], self.exclusions))
                 )
             
             self.config['last_encoding'] = self.combo_encoding.text
@@ -175,7 +177,7 @@ class PatchExecutableFrame(tk.Frame):
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
-                strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
+                strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
         self.combo_encoding.values = sorted(codepages,
                                             key=lambda x: int(x.strip(string.ascii_letters)))
@@ -240,7 +242,7 @@ class PatchExecutableFrame(tk.Frame):
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
-                strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
+                strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
 
         self.combo_encoding.values = sorted(codepages,
@@ -349,7 +351,7 @@ class TranslateExternalFiles(tk.Frame):
             for file in files:
                 with open(path.join(directory, file), 'r', encoding='utf-8') as fn:
                     pofile = po.PoReader(fn)
-                    strings = [val for _, val in cleanup_dictionary((entry['msgid'], entry['msgstr']) for entry in pofile)]
+                    strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
                 codepages = filter_codepages(codepages, strings)
             self.combo_encoding.values = sorted(codepages,
                                                 key=lambda x: int(x.strip(string.ascii_letters)))
