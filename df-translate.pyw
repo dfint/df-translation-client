@@ -50,9 +50,11 @@ def filter_codepages(codepages, strings):
     for codepage in codepages:
         try:
             for item in strings:
-                item.encode(codepage)
+                # Only one-byte encodings are supported
+                if len(item.encode(codepage)) != len(item):
+                    raise ValueError
             yield codepage
-        except UnicodeEncodeError:
+        except (UnicodeEncodeError, ValueError):
             pass
 
 
