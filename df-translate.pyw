@@ -366,10 +366,11 @@ class TranslateExternalFiles(tk.Frame):
                 po_filename='raw-objects',
                 func=translate_raws,
             ),
-            r'data_src': dict(
-                po_filename='uncompressed',
-                func=lambda *args: translate_plain_text(*args, join_paragraphs=True),
-            ),
+            # Swithched off for now
+            # r'data_src': dict(
+            #     po_filename='uncompressed',
+            #     func=lambda *args: translate_plain_text(*args, join_paragraphs=True),
+            # ),
             r'data\speech': dict(
                 po_filename='speech',
                 func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
@@ -384,14 +385,20 @@ class TranslateExternalFiles(tk.Frame):
         for cur_dir, _, files in os.walk(self.fileentry_df_root_path.text):
             for pattern in patterns:
                 if cur_dir.endswith(pattern):
-                    self.listbox_found_directories.insert(tk.END, cur_dir + ' (%s files)' % len(files))
+                    self.listbox_found_directories.append(cur_dir + ' (%s files)' % len(files))
                     postfix = '_{}.po'.format(self.combo_language.text)
                     po_filename = os.path.join(self.fileentry_translation_files.text,
                                                patterns[pattern]['po_filename'] + postfix)
 
                     if translate:
                         func = patterns[pattern]['func']
-                        # func(po_filename, cur_dir, encoding)
+                        for filename in func(po_filename, cur_dir, self.combo_encoding.get()):
+                            # print(filename, file=sys.stderr)
+                            self.listbox_found_directories.append(filename)
+
+        if translate:
+            self.listbox_found_directories.append("Completed.")
+
 
     def __init__(self, master, config, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
