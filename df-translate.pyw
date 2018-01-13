@@ -337,7 +337,7 @@ class TranslateExternalFiles(tk.Frame):
                     if po.PoReader(file).meta['Language'] == language:
                         yield filename
 
-    def update_listbox_translation_files(self, event=None, language=None):
+    def update_listbox_translation_files(self, _=None, language=None):
         language = self.combo_language.text if not language else language
         directory = self.fileentry_translation_files.text
         files = self.filter_files_by_language(directory, language) if path.exists(directory) else tuple()
@@ -482,7 +482,7 @@ class App(tk.Tk):
 
         if not noconfig:
             config = load_settings(config_path, defaults=config)
-            self.bind('<Destroy>', lambda _ : save_settings(config, config_path))  # Save settings on quit
+            self.bind('<Destroy>', lambda _: save_settings(config, config_path))  # Save settings on quit
             self.save_settings_repeatedly(config, config_path, delay=500)  # Save settings every 500 ms
 
         return config, config_path
