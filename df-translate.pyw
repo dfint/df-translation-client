@@ -270,7 +270,6 @@ class PatchExecutableFrame(tk.Frame):
         
         self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
 
-        # FIXME: chk_add_leading_trailing_spaces does nothing
         self.chk_add_leading_trailing_spaces = self.setup_checkbutton(
             text='Add necessary leading/trailing spaces',
             config_key='add_leading_trailing_spaces',
