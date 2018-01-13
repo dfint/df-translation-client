@@ -515,6 +515,7 @@ class App(tk.Tk):
         if 0 <= tab < len(notebook.tabs()):
             notebook.select(tab)
 
+
 if __name__ == '__main__':
     mp.freeze_support()
     App(noconfig='--noconfig' in sys.argv).mainloop()
