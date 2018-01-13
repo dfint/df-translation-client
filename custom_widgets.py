@@ -96,9 +96,15 @@ class ListboxCustom(tk.Frame):
 
     def clear(self):
         self._listbox.delete(0, tk.END)
+        self._listbox.update()
 
     def curselection(self):
         return self._listbox.curselection()
+
+    def append(self, item):
+        self._listbox.insert(tk.END, item)
+        self._listbox.yview_moveto('1.0')
+        self._listbox.update()
 
 
 class CustomText(tk.Frame):
