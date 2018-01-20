@@ -380,6 +380,7 @@ class TranslateExternalFiles(tk.Frame):
             ),
         }
 
+        # TODO: add progressbar
         self.listbox_found_directories.clear()
         for cur_dir, _, files in os.walk(self.fileentry_df_root_path.text):
             for pattern in patterns:
@@ -397,7 +398,6 @@ class TranslateExternalFiles(tk.Frame):
 
         if translate:
             self.listbox_found_directories.append("Completed.")
-
 
     def __init__(self, master, config, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
