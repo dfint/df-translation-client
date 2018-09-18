@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from custom_widgets import FileEntry
+from custom_widgets import FileEntry, CustomText
 import importlib
 
 
@@ -33,6 +33,9 @@ class App(tk.Tk):
 
         self.button_reload = ttk.Button(self, text='Reload dfrus', command=reload)
         self.button_reload.pack()
+
+        self.log_field = CustomText(self, enabled=False, height=16)
+        self.log_field.pack()
 
 
 if __name__ == '__main__':
