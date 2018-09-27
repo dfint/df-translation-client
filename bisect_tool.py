@@ -36,12 +36,16 @@ class Bisect(tk.Frame):
         self.grid_rowconfigure(0, weight=1)
 
     def insert_node(self, parent_node='', index='end', start=0, end=0):
-        if start != end:
-            text='[{} : {}] ({} strings)'.format(start, end, end-start+1)
-            values = (start, end, '{!r} ... {!r}'.format(self._strings[start], self._strings[end]))
-        else:
+        if start == end:
             text='[{} : {}] ({} string)'.format(start, end, end-start+1)
             values = (start, end, repr(self._strings[start]))
+        else:
+            text='[{} : {}] ({} strings)'.format(start, end, end-start+1)
+            if end - start + 1 <= 2:
+                strings = ','.join(map(repr, islice(self._strings, start, end+1)))
+            else:
+                strings = '{!r} ... {!r}'.format(self._strings[start], self._strings[end])
+            values = (start, end, strings)
         
         tree = self.tree
         item_id = tree.insert(parent_node, index, text=text, open=True, values=values)
