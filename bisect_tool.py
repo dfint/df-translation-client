@@ -75,7 +75,7 @@ class Bisect(tk.Frame):
             if len(ranges) == 1:
                 # Only one row selected (optimized case)
                 start, end = ranges[0]
-                return self._strings[start:end+1]
+                return islice(self._strings, start, end+1)
             else:
                 # Merge ranges when multiple rows selected
                 enumerated_strings = list(enumerate(self._strings))
