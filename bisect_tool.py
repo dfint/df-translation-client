@@ -64,7 +64,7 @@ class Bisect(tk.Frame):
 
     @property
     def selected_ranges(self):
-        return map(int, self.tree.item(item, option="values")[:2]) for item in self.tree.selection()
+        return (map(int, self.tree.item(item, option="values")[:2]) for item in self.tree.selection())
 
     @property
     def filtered_strings(self):
@@ -79,15 +79,17 @@ class Bisect(tk.Frame):
             else:
                 # Merge ranges when multiple rows selected
                 enumerated_strings = list(enumerate(self._strings))
-                strings = {}
+                strings = set()
                 for start, end in ranges:
                     strings |= set(islice(enumerated_strings, start, end+1))
 
-                strings = map(itemgetter(1), sorted(strings, key=itemgetter(0))
+                strings = map(itemgetter(1), sorted(strings, key=itemgetter(0)))
                 return strings
 
 
 if __name__ == '__main__':
     root = tk.Tk()
-    Bisect(root, strings='Lorem ipsum dolor sit amet'.split()).pack(fill=tk.BOTH, expand=1)
+    bisect = Bisect(strings='Lorem ipsum dolor sit amet'.split())
+    bisect.pack(fill=tk.BOTH, expand=1)
+    ttk.Button(text='Get strings', command=lambda: print(list(bisect.filtered_strings))).pack()
     root.mainloop()
