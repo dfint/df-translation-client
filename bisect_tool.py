@@ -37,8 +37,13 @@ class Bisect(tk.Frame):
                 self.insert_node(item, start=mid+1, end=end)
 
     @property
-    def filtered_dictionary(self):
-        return self._strings
+    def filtered_strings(self):
+        item = self.tree.selection()
+        if not item:
+            return self._strings
+        else:
+            start, end = map(int, self.tree.item(item[0], option="values")[:2])
+            return self._strings[start:end+1]
 
 
 if __name__ == '__main__':
