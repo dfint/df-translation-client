@@ -15,6 +15,9 @@ class Bisect(tk.Frame):
             self.insert_node(start=0, end=len(strings)-1)
         
         ttk.Button(self, text="Split", command=self.split_selected_node).grid()
+        ttk.Button(self, text="Mark as bad", command=lambda: self.mark_selected_node(foreground='red')).grid()
+        ttk.Button(self, text="Mark as good", command=lambda: self.mark_selected_node(foreground='green')).grid()
+        ttk.Button(self, text="Clear mark", command=lambda: self.mark_selected_node(foreground='black')).grid()
 
     def insert_node(self, parent_node='', index='end', start=0, end=0):
         if start != end:
@@ -23,8 +26,10 @@ class Bisect(tk.Frame):
         else:
             text='[{} : {}] ({} string)'.format(start, end, end-start+1)
             values = (start, end, repr(self._strings[start]))
-
-        self.tree.insert(parent_node, index, text=text, open=True, values=values)
+        
+        tree = self.tree
+        item_id = tree.insert(parent_node, index, text=text, open=True, values=values)
+        tree.item(item_id, tags=(item_id,))
 
     def split_selected_node(self):
         tree = self.tree
@@ -35,6 +40,12 @@ class Bisect(tk.Frame):
                 mid = (start + end) // 2
                 self.insert_node(item, start=start, end=mid)
                 self.insert_node(item, start=mid+1, end=end)
+
+    def mark_selected_node(self, **kwargs):
+        tree = self.tree
+        item = tree.selection()
+        if item:
+            tree.tag_configure(item[0], **kwargs)
 
     @property
     def filtered_strings(self):
