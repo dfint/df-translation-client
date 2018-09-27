@@ -7,7 +7,7 @@ class Bisect(tk.Frame):
         super().__init__(*args, **kwargs)
         self._strings = strings
         self.tree = tree = ttk.Treeview(self)
-        tree.grid(columnspan=4)
+        tree.grid(sticky='nswe')
         tree["columns"] = ("start", "end", "strings")
         tree["displaycolumns"] = tree["columns"][-1]
         tree.heading('#0', text='Tree')
@@ -15,11 +15,22 @@ class Bisect(tk.Frame):
 
         if strings:
             self.insert_node(start=0, end=len(strings)-1)
+
+        vscroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=tree.yview)
+        hscroll = ttk.Scrollbar(self, orient=tk.HORIZONTAL, command=tree.xview)
+        tree.configure(xscrollcommand=hscroll.set, yscrollcommand=vscroll.set)
+        vscroll.grid(row=0, column=1, sticky='ns')
+        hscroll.grid(row=1, column=0, columnspan=4, sticky='we')
         
-        ttk.Button(self, text="Split", command=self.split_selected_node).grid(row=3, column=0)
-        ttk.Button(self, text="Mark as bad", command=lambda: self.mark_selected_node(foreground='red')).grid(row=3, column=1)
-        ttk.Button(self, text="Mark as good", command=lambda: self.mark_selected_node(foreground='green')).grid(row=3, column=2)
-        ttk.Button(self, text="Clear mark", command=lambda: self.mark_selected_node(foreground='black')).grid(row=3, column=3)
+        toolbar = tk.Frame(self)
+        ttk.Button(toolbar, text="Split", command=self.split_selected_node).pack(side='left')
+        ttk.Button(toolbar, text="Mark as bad", command=lambda: self.mark_selected_node(foreground='red')).pack(side='left')
+        ttk.Button(toolbar, text="Mark as good", command=lambda: self.mark_selected_node(foreground='green')).pack(side='left')
+        ttk.Button(toolbar, text="Clear mark", command=lambda: self.mark_selected_node(foreground='black')).pack(side='left')
+        toolbar.grid(row=2, column=0)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
     def insert_node(self, parent_node='', index='end', start=0, end=0):
         if start != end:
@@ -61,5 +72,5 @@ class Bisect(tk.Frame):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    Bisect(root, strings='Lorem ipsum dolor sit amet'.split()).pack()
+    Bisect(root, strings='Lorem ipsum dolor sit amet'.split()).pack(fill=tk.BOTH, expand=1)
     root.mainloop()
