@@ -7,22 +7,24 @@ class Bisect(tk.Frame):
         super().__init__(*args, **kwargs)
         self._strings = strings
         self.tree = tree = ttk.Treeview(self)
-        tree.grid()
-        tree["columns"] = ("start", "end", "start_string", "end_string")
-        tree["displaycolumns"] = tree["columns"][-2:]
+        tree.grid(columnspan=4)
+        tree["columns"] = ("start", "end", "strings")
+        tree["displaycolumns"] = tree["columns"][-1]
+        tree.heading('#0', text='Tree')
+        tree.heading('#1', text='Strings')
 
         if strings:
             self.insert_node(start=0, end=len(strings)-1)
         
-        ttk.Button(self, text="Split", command=self.split_selected_node).grid()
-        ttk.Button(self, text="Mark as bad", command=lambda: self.mark_selected_node(foreground='red')).grid()
-        ttk.Button(self, text="Mark as good", command=lambda: self.mark_selected_node(foreground='green')).grid()
-        ttk.Button(self, text="Clear mark", command=lambda: self.mark_selected_node(foreground='black')).grid()
+        ttk.Button(self, text="Split", command=self.split_selected_node).grid(row=3, column=0)
+        ttk.Button(self, text="Mark as bad", command=lambda: self.mark_selected_node(foreground='red')).grid(row=3, column=1)
+        ttk.Button(self, text="Mark as good", command=lambda: self.mark_selected_node(foreground='green')).grid(row=3, column=2)
+        ttk.Button(self, text="Clear mark", command=lambda: self.mark_selected_node(foreground='black')).grid(row=3, column=3)
 
     def insert_node(self, parent_node='', index='end', start=0, end=0):
         if start != end:
             text='[{} : {}] ({} strings)'.format(start, end, end-start+1)
-            values = (start, end, repr(self._strings[start]), repr(self._strings[end]))
+            values = (start, end, '{!r} ... {!r}'.format(self._strings[start], self._strings[end]))
         else:
             text='[{} : {}] ({} string)'.format(start, end, end-start+1)
             values = (start, end, repr(self._strings[start]))
