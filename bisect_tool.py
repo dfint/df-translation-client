@@ -1,5 +1,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+from functools import reduce
+from operator import itemgetter
+from itertools import islice
 
 
 class Bisect(tk.Frame):
@@ -27,7 +30,7 @@ class Bisect(tk.Frame):
         ttk.Button(toolbar, text="Mark as bad", command=lambda: self.mark_selected_node(foreground='red')).pack(side='left')
         ttk.Button(toolbar, text="Mark as good", command=lambda: self.mark_selected_node(foreground='green')).pack(side='left')
         ttk.Button(toolbar, text="Clear mark", command=lambda: self.mark_selected_node(foreground='black')).pack(side='left')
-        toolbar.grid(row=2, column=0)
+        toolbar.grid()
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -56,18 +59,32 @@ class Bisect(tk.Frame):
 
     def mark_selected_node(self, **kwargs):
         tree = self.tree
-        item = tree.selection()
-        if item:
-            tree.tag_configure(item[0], **kwargs)
+        for item in tree.selection():
+            tree.tag_configure(item, **kwargs)
+
+    @property
+    def selected_ranges(self):
+        return map(int, self.tree.item(item, option="values")[:2]) for item in self.tree.selection()
 
     @property
     def filtered_strings(self):
-        item = self.tree.selection()
-        if not item:
+        ranges = list(self.selected_ranges)
+        if not ranges:
             return self._strings
         else:
-            start, end = map(int, self.tree.item(item[0], option="values")[:2])
-            return self._strings[start:end+1]
+            if len(ranges) == 1:
+                # Only one row selected (optimized case)
+                start, end = ranges[0]
+                return self._strings[start:end+1]
+            else:
+                # Merge ranges when multiple rows selected
+                enumerated_strings = list(enumerate(self._strings))
+                strings = {}
+                for start, end in ranges:
+                    strings |= set(islice(enumerated_strings, start, end+1))
+
+                strings = map(itemgetter(1), sorted(strings, key=itemgetter(0))
+                return strings
 
 
 if __name__ == '__main__':
