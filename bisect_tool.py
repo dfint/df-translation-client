@@ -27,9 +27,9 @@ class Bisect(tk.Frame):
         
         toolbar = tk.Frame(self)
         ttk.Button(toolbar, text="Split", command=self.split_selected_node).pack(side='left')
-        ttk.Button(toolbar, text="Mark as bad", command=lambda: self.mark_selected_node(foreground='red')).pack(side='left')
-        ttk.Button(toolbar, text="Mark as good", command=lambda: self.mark_selected_node(foreground='green')).pack(side='left')
-        ttk.Button(toolbar, text="Clear mark", command=lambda: self.mark_selected_node(foreground='black')).pack(side='left')
+        ttk.Button(toolbar, text="Mark as bad", command=lambda: self.mark_selected_node(background='orange')).pack(side='left')
+        ttk.Button(toolbar, text="Mark as good", command=lambda: self.mark_selected_node(background='lightgreen')).pack(side='left')
+        ttk.Button(toolbar, text="Clear mark", command=lambda: self.mark_selected_node(background='white')).pack(side='left')
         toolbar.grid()
 
         self.grid_columnconfigure(0, weight=1)
