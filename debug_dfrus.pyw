@@ -39,7 +39,7 @@ class App(tk.Tk):
         self.bisect.pack()
 
         ttk.Button(self, text='Patch DF').pack()
-        TwoStateButton(self, 'Run DF', None, 'Kill DF process', None)
+        TwoStateButton(self, 'Run DF', None, 'Kill DF process', None).pack()
 
         self.log_field = CustomText(self, enabled=False, height=8)
         self.log_field.pack()
