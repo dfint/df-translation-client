@@ -10,16 +10,6 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.label_dfrus_state = tk.Label(self)
-        self.label_dfrus_state.pack()
-
-        self.dfrus = None
-        try:
-            self.dfrus = importlib.import_module('dfrus.dfrus')
-            self.label_dfrus_state['text'] = 'dfrus module loaded successfully'
-        except ImportError:
-            self.label_dfrus_state['text'] = 'dfrus import error'
-
         self.file_entry = FileEntry(self)
         self.file_entry.pack()
 
@@ -29,7 +19,8 @@ class App(tk.Tk):
                     importlib.reload(self.dfrus)
                 except:
                     raise
-                self.label_dfrus_state['text'] = 'dfrus reloaded'
+                print('dfrus reloaded', file=self.log_field)
+                print(self.dfrus.__file__, file=self.log_field)
             else:
                 pass
 
@@ -41,8 +32,16 @@ class App(tk.Tk):
         ttk.Button(self, text='Patch DF').pack()
         TwoStateButton(self, 'Run DF', None, 'Kill DF process', None).pack()
 
-        self.log_field = CustomText(self, enabled=False, height=8)
-        self.log_field.pack()
+        log_field = self.log_field = CustomText(self, enabled=False, height=8)
+        log_field.pack()
+
+        self.dfrus = None
+        try:
+            self.dfrus = importlib.import_module('dfrus')
+            print('dfrus module loaded successfully', file=log_field)
+            print(self.dfrus.__file__, file=log_field)
+        except ImportError:
+            print('dfrus import error', file=log_field)
 
 
 if __name__ == '__main__':
