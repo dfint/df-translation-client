@@ -1,7 +1,9 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from custom_widgets import FileEntry, CustomText
 import importlib
+
+from custom_widgets import FileEntry, CustomText, TwoStateButton
+from bisect_tool import Bisect
 
 
 class App(tk.Tk):
@@ -31,10 +33,15 @@ class App(tk.Tk):
             else:
                 pass
 
-        self.button_reload = ttk.Button(self, text='Reload dfrus', command=reload)
-        self.button_reload.pack()
+        ttk.Button(self, text='Reload dfrus', command=reload).pack()
 
-        self.log_field = CustomText(self, enabled=False, height=16)
+        self.bisect = Bisect()
+        self.bisect.pack()
+
+        ttk.Button(self, text='Patch DF').pack()
+        TwoStateButton(self, 'Run DF', None, 'Kill DF process', None)
+
+        self.log_field = CustomText(self, enabled=False, height=8)
         self.log_field.pack()
 
 
