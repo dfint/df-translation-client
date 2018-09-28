@@ -54,7 +54,7 @@ class Bisect(tk.Frame):
     def split_selected_node(self):
         tree = self.tree
         item = tree.selection()
-        if item:
+        if item and not tree.get_children(item[0]):
             start, end = map(int, tree.item(item[0], option="values")[:2])
             if start != end:
                 mid = (start + end) // 2
