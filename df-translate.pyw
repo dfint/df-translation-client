@@ -21,6 +21,7 @@ try:
 except ImportError:
     from dfrus.patch_charmap import get_codepages
 
+
 class TranslateExternalFiles(tk.Frame):
     @staticmethod
     def get_languages(directory):
