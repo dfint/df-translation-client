@@ -9,11 +9,7 @@ from config import check_and_save_path, init_section
 from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
 from dialog_dont_fix_spaces import DialogDontFixSpaces
 from dfrus import dfrus
-
-try:
-    from dfrus.patchdf import get_codepages
-except ImportError:
-    from dfrus.patch_charmap import get_codepages
+from dfrus.patch_charmap import get_codepages
 
 
 def cleanup_spaces(d: iter, exclusions=None):
