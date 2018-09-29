@@ -14,7 +14,7 @@ from custom_widgets import ComboboxCustom, ListboxCustom, FileEntry
 from df_gettext_toolkit import po
 from df_gettext_toolkit.translate_plain_text import translate_plain_text
 from df_gettext_toolkit.translate_raws import translate_raws
-from tab_download import DownloadTranslationsFrame
+from frame_download import DownloadTranslationsFrame
 
 try:
     from dfrus.patchdf import get_codepages
