@@ -1,6 +1,5 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from functools import reduce
 from operator import itemgetter
 from itertools import islice
 
