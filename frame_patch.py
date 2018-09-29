@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import string
 import tkinter as tk
+import dfrus
 from collections import OrderedDict
 from os import path
 from tkinter import messagebox, ttk as ttk
@@ -8,7 +9,6 @@ from df_gettext_toolkit import po
 from config import check_and_save_path, init_section
 from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
 from dialog_dont_fix_spaces import DialogDontFixSpaces
-from dfrus import dfrus
 from dfrus.patch_charmap import get_codepages
 
 
