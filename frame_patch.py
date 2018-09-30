@@ -81,6 +81,16 @@ class PatchExecutableFrame(tk.Frame):
             self.log_field.write('\n[MESSAGE QUEUE/PIPE BROKEN]')
             self.button_patch.reset_state()
 
+    def load_dictionary(self, translation_file):
+        with open(translation_file, 'r', encoding='utf-8') as fn:
+            pofile = po.PoReader(fn)
+            meta = pofile.meta
+            dictionary = OrderedDict(
+                cleanup_spaces(((entry['msgid'], cleanup_special_symbols(entry['msgstr'])) for entry in pofile),
+                               self.exclusions.get(meta['Language'], self.exclusions))
+            )
+        return dictionary
+
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
             return False
@@ -93,13 +103,7 @@ class PatchExecutableFrame(tk.Frame):
         elif not translation_file or not path.exists(translation_file):
             messagebox.showerror('Error', 'Valid path to a translation file must be specified')
         else:
-            with open(translation_file, 'r', encoding='utf-8') as fn:
-                pofile = po.PoReader(fn)
-                meta = pofile.meta
-                dictionary = OrderedDict(
-                    cleanup_spaces(((entry['msgid'], cleanup_special_symbols(entry['msgstr'])) for entry in pofile),
-                                   self.exclusions.get(meta['Language'], self.exclusions))
-                )
+            dictionary = self.load_dictionary(translation_file)
 
             self.config['last_encoding'] = self.combo_encoding.text
 
