@@ -9,7 +9,8 @@ from df_gettext_toolkit.translate_raws import translate_raws
 from dfrus.patch_charmap import get_codepages
 from config import check_and_save_path, init_section
 from custom_widgets import FileEntry, ComboboxCustom, ListboxCustom
-from frame_patch import cleanup_special_symbols, filter_codepages
+from frame_patch import filter_codepages
+from cleanup import cleanup_special_symbols
 
 
 class TranslateExternalFiles(tk.Frame):

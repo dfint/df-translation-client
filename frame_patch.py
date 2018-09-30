@@ -6,31 +6,12 @@ from collections import OrderedDict
 from os import path
 from tkinter import messagebox, ttk as ttk
 from df_gettext_toolkit import po
+from cleanup import cleanup_spaces, cleanup_special_symbols
 from config import check_and_save_path, init_section
 from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
 from dialog_dont_fix_spaces import DialogDontFixSpaces
 from dfrus.patch_charmap import get_codepages
 from bisect_tool import Bisect
-
-
-def cleanup_spaces(d: iter, exclusions=None):
-    exclusions = set(exclusions) if exclusions else set()
-
-    for original_string, translation in d:
-        if original_string and translation and original_string != translation:
-            if original_string not in exclusions:
-                if original_string[0] == ' ' and translation[0] not in {' ', ','}:
-                    translation = ' ' + translation
-
-                if original_string[-1] == ' ' and translation[-1] != ' ':
-                    translation += ' '
-
-            yield original_string, translation
-
-
-def cleanup_special_symbols(s):
-    # TODO: Make this mapping customizable
-    return s.translate({0xfeff: None, 0x2019: "'", 0x201d: '"', 0x2014: '-'})
 
 
 def filter_codepages(codepages, strings):
