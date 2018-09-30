@@ -20,7 +20,7 @@ class CheckbuttonVar(ttk.Checkbutton):
         self._var.set(value)
 
 
-class EntryCustom(ttk.Entry):
+class EntryCustom(tk.Entry):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
@@ -158,6 +158,12 @@ class CustomText(tk.Frame):
 
 
 class FileEntry(tk.Frame):
+    def change_color(self):
+        if self.path_is_valid():
+            self.entry.config(background='white')
+        else:
+            self.entry.config(background='red')
+
     def bt_browse(self):
         file_path = ''
         # Use self.default_path only if self.entry.text is empty (Captain Obvious)
@@ -183,13 +189,19 @@ class FileEntry(tk.Frame):
 
             self._prev_value = file_path
 
+            if self._flag_change_entry_color:
+                self.change_color()
+
     def on_entry_keyup(self, event):
         if event.widget.text != self._prev_value:
             self.on_change(event.widget.text)
             self._prev_value = event.widget.text
 
+            if self._flag_change_entry_color:
+                self.change_color()
+
     def __init__(self, *args, button_text=None, default_path=None, on_change=None, filetypes=None,
-                 dialogtype='askopenfilename', **kwargs):
+                 dialogtype='askopenfilename', change_color=False, **kwargs):
         super().__init__(*args, **kwargs)
 
         if button_text is None:
@@ -209,6 +221,10 @@ class FileEntry(tk.Frame):
         self.entry.pack(fill='x', expand=1)
         if self.on_change is not None:
             self.entry.bind('<KeyRelease>', func=self.on_entry_keyup)
+
+        self._flag_change_entry_color = change_color
+        if change_color:
+            self.change_color()
     
     @property
     def text(self):
