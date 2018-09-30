@@ -10,6 +10,7 @@ from config import check_and_save_path, init_section
 from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
 from dialog_dont_fix_spaces import DialogDontFixSpaces
 from dfrus.patch_charmap import get_codepages
+from bisect_tool import Bisect
 
 
 def cleanup_spaces(d: iter, exclusions=None):
@@ -57,6 +58,12 @@ class ProcessMessageWrapper:
 
     def flush(self):
         pass  # stub method
+
+
+class DebugFrame(tk.Frame):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        Bisect(self).pack(fill=tk.BOTH, expand=1)
 
 
 class PatchExecutableFrame(tk.Frame):
@@ -175,7 +182,7 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = self.config['language_codepages'][self.translation_file_language]
 
-    def __init__(self, master, config):
+    def __init__(self, master, config, debug=False):
         super().__init__(master)
 
         self.config = init_section(
@@ -266,6 +273,10 @@ class PatchExecutableFrame(tk.Frame):
         button_exclusions = ttk.Button(self, text='Exclusions...', command=self.bt_exclusions)
         button_exclusions.grid(row=4, column=2)
 
+        self.debug_frame = None if not debug else DebugFrame(self)
+        if self.debug_frame:
+            self.debug_frame.grid(columnspan=3, sticky='NSWE')
+
         self.chk_debug_output = self.setup_checkbutton(
             text='Enable debugging output',
             config_key='debug_output',
@@ -276,12 +287,12 @@ class PatchExecutableFrame(tk.Frame):
         self.button_patch = TwoStateButton(self,
                                            text='Patch!', command=self.bt_patch,
                                            text2='Stop!', command2=self.bt_stop)
-        self.button_patch.grid(row=5, column=2)
+        self.button_patch.grid(row=6, column=2)
 
-        self.log_field = CustomText(self, width=48, height=16, enabled=False)
+        self.log_field = CustomText(self, width=48, height=8, enabled=False)
         self.log_field.grid(columnspan=3, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(6, weight=1)
+        self.grid_rowconfigure(7, weight=1)
 
         self.bind('<Destroy>', self.kill_processes)

@@ -42,7 +42,7 @@ class App(tk.Tk):
 
         return config, config_path
 
-    def __init__(self, noconfig=False):
+    def __init__(self, noconfig=False, debug=False):
         super().__init__()
 
         executable = path.split(sys.executable)[1]
@@ -60,7 +60,7 @@ class App(tk.Tk):
         notebook.add(DownloadTranslationsFrame(notebook, self.config),
                      text='Download translations')
 
-        notebook.add(PatchExecutableFrame(notebook, self.config),
+        notebook.add(PatchExecutableFrame(notebook, self.config, debug=debug),
                      text='Patch executable file')
 
         notebook.add(TranslateExternalFiles(notebook, self.config),
@@ -73,4 +73,4 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     mp.freeze_support()
-    App(noconfig='--noconfig' in sys.argv).mainloop()
+    App(noconfig='--noconfig' in sys.argv, debug='--debug' in sys.argv).mainloop()
