@@ -1,3 +1,4 @@
+import importlib
 import multiprocessing as mp
 import string
 import tkinter as tk
@@ -42,8 +43,13 @@ class ProcessMessageWrapper:
 
 
 class DebugFrame(tk.Frame):
+    @staticmethod
+    def reload():
+        importlib.reload(dfrus)
+
     def __init__(self, *args, dictionary=None, **kwargs):
         super().__init__(*args, **kwargs)
+        ttk.Button(self, text='Reload dfrus', command=self.reload).pack()
         self.bisect = Bisect(self, strings=list(dictionary.items()))
         self.bisect.pack(fill=tk.BOTH, expand=1)
 
