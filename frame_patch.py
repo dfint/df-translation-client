@@ -111,7 +111,10 @@ class PatchExecutableFrame(tk.Frame):
         elif not self.dictionary:
             messagebox.showerror('Error', "Dictionary wasn't loaded")
         else:
-            dictionary = self.dictionary
+            if not self.debug_frame:
+                dictionary = self.dictionary
+            else:
+                dictionary = OrderedDict(self.debug_frame.bisect.filtered_strings)
 
             self.config['last_encoding'] = self.combo_encoding.text
 
