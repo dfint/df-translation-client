@@ -61,9 +61,10 @@ class ProcessMessageWrapper:
 
 
 class DebugFrame(tk.Frame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, dictionary=None, **kwargs):
         super().__init__(*args, **kwargs)
-        Bisect(self).pack(fill=tk.BOTH, expand=1)
+        self.bisect = Bisect(self, strings=list(dictionary.items()))
+        self.bisect.pack(fill=tk.BOTH, expand=1)
 
 
 class PatchExecutableFrame(tk.Frame):
@@ -91,19 +92,26 @@ class PatchExecutableFrame(tk.Frame):
             )
         return dictionary
 
+    @property
+    def dictionary(self):
+        if not self._dictionary:
+            translation_file = self.fileentry_translation_file.text
+            if self.fileentry_translation_file.path_is_valid():
+                self._dictionary = self.load_dictionary(translation_file)
+        return self._dictionary
+
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
             return False
 
         executable_file = self.fileentry_executable_file.text
-        translation_file = self.fileentry_translation_file.text
 
         if not executable_file or not path.exists(executable_file):
             messagebox.showerror('Error', 'Valid path to an executable file must be specified')
-        elif not translation_file or not path.exists(translation_file):
-            messagebox.showerror('Error', 'Valid path to a translation file must be specified')
+        elif not self.dictionary:
+            messagebox.showerror('Error', "Dictionary wasn't loaded")
         else:
-            dictionary = self.load_dictionary(translation_file)
+            dictionary = self.dictionary
 
             self.config['last_encoding'] = self.combo_encoding.text
 
@@ -201,6 +209,8 @@ class PatchExecutableFrame(tk.Frame):
 
         self.dfrus_process = None
 
+        self._dictionary = None
+
         tk.Label(self, text='DF executable file:').grid()
 
         self.fileentry_executable_file = FileEntry(
@@ -224,6 +234,7 @@ class PatchExecutableFrame(tk.Frame):
             ],
             default_path=config.get('df_exe_translation_file', ''),
             on_change=self.update_combo_encoding,
+            change_color=True
         )
         self.fileentry_translation_file.grid(column=1, row=1, columnspan=2, sticky='EW')
 
@@ -277,7 +288,7 @@ class PatchExecutableFrame(tk.Frame):
         button_exclusions = ttk.Button(self, text='Exclusions...', command=self.bt_exclusions)
         button_exclusions.grid(row=4, column=2)
 
-        self.debug_frame = None if not debug else DebugFrame(self)
+        self.debug_frame = None if not debug else DebugFrame(self, dictionary=self.dictionary)
         if self.debug_frame:
             self.debug_frame.grid(columnspan=3, sticky='NSWE')
 
@@ -297,6 +308,6 @@ class PatchExecutableFrame(tk.Frame):
         self.log_field.grid(columnspan=3, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(7, weight=1)
+        self.grid_rowconfigure(5, weight=1)
 
         self.bind('<Destroy>', self.kill_processes)
