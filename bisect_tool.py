@@ -47,6 +47,7 @@ class Bisect(tk.Frame):
         tree = self.tree
         item_id = tree.insert(parent_node, index, text=text, open=True, values=values)
         tree.item(item_id, tags=(item_id,))
+        return item_id
 
     def split_selected_node(self):
         tree = self.tree
@@ -55,7 +56,8 @@ class Bisect(tk.Frame):
             start, end = map(int, tree.item(item[0], option="values")[:2])
             if start != end:
                 mid = (start + end) // 2
-                self.insert_node(item, start=start, end=mid)
+                new_item = self.insert_node(item, start=start, end=mid)
+                tree.selection_set(new_item)  # move selection to the first child
                 self.insert_node(item, start=mid+1, end=end)
 
     def mark_selected_node(self, **kwargs):
