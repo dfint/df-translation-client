@@ -281,6 +281,7 @@ class PatchExecutableFrame(tk.Frame):
         self.debug_frame = None if not debug else DebugFrame(self, dictionary=self.dictionary)
         if self.debug_frame:
             self.debug_frame.grid(columnspan=3, sticky='NSWE')
+            self.grid_rowconfigure(5, weight=1)
 
         self.chk_debug_output = self.setup_checkbutton(
             text='Enable debugging output',
@@ -296,8 +297,8 @@ class PatchExecutableFrame(tk.Frame):
 
         self.log_field = CustomText(self, width=48, height=8, enabled=False)
         self.log_field.grid(columnspan=3, sticky='NSWE')
+        self.grid_rowconfigure(self.log_field.grid_info()['row'], weight=1)
 
         self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(5, weight=1)
-
+        
         self.bind('<Destroy>', self.kill_processes)
