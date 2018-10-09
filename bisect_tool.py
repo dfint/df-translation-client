@@ -19,10 +19,8 @@ class Bisect(tk.Frame):
             self.insert_node(start=0, end=len(strings)-1)
 
         vscroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=tree.yview)
-        hscroll = ttk.Scrollbar(self, orient=tk.HORIZONTAL, command=tree.xview)
-        tree.configure(xscrollcommand=hscroll.set, yscrollcommand=vscroll.set)
+        tree.configure(yscrollcommand=vscroll.set)
         vscroll.grid(row=0, column=1, sticky='ns')
-        hscroll.grid(row=1, column=0, columnspan=4, sticky='we')
         
         toolbar = tk.Frame(self)
         ttk.Button(toolbar, text="Split", command=self.split_selected_node).pack(side='left')
