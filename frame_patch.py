@@ -179,8 +179,12 @@ class PatchExecutableFrame(tk.Frame):
         self.combo_encoding.values = sorted(codepages,
                                             key=lambda x: int(x.strip(string.ascii_letters)))
 
+        
         if self.translation_file_language not in self.config['language_codepages']:
-            self.combo_encoding.current(0)
+            if self.combo_encoding.values:
+                self.combo_encoding.current(0)
+            else:
+                self.combo_encoding.text = 'cp437'
         else:
             self.combo_encoding.text = self.config['language_codepages'][self.translation_file_language]
 
