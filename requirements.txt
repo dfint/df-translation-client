@@ -1,5 +1,6 @@
 https://github.com/insolor/python-transifex/archive/master.zip#egg=python-transifex
-https://github.com/dfint/dfrus-py/archive/package.zip#egg=dfrus
+https://github.com/dfint/dfrus-py/archive/develop.zip#egg=dfrus
 https://github.com/dfint/df-gettext-toolkit/archive/master.zip#egg=df-gettext-toolkit
 https://github.com/dfint/df_raw_decoder/archive/master.zip#egg=df-raw-decoder
 pyinstaller
+
