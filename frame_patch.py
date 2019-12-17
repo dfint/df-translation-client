@@ -13,6 +13,7 @@ from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateBu
 from dialog_dont_fix_spaces import DialogDontFixSpaces
 from dfrus.patch_charmap import get_codepages
 from bisect_tool import Bisect
+from natsort import natsorted
 
 
 def filter_codepages(codepages, strings):
@@ -249,8 +250,7 @@ class PatchExecutableFrame(tk.Frame):
                 strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
 
-        self.combo_encoding.values = sorted(codepages,
-                                            key=lambda x: int(x.strip(string.ascii_letters)))
+        self.combo_encoding.values = natsorted(codepages)
 
         if 'last_encoding' in config:
             self.combo_encoding.text = config['last_encoding']

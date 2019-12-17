@@ -3,4 +3,4 @@ https://github.com/dfint/dfrus-py/archive/develop.zip#egg=dfrus
 https://github.com/dfint/df-gettext-toolkit/archive/master.zip#egg=df-gettext-toolkit
 https://github.com/dfint/df_raw_decoder/archive/master.zip#egg=df-raw-decoder
 pyinstaller
-
+natsort
