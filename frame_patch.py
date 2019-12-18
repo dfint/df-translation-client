@@ -24,7 +24,7 @@ def filter_codepages(codepages, strings):
                 if len(item.encode(codepage)) != len(item):
                     raise ValueError
             yield codepage
-        except (UnicodeEncodeError, ValueError):
+        except (UnicodeEncodeError, ValueError, LookupError):
             pass
 
 
