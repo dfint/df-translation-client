@@ -254,7 +254,7 @@ class PatchExecutableFrame(tk.Frame):
 
         if 'last_encoding' in config:
             self.combo_encoding.text = config['last_encoding']
-        else:
+        elif self.combo_encoding.values:
             self.combo_encoding.current(0)
 
         def save_encoding_into_config(event):
