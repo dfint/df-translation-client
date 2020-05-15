@@ -8,7 +8,7 @@ from df_gettext_toolkit.translate_raws import translate_raws
 from dfrus.patch_charmap import get_codepages
 from natsort import natsorted
 
-from config import check_and_save_path, init_section
+from config import check_and_save_path, init_section, Config
 from custom_widgets import FileEntry, ComboboxCustom, ListboxCustom
 from cleanup import cleanup_special_symbols
 
@@ -112,7 +112,7 @@ class TranslateExternalFiles(tk.Frame):
         if translate:
             self.listbox_found_directories.append("Completed.")
 
-    def __init__(self, master, config, *args, **kwargs):
+    def __init__(self, master, config: Config, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.config = init_section(config, section_name='translate_external_files')
         config = self.config

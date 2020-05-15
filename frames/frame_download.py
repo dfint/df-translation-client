@@ -6,7 +6,7 @@ import subprocess
 import sys
 import requests
 
-from config import check_and_save_path, init_section
+from config import check_and_save_path, init_section, Config
 from custom_widgets import ComboboxCustom, EntryCustom, FileEntry, TwoStateButton, ListboxCustom
 from os import path
 from tkinter import messagebox
@@ -176,7 +176,7 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.download_process and self.download_process.is_alive():
             self.download_process.terminate()
 
-    def __init__(self, master, config):
+    def __init__(self, master, config: Config):
         super().__init__(master)
         
         self.config = init_section(

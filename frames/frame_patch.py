@@ -9,7 +9,7 @@ from os import path
 from tkinter import messagebox, ttk as ttk
 from df_gettext_toolkit import po
 from cleanup import cleanup_spaces, cleanup_special_symbols
-from config import check_and_save_path, init_section
+from config import check_and_save_path, init_section, Config
 from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
 from dfrus.patch_charmap import get_codepages
 from bisect_tool import Bisect
@@ -182,7 +182,6 @@ class PatchExecutableFrame(tk.Frame):
         self.combo_encoding.values = sorted(codepages,
                                             key=lambda x: int(x.strip(string.ascii_letters)))
 
-        
         if self.translation_file_language not in self.config['language_codepages']:
             if self.combo_encoding.values:
                 self.combo_encoding.current(0)
@@ -191,7 +190,7 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = self.config['language_codepages'][self.translation_file_language]
 
-    def __init__(self, master, config, debug=False):
+    def __init__(self, master, config: Config, debug=False):
         super().__init__(master)
 
         self.config = init_section(
