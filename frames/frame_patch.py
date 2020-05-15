@@ -10,9 +10,9 @@ from tkinter import messagebox, ttk as ttk
 from df_gettext_toolkit import po
 from cleanup import cleanup_spaces, cleanup_special_symbols
 from config import check_and_save_path, init_section, Config
-from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
+from widgets.custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
 from dfrus.patch_charmap import get_codepages
-from bisect_tool import Bisect
+from widgets.bisect_tool import Bisect
 from natsort import natsorted
 
 from .dialog_dont_fix_spaces import DialogDontFixSpaces

@@ -9,7 +9,7 @@ from dfrus.patch_charmap import get_codepages
 from natsort import natsorted
 
 from config import check_and_save_path, init_section, Config
-from custom_widgets import FileEntry, ComboboxCustom, ListboxCustom
+from widgets.custom_widgets import FileEntry, ComboboxCustom, ListboxCustom
 from cleanup import cleanup_special_symbols
 
 from .frame_patch import filter_codepages

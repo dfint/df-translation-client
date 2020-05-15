@@ -7,7 +7,7 @@ import sys
 import requests
 
 from config import check_and_save_path, init_section, Config
-from custom_widgets import ComboboxCustom, EntryCustom, FileEntry, TwoStateButton, ListboxCustom
+from widgets.custom_widgets import ComboboxCustom, EntryCustom, FileEntry, TwoStateButton, ListboxCustom
 from os import path
 from tkinter import messagebox
 from transifex.api import TransifexAPI, TransifexAPIException

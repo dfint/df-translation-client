@@ -2,8 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import importlib
 
-from custom_widgets import FileEntry, CustomText, TwoStateButton
-from bisect_tool import Bisect
+from widgets.custom_widgets import FileEntry, CustomText, TwoStateButton
+from widgets.bisect_tool import Bisect
 
 
 class App(tk.Tk):

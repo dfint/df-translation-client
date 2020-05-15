@@ -2,7 +2,7 @@ import re
 import tkinter as tk
 from tkinter import ttk as ttk
 
-from custom_widgets import ComboboxCustom, ListboxCustom, EntryCustom
+from widgets.custom_widgets import ComboboxCustom, ListboxCustom, EntryCustom
 
 
 def show_spaces(s):
