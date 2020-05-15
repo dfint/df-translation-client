@@ -20,10 +20,10 @@ def init_section(config: "Config", section_name, defaults=None):
 
 class Config:
     def __init__(self, defaults=None, config_path=None):
-        if not defaults:
-            defaults = defaultdict(dict)
+        self.config = defaultdict(dict)
+        if defaults is not None:
+            self.config.update(defaults)
 
-        self.config = defaults
         self.config_path = config_path
 
     def save_settings(self):
