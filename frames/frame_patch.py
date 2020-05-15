@@ -3,6 +3,7 @@ import multiprocessing as mp
 import string
 import tkinter as tk
 import dfrus
+
 from collections import OrderedDict
 from os import path
 from tkinter import messagebox, ttk as ttk
@@ -10,10 +11,11 @@ from df_gettext_toolkit import po
 from cleanup import cleanup_spaces, cleanup_special_symbols
 from config import check_and_save_path, init_section
 from custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
-from dialog_dont_fix_spaces import DialogDontFixSpaces
 from dfrus.patch_charmap import get_codepages
 from bisect_tool import Bisect
 from natsort import natsorted
+
+from .dialog_dont_fix_spaces import DialogDontFixSpaces
 
 
 def filter_codepages(codepages, strings):
