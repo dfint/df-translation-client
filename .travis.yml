@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.6"
+install:
+  - skip
+  #- pip install -e .
+# Run tests
+script:
+  - pip install -r requirements.test.txt
+  - pip install codecov
+  - pytest --cov=./dfrus
+  - codecov
