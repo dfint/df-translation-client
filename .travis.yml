@@ -2,7 +2,7 @@ language: python
 python:
   - "3.6"
 install:
-  - skip
+  - export PYTHONPATH=${PYTHONPATH}:.
   #- pip install -e .
 # Run tests
 script:
