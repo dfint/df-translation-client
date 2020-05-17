@@ -8,5 +8,5 @@ install:
 script:
   - pip install -r requirements.test.txt
   - pip install codecov
-  - pytest --cov=./dfrus
+  - pytest --cov=.
   - codecov
