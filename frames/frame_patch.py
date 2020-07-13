@@ -2,8 +2,8 @@ import importlib
 import multiprocessing as mp
 import string
 import tkinter as tk
-import dfrus
 
+from dfrus import dfrus
 from collections import OrderedDict
 from os import path
 from tkinter import messagebox, ttk as ttk
