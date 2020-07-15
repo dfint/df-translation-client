@@ -97,7 +97,7 @@ class TranslateExternalFiles(tk.Frame):
         self.listbox_found_directories.clear()
         for cur_dir, _, files in os.walk(self.fileentry_df_root_path.text):
             for pattern in patterns:
-                if cur_dir.endswith(pattern):
+                if cur_dir.replace('/', '\\').endswith(pattern):
                     self.listbox_found_directories.append(cur_dir + ' (%s files)' % len(files))
                     postfix = '_{}.po'.format(self.combo_language.text)
                     po_filename = os.path.join(self.fileentry_translation_files.text,
