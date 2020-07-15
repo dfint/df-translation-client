@@ -1,7 +1,7 @@
 import os
 import tkinter as tk
 from os import path
-from tkinter import ttk as ttk
+from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
 from df_gettext_toolkit.translate_plain_text import translate_plain_text
 from df_gettext_toolkit.translate_raws import translate_raws
@@ -102,6 +102,12 @@ class TranslateExternalFiles(tk.Frame):
                     postfix = '_{}.po'.format(self.combo_language.text)
                     po_filename = os.path.join(self.fileentry_translation_files.text,
                                                patterns[pattern]['po_filename'] + postfix)
+
+                    if not path.exists(po_filename) or not path.isfile(po_filename):
+                        filename = path.split(po_filename)[1]
+                        messagebox.showerror(title="error",
+                                             message=f"File {filename} doesn't exist or it is a directory")
+                        return
 
                     if translate:
                         func = patterns[pattern]['func']
