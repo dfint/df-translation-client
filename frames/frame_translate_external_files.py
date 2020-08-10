@@ -1,12 +1,11 @@
-import os
 import tkinter as tk
-from os import path
 from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
 from df_gettext_toolkit.translate_plain_text import translate_plain_text
 from df_gettext_toolkit.translate_raws import translate_raws
 from dfrus.patch_charmap import get_codepages
 from natsort import natsorted
+from pathlib import Path
 
 from config import check_and_save_path, init_section, Config
 from widgets.custom_widgets import FileEntry, ComboboxCustom, ListboxCustom
@@ -19,16 +18,16 @@ class TranslateExternalFiles(tk.Frame):
     @staticmethod
     def get_languages(directory):
         languages = set()
-        for filename in os.listdir(directory):
-            if filename.endswith('.po'):
-                with open(path.join(directory, filename), encoding='utf-8') as file:
-                    languages.add(po.PoReader(file).meta['Language'])
+        directory = Path(directory)
+        for filename in directory.glob('*.po'):
+            with open(directory / filename, encoding='utf-8') as file:
+                languages.add(po.PoReader(file).meta['Language'])
 
         return sorted(languages)
 
     def on_change_translation_files_path(self, config, key, directory):
         check_and_save_path(config, key, directory)
-        if path.exists(directory):
+        if Path(directory).exists():
             languages = self.get_languages(directory)
             self.combo_language.values = languages
 
@@ -43,28 +42,27 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_language.text = ''
 
     @staticmethod
-    def filter_files_by_language(directory, language):
-        for filename in os.listdir(directory):
-            if filename.endswith('.po'):
-                with open(path.join(directory, filename), encoding='utf-8') as file:
-                    if po.PoReader(file).meta['Language'] == language:
-                        yield filename
+    def filter_files_by_language(directory: Path, language):
+        for filename in directory.glob("*.po"):
+            with open(filename, encoding='utf-8') as file:
+                if po.PoReader(file).meta['Language'] == language:
+                    yield filename.name
 
     def update_listbox_translation_files(self, _=None, language=None):
         language = self.combo_language.text if not language else language
-        directory = self.fileentry_translation_files.text
-        files = self.filter_files_by_language(directory, language) if path.exists(directory) else tuple()
+        directory = Path(self.fileentry_translation_files.text)
+        files = self.filter_files_by_language(directory, language) if directory.exists() else tuple()
         self.listbox_translation_files.values = files
 
     def update_combo_encoding(self, _=None):
         language = self.combo_language.text
-        directory = self.fileentry_translation_files.text
+        directory = Path(self.fileentry_translation_files.text)
         # TODO: Unify with PatchExecutableFrame.update_combo_encoding()
-        if path.exists(directory):
+        if directory.exists():
             files = self.filter_files_by_language(directory, language)
             codepages = get_codepages().keys()
             for file in files:
-                with open(path.join(directory, file), 'r', encoding='utf-8') as fn:
+                with open(directory / file, 'r', encoding='utf-8') as fn:
                     pofile = po.PoReader(fn)
                     strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
                 codepages = filter_codepages(codepages, strings)
@@ -74,20 +72,20 @@ class TranslateExternalFiles(tk.Frame):
 
     def bt_search(self, translate=False):
         patterns = {
-            r'raw\objects': dict(
+            'raw/objects': dict(
                 po_filename='raw-objects',
                 func=translate_raws,
             ),
             # Switched off for now
-            # r'data_src': dict(
+            # 'data_src': dict(
             #     po_filename='uncompressed',
             #     func=lambda *args: translate_plain_text(*args, join_paragraphs=True),
             # ),
-            r'data\speech': dict(
+            'data/speech': dict(
                 po_filename='speech',
                 func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
             ),
-            r'raw\objects\text': dict(
+            'raw/objects/text': dict(
                 po_filename='text',
                 func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
             ),
@@ -95,25 +93,33 @@ class TranslateExternalFiles(tk.Frame):
 
         # TODO: add progressbar
         self.listbox_found_directories.clear()
-        for cur_dir, _, files in os.walk(self.fileentry_df_root_path.text):
-            for pattern in patterns:
-                if cur_dir.replace('/', '\\').endswith(pattern):
-                    self.listbox_found_directories.append(cur_dir + ' (%s files)' % len(files))
-                    postfix = '_{}.po'.format(self.combo_language.text)
-                    po_filename = os.path.join(self.fileentry_translation_files.text,
-                                               patterns[pattern]['po_filename'] + postfix)
+        base_path = self.fileentry_df_root_path.text
+        po_directory = Path(self.fileentry_translation_files.text)
+        for cur_dir in Path(base_path).rglob("*"):
+            if cur_dir.is_dir():
+                for pattern in patterns:
+                    if cur_dir.match('*/' + pattern):
+                        self.listbox_found_directories.append(f"Matched {pattern} pattern")
+                        postfix = '_{}.po'.format(self.combo_language.text)
+                        po_filename = patterns[pattern]['po_filename'] + postfix
 
-                    if not path.exists(po_filename) or not path.isfile(po_filename):
-                        filename = path.split(po_filename)[1]
-                        messagebox.showerror(title="error",
-                                             message=f"File {filename} doesn't exist or it is a directory")
-                        return
+                        po_file_path = po_directory / po_filename
 
-                    if translate:
-                        func = patterns[pattern]['func']
-                        for filename in func(po_filename, cur_dir, self.combo_encoding.get()):
-                            # print(filename, file=sys.stderr)
-                            self.listbox_found_directories.append(filename)
+                        if not po_file_path.exists():
+                            messagebox.showerror(title="error",
+                                                 message=f"File {po_filename} doesn't exist or it is a directory")
+                            return
+
+                        if po_file_path.is_dir():
+                            messagebox.showerror(title="error",
+                                                 message=f"{po_filename} is a directory")
+                            return
+
+                        if translate:
+                            func = patterns[pattern]['func']
+                            for filename in func(po_file_path, cur_dir, self.combo_encoding.get()):
+                                # print(filename, file=sys.stderr)
+                                self.listbox_found_directories.append(filename)
 
         if translate:
             self.listbox_found_directories.append("Completed.")
@@ -147,8 +153,8 @@ class TranslateExternalFiles(tk.Frame):
         self.combo_language = ComboboxCustom(self)
         self.combo_language.grid(row=2, column=1, sticky='WE')
 
-        directory = self.fileentry_translation_files.text
-        if path.exists(directory):
+        directory = Path(self.fileentry_translation_files.text)
+        if directory.exists():
             languages = self.get_languages(directory)
             self.combo_language.values = languages
             if languages:
