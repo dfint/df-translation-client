@@ -1,6 +1,5 @@
 # DF Translation Client
-[![Build Status](https://travis-ci.com/dfint/df-translation-client.svg?branch=master)](https://travis-ci.com/dfint/df-translation-client)
-[![codecov](https://codecov.io/gh/dfint/df-translation-client/branch/master/graph/badge.svg)](https://codecov.io/gh/dfint/df-translation-client)
+[![Python application](https://github.com/dfint/df-translation-client/workflows/Python%20application/badge.svg)](https://github.com/dfint/df-translation-client/actions?query=workflow%3A"Python+application")
 
 A GUI client intended to simplify usage of all the utils of the localization project (https://github.com/dfint/).
 
