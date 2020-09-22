@@ -69,7 +69,6 @@ class TranslateExternalFiles(tk.Frame):
                 codepages = filter_codepages(codepages, strings)
             self.combo_encoding.values = natsorted(codepages)
             
-            print(self.combo_encoding.values)
             if self.combo_encoding.values:
                 self.combo_encoding.current(0)
             else:
