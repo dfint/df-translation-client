@@ -1,3 +1,4 @@
+import codecs
 import importlib
 import multiprocessing as mp
 import string
@@ -11,21 +12,27 @@ from df_gettext_toolkit import po
 from cleanup import cleanup_spaces, cleanup_special_symbols
 from config import check_and_save_path, init_section, Config
 from widgets.custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
-from dfrus.patch_charmap import get_codepages
+from dfrus.patch_charmap import get_codepages, get_encoder
 from widgets.bisect_tool import Bisect
 from natsort import natsorted
 
 from .dialog_dont_fix_spaces import DialogDontFixSpaces
 
 
-def filter_codepages(codepages, strings):
-    for codepage in codepages:
+def filter_codepages(encodings, strings):
+    for encoding in encodings:
         try:
-            for item in strings:
-                # Only one-byte encodings are supported
-                if len(item.encode(codepage)) != len(item):
+            encoder_function = codecs.getencoder(encoding)
+        except LookupError:
+            encoder_function = get_encoder(encoding)
+        
+        try:
+            for text in strings:
+                print(text)
+                encoded_text = encoder_function(text)[0]
+                if len(encoded_text) != len(text):  # Only one-byte encodings are supported
                     raise ValueError
-            yield codepage
+            yield encoding
         except (UnicodeEncodeError, ValueError, LookupError):
             pass
 
