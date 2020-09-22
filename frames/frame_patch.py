@@ -28,9 +28,9 @@ def filter_codepages(encodings, strings):
         
         try:
             for text in strings:
-                print(text)
                 encoded_text = encoder_function(text)[0]
-                if len(encoded_text) != len(text):  # Only one-byte encodings are supported
+                # Only one-byte encodings are supported (but shorter result is allowed)
+                if len(encoded_text) > len(text): 
                     raise ValueError
             yield encoding
         except (UnicodeEncodeError, ValueError, LookupError):
