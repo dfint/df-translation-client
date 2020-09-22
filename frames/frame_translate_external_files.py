@@ -37,6 +37,7 @@ class TranslateExternalFiles(tk.Frame):
                 self.combo_language.text = ''
 
             self.update_listbox_translation_files(language=self.combo_language.text)
+            self.update_combo_encoding()
         else:
             self.combo_language.values = tuple()
             self.combo_language.text = ''
@@ -68,6 +69,7 @@ class TranslateExternalFiles(tk.Frame):
                 codepages = filter_codepages(codepages, strings)
             self.combo_encoding.values = natsorted(codepages)
             
+            print(self.combo_encoding.values)
             if self.combo_encoding.values:
                 self.combo_encoding.current(0)
             else:
