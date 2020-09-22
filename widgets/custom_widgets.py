@@ -2,8 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 from tkinter import filedialog
-from os import path
 from collections import namedtuple
+from pathlib import Path
 
 
 class CheckbuttonVar(ttk.Checkbutton):
@@ -167,14 +167,14 @@ class FileEntry(tk.Frame):
     def bt_browse(self):
         file_path = ''
         # Use self.default_path only if self.entry.text is empty (Captain Obvious)
-        self.default_path = self.entry.text or self.default_path
+        self.default_path = Path(self.entry.text or self.default_path)
         if self.dialogtype == 'askopenfilename':
-            if path.isfile(self.default_path):
-                initialdir = None
-                initialfile = self.default_path
+            if self.default_path.is_file():
+                initialdir = self.default_path.parent
+                initialfile = self.default_path.name
             else:
                 initialdir = self.default_path
-                initialfile = None
+                initialfile = ''
 
             file_path = filedialog.askopenfilename(filetypes=self.filetypes,
                                                    initialdir=initialdir, initialfile=initialfile)
@@ -231,7 +231,7 @@ class FileEntry(tk.Frame):
         return self.entry.text
 
     def path_is_valid(self):
-        return self.text and path.exists(self.text)
+        return self.text and Path(self.text).exists()
 
 
 class TwoStateButton(ttk.Button):
