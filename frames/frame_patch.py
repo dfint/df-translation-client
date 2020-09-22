@@ -186,8 +186,7 @@ class PatchExecutableFrame(tk.Frame):
                 self.translation_file_language = pofile.meta['Language']
                 strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
-        self.combo_encoding.values = sorted(codepages,
-                                            key=lambda x: int(x.strip(string.ascii_letters)))
+        self.combo_encoding.values = natsorted(codepages)
 
         if self.translation_file_language not in self.config['language_codepages']:
             if self.combo_encoding.values:

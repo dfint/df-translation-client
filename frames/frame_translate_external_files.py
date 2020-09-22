@@ -67,8 +67,11 @@ class TranslateExternalFiles(tk.Frame):
                     strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
                 codepages = filter_codepages(codepages, strings)
             self.combo_encoding.values = natsorted(codepages)
-
-            self.combo_encoding.current(0)
+            
+            if self.combo_encoding.values:
+                self.combo_encoding.current(0)
+            else:
+                self.combo_encoding.text = 'cp437'
 
     def bt_search(self, translate=False):
         patterns = {
