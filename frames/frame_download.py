@@ -85,7 +85,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     project=project,
                     language=language,
                     resources=resources,
-                    file_path_pattern=Path(download_dir) / '%s_' + language + '.po'
+                    file_path_pattern=str(Path(download_dir) / ('%s_' + language + '.po'))
                 )
             )
             self.download_process.start()
