@@ -5,7 +5,7 @@ import tkinter as tk
 
 from dfrus import dfrus
 from collections import OrderedDict
-from os import path
+from pathlib import Path
 from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
 from cleanup import cleanup_spaces, cleanup_special_symbols
@@ -102,7 +102,7 @@ class PatchExecutableFrame(tk.Frame):
 
         executable_file = self.file_entry_executable_file.text
 
-        if not executable_file or not path.exists(executable_file):
+        if not executable_file or not Path(executable_file).exists():
             messagebox.showerror('Error', 'Valid path to an executable file must be specified')
         elif not self.dictionary:
             messagebox.showerror('Error', "Dictionary wasn't loaded")
@@ -150,7 +150,7 @@ class PatchExecutableFrame(tk.Frame):
         translation_file = self.fileentry_translation_file.text
         language = None
         dictionary = None
-        if translation_file and path.exists(translation_file):
+        if translation_file and Path(translation_file).exists():
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 meta = pofile.meta

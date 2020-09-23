@@ -5,7 +5,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 from config import Config
-from os import path
+from pathlib import Path
 from tkinter import messagebox
 from frames.frame_patch import PatchExecutableFrame
 from frames.frame_download import DownloadTranslationsFrame
@@ -46,7 +46,7 @@ class MainWindow(tk.Tk):
         self.after(delay, self.check_for_errors, stderr, delay)
 
     def init_error_handler(self):
-        executable = path.split(sys.executable)[1]
+        executable = Path(sys.executable).name
         if executable.startswith('pythonw') or not executable.startswith('python'):  # if no console attached
             stderr = io.StringIO()
             sys.stderr = stderr
@@ -64,12 +64,12 @@ class MainWindow(tk.Tk):
 class App:
     def init_config(self):
         config_name = '.df-translate.json'
-        user_directory = path.expanduser('~')
+        user_directory = Path('~').expanduser()
 
         config = Config()
 
         if not self.ignore_config_file:
-            config_path = path.join(user_directory, config_name)
+            config_path = user_directory / config_name
             config.load_settings(config_path)
 
         return config

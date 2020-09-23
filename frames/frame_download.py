@@ -8,7 +8,7 @@ import requests
 
 from config import Config
 from widgets.custom_widgets import ComboboxCustom, EntryCustom, FileEntry, TwoStateButton, ListboxCustom
-from os import path
+from pathlib import Path
 from tkinter import messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
 
@@ -85,7 +85,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     project=project,
                     language=language,
                     resources=resources,
-                    file_path_pattern=path.join(download_dir, '%s_' + language + '.po')
+                    file_path_pattern=Path(download_dir) / '%s_' + language + '.po'
                 )
             )
             self.download_process.start()
@@ -149,7 +149,7 @@ class DownloadTranslationsFrame(tk.Frame):
             else:
                 self.config_section['download_to'] = download_dir
             
-            if not path.exists(download_dir):
+            if not Path(download_dir).exists():
                 messagebox.showerror('Directory does not exist', 'Specify existing directory first')
                 return
             
