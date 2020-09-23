@@ -41,8 +41,8 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_language.values = tuple()
             self.combo_language.text = ''
 
-    def on_change_translation_files_path(self, config, key, directory):
-        config.check_and_save_path(key, directory)
+    def save_path_to_config(self, key, directory):
+        self.config_section.check_and_save_path(key, directory)
         self.update_combo_languages(directory)
 
     @staticmethod
@@ -142,7 +142,7 @@ class TranslateExternalFiles(tk.Frame):
             self,
             dialogtype='askdirectory',
             default_path=config_section.get('df_root_path', ''),
-            on_change=lambda text: self.config_section.check_and_save_path('df_root_path', text),
+            on_change=lambda text: self.save_path_to_config('df_root_path', text),
         )
         self.file_entry_df_root_path.grid(row=0, column=1, sticky='WE')
 
@@ -152,8 +152,7 @@ class TranslateExternalFiles(tk.Frame):
             self,
             dialogtype='askdirectory',
             default_path=config_section.get('translation_files_path', ''),
-            on_change=lambda path: self.on_change_translation_files_path(self.config_section,
-                                                                         'translation_files_path', path),
+            on_change=lambda path: self.save_path_to_config('translation_files_path', path),
         )
         self.file_entry_translation_files.grid(row=1, column=1, sticky='WE')
 
