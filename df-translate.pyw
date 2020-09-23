@@ -55,7 +55,7 @@ class MainWindow(tk.Tk):
         self.app = app
         self.init_error_handler()
         config = self.app.config
-        self.config_section = config.init_section('application')
+        self.config_section = config.init_section('application', dict(last_tab_opened=0))
         self.notebook = self.init_notebook(config)
 
 
@@ -64,8 +64,7 @@ class App:
         config_name = '.df-translate.json'
         user_directory = path.expanduser('~')
 
-        default_config = dict(application=dict(last_tab_opened=0))
-        config = Config(default_config)
+        config = Config()
 
         if not self.ignore_config_file:
             config_path = path.join(user_directory, config_name)

@@ -11,11 +11,8 @@ class ConfigSection(UserDict):
 
 
 class Config:
-    def __init__(self, defaults=None, config_path=None):
+    def __init__(self, config_path=None):
         self._sections = defaultdict(ConfigSection)
-        if defaults is not None:
-            self._sections.update(defaults)
-
         self.config_path = config_path
 
     def save_settings(self):
