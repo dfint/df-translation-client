@@ -11,7 +11,7 @@ def show_spaces(s):
     return '\u2022' * len(parts.group(1)) + parts.group(2) + '\u2022' * len(parts.group(3))
 
 
-class DialogDontFixSpaces(tk.Toplevel):
+class DialogDoNotFixSpaces(tk.Toplevel):
     def update_listbox_exclusions(self):
         exclusions = self.exclusions.get(self.combo_language.text, list())
         self.listbox_exclusions.values = sorted(show_spaces(item) for item in exclusions)
@@ -27,7 +27,7 @@ class DialogDontFixSpaces(tk.Toplevel):
                   if self.language == self.combo_language.text else tuple())
         self.listbox_exclusions_hints.values = values
 
-    def entry_search_key_up(self, _):
+    def entry_search_key_release(self, _):
         self.update_listbox_exclusions_hints()
 
     def bt_remove_selected(self):
@@ -88,7 +88,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         tk.Label(parent_frame, text='Filter:').pack(side=tk.LEFT)
 
         self.entry_search = Entry(parent_frame)
-        self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_up)
+        self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_release)
         self.entry_search.pack(fill='both', expand=1)
 
         parent_frame.grid(column=1, row=0, sticky=tk.W+tk.E)

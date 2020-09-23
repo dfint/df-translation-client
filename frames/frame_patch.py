@@ -15,7 +15,7 @@ from widgets.custom_widgets import Checkbutton, Combobox
 from dfrus.patch_charmap import get_codepages, get_encoder
 from natsort import natsorted
 
-from .dialog_dont_fix_spaces import DialogDontFixSpaces
+from .dialog_do_not_fix_spaces import DialogDoNotFixSpaces
 
 
 def filter_codepages(encodings, strings):
@@ -157,7 +157,7 @@ class PatchExecutableFrame(tk.Frame):
                 language = meta['Language']
                 dictionary = {entry['msgid']: entry['msgstr'] for entry in pofile}
 
-        dialog = DialogDontFixSpaces(self, self.config_section['fix_space_exclusions'], language, dictionary)
+        dialog = DialogDoNotFixSpaces(self, self.config_section['fix_space_exclusions'], language, dictionary)
         self.config_section['fix_space_exclusions'] = dialog.exclusions or self.config_section['fix_space_exclusions']
         self.exclusions = self.config_section['fix_space_exclusions']
 
@@ -270,13 +270,13 @@ class PatchExecutableFrame(tk.Frame):
 
         self.combo_encoding.bind('<<ComboboxSelected>>', func=save_encoding_into_config)
 
-        # FIXME: chk_dont_patch_charmap does nothing
-        self.chk_dont_patch_charmap = self.setup_checkbutton(
+        # FIXME: chk_do_not_patch_charmap does nothing
+        self.chk_do_not_patch_charmap = self.setup_checkbutton(
             text="Don't patch charmap table",
-            config_key='dont_patch_charmap',
+            config_key='do_not_patch_charmap',
             default_state=False)
 
-        self.chk_dont_patch_charmap.grid(column=1, sticky=tk.W)
+        self.chk_do_not_patch_charmap.grid(column=1, sticky=tk.W)
 
         self.chk_add_leading_trailing_spaces = self.setup_checkbutton(
             text='Add necessary leading/trailing spaces',
