@@ -7,7 +7,8 @@ import sys
 import requests
 
 from config import Config
-from widgets.custom_widgets import ComboboxCustom, EntryCustom, FileEntry, TwoStateButton, ListboxCustom
+from widgets import FileEntry, ScrollableListbox, TwoStateButton
+from widgets.custom_widgets import Combobox, Entry
 from pathlib import Path
 from tkinter import messagebox
 from transifex.api import TransifexAPI, TransifexAPIException
@@ -186,19 +187,19 @@ class DownloadTranslationsFrame(tk.Frame):
 
         tk.Label(self, text='Transifex project:').grid()
 
-        self.combo_projects = ComboboxCustom(self, values=self.config_section['recent_projects'])
+        self.combo_projects = Combobox(self, values=self.config_section['recent_projects'])
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0, sticky=tk.W + tk.E)
         
         tk.Label(self, text='Username:').grid(column=0, row=1)
         
-        self.entry_username = EntryCustom(self)
+        self.entry_username = Entry(self)
         self.entry_username.text = self.config_section.get('username', '')
         self.entry_username.grid(column=1, row=1, sticky=tk.W + tk.E)
         
         tk.Label(self, text='Password:').grid(column=0, row=2)
         
-        self.entry_password = EntryCustom(self, show='\u2022')  # 'bullet' symbol
+        self.entry_password = Entry(self, show='\u2022')  # 'bullet' symbol
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
         button_connect = ttk.Button(self, text='Connect...', command=self.bt_connect)
@@ -208,7 +209,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         tk.Label(self, text='Choose language:').grid(column=0)
         
-        self.combo_languages = ComboboxCustom(self)
+        self.combo_languages = Combobox(self)
         self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
         
         # self.chk_all_languages = CheckbuttonVar(self, text='All languages (backup)')
@@ -220,7 +221,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         self.fileentry_download_to = FileEntry(
             self,
-            dialogtype='askdirectory',
+            dialog_type='askdirectory',
             default_path=self.config_section.get('download_to', ''),
             on_change=lambda text: self.config_section.check_and_save_path('download_to', text),
         )
@@ -236,7 +237,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         tk.Label(self, text='Resources:').grid(columnspan=3)
 
-        self.listbox_resources = ListboxCustom(self)
+        self.listbox_resources = ScrollableListbox(self)
         self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W + tk.N + tk.S)
 
         self.grid_columnconfigure(1, weight=1)

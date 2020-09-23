@@ -2,8 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import importlib
 
-from widgets.custom_widgets import FileEntry, CustomText, TwoStateButton
-from widgets.bisect_tool import Bisect
+from widgets import FileEntry, BisectTool, CustomScrollableText, TwoStateButton
 
 
 class App(tk.Tk):
@@ -26,13 +25,13 @@ class App(tk.Tk):
 
         ttk.Button(self, text='Reload dfrus', command=reload).pack()
 
-        self.bisect = Bisect()
+        self.bisect = BisectTool()
         self.bisect.pack()
 
         ttk.Button(self, text='Patch DF').pack()
         TwoStateButton(self, 'Run DF', None, 'Kill DF process', None).pack()
 
-        log_field = self.log_field = CustomText(self, enabled=False, height=8)
+        log_field = self.log_field = CustomScrollableText(self, enabled=False, height=8)
         log_field.pack()
 
         self.dfrus = None

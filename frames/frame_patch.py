@@ -10,9 +10,9 @@ from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
 from cleanup import cleanup_spaces, cleanup_special_symbols
 from config import Config
-from widgets.custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
+from widgets import FileEntry, BisectTool, CustomScrollableText, TwoStateButton
+from widgets.custom_widgets import Checkbutton, Combobox
 from dfrus.patch_charmap import get_codepages, get_encoder
-from widgets.bisect_tool import Bisect
 from natsort import natsorted
 
 from .dialog_dont_fix_spaces import DialogDontFixSpaces
@@ -59,7 +59,7 @@ class DebugFrame(tk.Frame):
     def __init__(self, *args, dictionary=None, **kwargs):
         super().__init__(*args, **kwargs)
         ttk.Button(self, text='Reload dfrus', command=self.reload).pack()
-        self.bisect = Bisect(self, strings=list(dictionary.items()))
+        self.bisect = BisectTool(self, strings=list(dictionary.items()))
         self.bisect.pack(fill=tk.BOTH, expand=1)
 
 
@@ -167,7 +167,7 @@ class PatchExecutableFrame(tk.Frame):
         def save_checkbox_state(event, option_name):
             config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
 
-        check = CheckbuttonVar(self, text=text)
+        check = Checkbutton(self, text=text)
         check.bind('<1>', lambda event: save_checkbox_state(event, config_key))
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
@@ -216,7 +216,7 @@ class PatchExecutableFrame(tk.Frame):
 
         self.file_entry_executable_file = FileEntry(
             self,
-            dialogtype='askopenfilename',
+            dialog_type='askopenfilename',
             filetypes=[('Executable files', '*.exe')],
             default_path=self.config_section.get('df_executable', ''),
             on_change=lambda text: self.config_section.check_and_save_path('df_executable', text),
@@ -227,7 +227,7 @@ class PatchExecutableFrame(tk.Frame):
 
         self.fileentry_translation_file = FileEntry(
             self,
-            dialogtype='askopenfilename',
+            dialog_type='askopenfilename',
             filetypes=[
                 ("Hardcoded strings' translation", '*hardcoded*.po'),
                 ('Translation files', '*.po'),
@@ -241,7 +241,7 @@ class PatchExecutableFrame(tk.Frame):
 
         tk.Label(self, text='Encoding:').grid()
 
-        self.combo_encoding = ComboboxCustom(self)
+        self.combo_encoding = Combobox(self)
         self.combo_encoding.grid(column=1, row=2, sticky=tk.E + tk.W)
 
         codepages = get_codepages().keys()
@@ -305,7 +305,7 @@ class PatchExecutableFrame(tk.Frame):
                                            text2='Stop!', command2=self.bt_stop)
         self.button_patch.grid(row=6, column=2)
 
-        self.log_field = CustomText(self, width=48, height=8, enabled=False)
+        self.log_field = CustomScrollableText(self, width=48, height=8, enabled=False)
         self.log_field.grid(columnspan=3, sticky='NSWE')
         self.grid_rowconfigure(self.log_field.grid_info()['row'], weight=1)
 

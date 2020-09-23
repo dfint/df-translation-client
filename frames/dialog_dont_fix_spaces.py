@@ -2,7 +2,8 @@ import re
 import tkinter as tk
 from tkinter import ttk as ttk
 
-from widgets.custom_widgets import ComboboxCustom, ListboxCustom, EntryCustom
+from widgets import ScrollableListbox
+from widgets.custom_widgets import Combobox, Entry
 
 
 def show_spaces(s):
@@ -66,7 +67,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         parent_frame = tk.Frame(self)
         tk.Label(parent_frame, text='Language:').pack(side=tk.LEFT)
 
-        self.combo_language = ComboboxCustom(parent_frame, values=language_list)
+        self.combo_language = Combobox(parent_frame, values=language_list)
 
         self.combo_language.pack(fill='both', expand=1)
         parent_frame.grid(sticky=tk.W+tk.E)
@@ -78,7 +79,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         bt = ttk.Button(self, text='-- Remove selected --', command=self.bt_remove_selected)
         bt.grid(column=0, row=1, sticky=tk.W+tk.E)
 
-        self.listbox_exclusions = ListboxCustom(self, width=40, height=20)
+        self.listbox_exclusions = ScrollableListbox(self, width=40, height=20)
         self.listbox_exclusions.grid(sticky='NSWE')
 
         self.update_listbox_exclusions()
@@ -86,7 +87,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         parent_frame = tk.Frame(self)
         tk.Label(parent_frame, text='Filter:').pack(side=tk.LEFT)
 
-        self.entry_search = EntryCustom(parent_frame)
+        self.entry_search = Entry(parent_frame)
         self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_up)
         self.entry_search.pack(fill='both', expand=1)
 
@@ -95,7 +96,7 @@ class DialogDontFixSpaces(tk.Toplevel):
         bt = ttk.Button(self, text='<< Add selected <<', command=self.bt_add_selected)
         bt.grid(column=1, row=1, sticky=tk.W+tk.E)
 
-        self.listbox_exclusions_hints = ListboxCustom(self, width=40, height=20)
+        self.listbox_exclusions_hints = ScrollableListbox(self, width=40, height=20)
         self.listbox_exclusions_hints.grid(column=1, row=2, sticky='NSWE')
         self.update_listbox_exclusions_hints()
 

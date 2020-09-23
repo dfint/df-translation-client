@@ -8,7 +8,8 @@ from natsort import natsorted
 from pathlib import Path
 
 from config import Config
-from widgets.custom_widgets import FileEntry, ComboboxCustom, ListboxCustom
+from widgets import FileEntry, ScrollableListbox
+from widgets.custom_widgets import Combobox
 from cleanup import cleanup_special_symbols
 
 from .frame_patch import filter_codepages
@@ -140,7 +141,7 @@ class TranslateExternalFiles(tk.Frame):
 
         self.file_entry_df_root_path = FileEntry(
             self,
-            dialogtype='askdirectory',
+            dialog_type='askdirectory',
             default_path=config_section.get('df_root_path', ''),
             on_change=lambda text: self.save_path_to_config('df_root_path', text),
         )
@@ -150,14 +151,14 @@ class TranslateExternalFiles(tk.Frame):
 
         self.file_entry_translation_files = FileEntry(
             self,
-            dialogtype='askdirectory',
+            dialog_type='askdirectory',
             default_path=config_section.get('translation_files_path', ''),
             on_change=lambda path: self.save_path_to_config('translation_files_path', path),
         )
         self.file_entry_translation_files.grid(row=1, column=1, sticky='WE')
 
         tk.Label(self, text="Language:").grid()
-        self.combo_language = ComboboxCustom(self)
+        self.combo_language = Combobox(self)
         self.combo_language.grid(row=2, column=1, sticky='WE')
 
         directory = Path(self.file_entry_translation_files.text)
@@ -174,19 +175,19 @@ class TranslateExternalFiles(tk.Frame):
         self.combo_language.bind('<<ComboboxSelected>>', on_combo_language_change)
 
         tk.Label(self, text="Encoding:").grid()
-        self.combo_encoding = ComboboxCustom(self)
+        self.combo_encoding = Combobox(self)
         self.combo_encoding.grid(row=3, column=1, sticky='WE')
 
         self.update_combo_encoding()
 
-        self.listbox_translation_files = ListboxCustom(self)
+        self.listbox_translation_files = ScrollableListbox(self)
         self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
         self.update_listbox_translation_files(language=self.combo_language.text)
 
         ttk.Button(self, text='Search', command=self.bt_search).grid()
         ttk.Button(self, text='Translate', command=lambda: self.bt_search(translate=True)).grid(row=5, column=1)
 
-        self.listbox_found_directories = ListboxCustom(self)
+        self.listbox_found_directories = ScrollableListbox(self)
         self.listbox_found_directories.grid(columnspan=2, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)

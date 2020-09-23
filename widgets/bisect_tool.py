@@ -4,7 +4,7 @@ from operator import itemgetter
 from itertools import islice
 
 
-class Bisect(tk.Frame):
+class BisectTool(tk.Frame):
     def __init__(self, *args, strings=None, **kwargs):
         super().__init__(*args, **kwargs)
         self._strings = strings
@@ -18,15 +18,24 @@ class Bisect(tk.Frame):
         if strings:
             self.insert_node(start=0, end=len(strings)-1)
 
-        vscroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=tree.yview)
-        tree.configure(yscrollcommand=vscroll.set)
-        vscroll.grid(row=0, column=1, sticky='ns')
+        vertical_scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscrollcommand=vertical_scroll.set)
+        vertical_scroll.grid(row=0, column=1, sticky='ns')
         
         toolbar = tk.Frame(self)
-        ttk.Button(toolbar, text="Split", command=self.split_selected_node).pack(side='left')
-        ttk.Button(toolbar, text="Mark as bad", command=lambda: self.mark_selected_node(background='orange')).pack(side='left')
-        ttk.Button(toolbar, text="Mark as good", command=lambda: self.mark_selected_node(background='lightgreen')).pack(side='left')
-        ttk.Button(toolbar, text="Clear mark", command=lambda: self.mark_selected_node(background='white')).pack(side='left')
+
+        ttk.Button(toolbar, text="Split",
+                   command=self.split_selected_node).pack(side='left')
+
+        ttk.Button(toolbar, text="Mark as bad",
+                   command=lambda: self.mark_selected_node(background='orange')).pack(side='left')
+
+        ttk.Button(toolbar, text="Mark as good",
+                   command=lambda: self.mark_selected_node(background='lightgreen')).pack(side='left')
+
+        ttk.Button(toolbar, text="Clear mark",
+                   command=lambda: self.mark_selected_node(background='white')).pack(side='left')
+
         toolbar.grid()
 
         self.grid_columnconfigure(0, weight=1)
@@ -34,10 +43,10 @@ class Bisect(tk.Frame):
 
     def insert_node(self, parent_node='', index='end', start=0, end=0):
         if start == end:
-            text='[{} : {}] ({} string)'.format(start, end, end-start+1)
+            text = '[{} : {}] ({} string)'.format(start, end, end-start+1)
             values = (start, end, repr(self._strings[start]))
         else:
-            text='[{} : {}] ({} strings)'.format(start, end, end-start+1)
+            text = '[{} : {}] ({} strings)'.format(start, end, end-start+1)
             if end - start + 1 <= 2:
                 strings = ','.join(map(repr, islice(self._strings, start, end+1)))
             else:
@@ -92,7 +101,7 @@ class Bisect(tk.Frame):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    bisect = Bisect(strings='Lorem ipsum dolor sit amet'.split())
+    bisect = BisectTool(strings='Lorem ipsum dolor sit amet'.split())
     bisect.pack(fill=tk.BOTH, expand=1)
     ttk.Button(text='Get strings', command=lambda: print(list(bisect.filtered_strings))).pack()
     root.mainloop()
