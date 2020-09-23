@@ -52,7 +52,7 @@ class TranslateExternalFiles(tk.Frame):
                 if po.PoReader(file).meta['Language'] == language:
                     yield filename.name
 
-    def update_listbox_translation_files(self, _=None, language=None):
+    def update_listbox_translation_files(self, language=None):
         language = self.combo_language.text if not language else language
         directory = Path(self.file_entry_translation_files.text)
         files = self.filter_files_by_language(directory, language) if directory.exists() else tuple()
@@ -168,7 +168,11 @@ class TranslateExternalFiles(tk.Frame):
             if languages:
                 self.combo_language.current(0)
 
-        self.combo_language.bind('<<ComboboxSelected>>', self.update_listbox_translation_files)
+        def on_combo_language_change(_event):
+            self.update_listbox_translation_files()
+            self.update_combo_encoding()
+
+        self.combo_language.bind('<<ComboboxSelected>>', on_combo_language_change)
 
         tk.Label(self, text="Encoding:").grid()
         self.combo_encoding = ComboboxCustom(self)
