@@ -1,7 +1,6 @@
-import io
-import sys
 import tkinter as tk
-from pathlib import Path
+import traceback
+
 from tkinter import ttk as ttk, messagebox
 
 from config import Config
@@ -36,24 +35,20 @@ class MainWindow(tk.Tk):
 
         return notebook
 
-    def check_for_errors(self, stderr, delay=100):
-        if stderr.getvalue():
-            messagebox.showerror('Unhandled Exception', stderr.getvalue())
-            stderr.truncate(0)
-            stderr.seek(0)
-        self.after(delay, self.check_for_errors, stderr, delay)
+    def report_callback_exception(self, exc_type, exc_value, exc_traceback):
+        if issubclass(exc_type, KeyboardInterrupt):
+            self.quit()
+            return
 
-    def init_error_handler(self):
-        executable = Path(sys.executable).name
-        if executable.startswith('pythonw') or not executable.startswith('python'):  # if no console attached
-            stderr = io.StringIO()
-            sys.stderr = stderr
-            self.check_for_errors(stderr)
+        super().report_callback_exception(exc_type, exc_value, exc_traceback)
+
+        filename, line, *_ = traceback.extract_tb(exc_traceback).pop()
+        message = '{}: {}\n{}, Line: {}\n'.format(exc_type.__name__, exc_value, filename, line)
+        messagebox.showerror('Unhandled Exception', message)
 
     def __init__(self, app):
         super().__init__()
         self.app = app
-        self.init_error_handler()
         config = self.app.config
         self.config_section = config.init_section('application', dict(last_tab_opened=0))
         self.notebook = self.init_notebook(config)
