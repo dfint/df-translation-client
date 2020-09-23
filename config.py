@@ -1,34 +1,27 @@
 import json
-import os.path
 
-from collections import defaultdict
-
-
-def check_and_save_path(config, key, file_path):
-    if os.path.exists(file_path):
-        config[key] = file_path
+from pathlib import Path
+from collections import defaultdict, UserDict
 
 
-def init_section(config: "Config", section_name, defaults=None):
-    if not defaults:
-        defaults = dict()
-    section = defaults
-    section.update(config[section_name])
-    config[section_name] = section
-    return section
+class ConfigSection(UserDict):
+    def check_and_save_path(self, key, file_path):
+        if Path(file_path).exists():
+            self[key] = file_path
 
 
 class Config:
     def __init__(self, defaults=None, config_path=None):
-        self.config = defaultdict(dict)
+        self._sections = defaultdict(ConfigSection)
         if defaults is not None:
-            self.config.update(defaults)
+            self._sections.update(defaults)
 
         self.config_path = config_path
 
     def save_settings(self):
         with open(self.config_path, 'w', encoding='utf-8') as config_file:
-            json.dump(self.config, config_file, indent=4, sort_keys=True)
+            json.dump({key: dict(section) for key, section in self._sections.items()},
+                      config_file, indent=4, sort_keys=True)
 
     def load_settings(self, config_path=None):
         if config_path is None:
@@ -38,12 +31,14 @@ class Config:
 
         try:
             with open(config_path, encoding='utf-8') as config_file:
-                self.config.update(json.load(config_file))
+                self._sections.update(json.load(config_file))
         except (FileNotFoundError, ValueError):
             pass
 
-    def __getitem__(self, key):
-        return self.config[key]
-
-    def __setitem__(self, key, value):
-        self.config[key] = value
+    def init_section(self, section_name, defaults: dict = None) -> ConfigSection:
+        if not defaults:
+            defaults = dict()
+        section = ConfigSection(defaults)
+        section.update(self._sections[section_name])
+        self._sections[section_name] = section
+        return section

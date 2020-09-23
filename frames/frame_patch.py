@@ -1,7 +1,6 @@
 import codecs
 import importlib
 import multiprocessing as mp
-import string
 import tkinter as tk
 
 from dfrus import dfrus
@@ -10,7 +9,7 @@ from os import path
 from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
 from cleanup import cleanup_spaces, cleanup_special_symbols
-from config import check_and_save_path, init_section, Config
+from config import Config
 from widgets.custom_widgets import CheckbuttonVar, FileEntry, ComboboxCustom, TwoStateButton, CustomText
 from dfrus.patch_charmap import get_codepages, get_encoder
 from widgets.bisect_tool import Bisect
@@ -101,7 +100,7 @@ class PatchExecutableFrame(tk.Frame):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
             return False
 
-        executable_file = self.fileentry_executable_file.text
+        executable_file = self.file_entry_executable_file.text
 
         if not executable_file or not path.exists(executable_file):
             messagebox.showerror('Error', 'Valid path to an executable file must be specified')
@@ -113,7 +112,7 @@ class PatchExecutableFrame(tk.Frame):
             else:
                 dictionary = OrderedDict(self.debug_frame.bisect.filtered_strings)
 
-            self.config['last_encoding'] = self.combo_encoding.text
+            self.config_section['last_encoding'] = self.combo_encoding.text
 
             parent_conn, child_conn = mp.Pipe()
 
@@ -158,12 +157,12 @@ class PatchExecutableFrame(tk.Frame):
                 language = meta['Language']
                 dictionary = {entry['msgid']: entry['msgstr'] for entry in pofile}
 
-        dialog = DialogDontFixSpaces(self, self.config['fix_space_exclusions'], language, dictionary)
-        self.config['fix_space_exclusions'] = dialog.exclusions or self.config['fix_space_exclusions']
-        self.exclusions = self.config['fix_space_exclusions']
+        dialog = DialogDontFixSpaces(self, self.config_section['fix_space_exclusions'], language, dictionary)
+        self.config_section['fix_space_exclusions'] = dialog.exclusions or self.config_section['fix_space_exclusions']
+        self.exclusions = self.config_section['fix_space_exclusions']
 
     def setup_checkbutton(self, text, config_key, default_state):
-        config = self.config
+        config = self.config_section
 
         def save_checkbox_state(event, option_name):
             config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
@@ -174,7 +173,7 @@ class PatchExecutableFrame(tk.Frame):
         return check
 
     def update_combo_encoding(self, text):
-        check_and_save_path(self.config, 'df_exe_translation_file', text)
+        self.config_section.check_and_save_path('df_exe_translation_file', text)
 
         # Update codepage combobox
         # TODO: Cache supported codepages' list
@@ -188,26 +187,26 @@ class PatchExecutableFrame(tk.Frame):
             codepages = filter_codepages(codepages, strings)
         self.combo_encoding.values = natsorted(codepages)
 
-        if self.translation_file_language not in self.config['language_codepages']:
+        if self.translation_file_language not in self.config_section['language_codepages']:
             if self.combo_encoding.values:
                 self.combo_encoding.current(0)
             else:
                 self.combo_encoding.text = 'cp437'
         else:
-            self.combo_encoding.text = self.config['language_codepages'][self.translation_file_language]
+            self.combo_encoding.text = self.config_section['language_codepages'][self.translation_file_language]
 
     def __init__(self, master, config: Config, debug=False):
         super().__init__(master)
 
-        self.config = init_section(
-            config, section_name='patch_executable',
+        self.config_section = config.init_section(
+            section_name='patch_executable',
             defaults=dict(
                 fix_space_exclusions=dict(ru=['Histories of ']),
                 language_codepages=dict(),
             )
         )
-        config = self.config
-        self.exclusions = config['fix_space_exclusions']
+
+        self.exclusions = self.config_section['fix_space_exclusions']
 
         self.dfrus_process = None
 
@@ -215,14 +214,14 @@ class PatchExecutableFrame(tk.Frame):
 
         tk.Label(self, text='DF executable file:').grid()
 
-        self.fileentry_executable_file = FileEntry(
+        self.file_entry_executable_file = FileEntry(
             self,
             dialogtype='askopenfilename',
             filetypes=[('Executable files', '*.exe')],
-            default_path=config.get('df_executable', ''),
-            on_change=lambda text: check_and_save_path(self.config, 'df_executable', text),
+            default_path=self.config_section.get('df_executable', ''),
+            on_change=lambda text: self.config_section.check_and_save_path('df_executable', text),
         )
-        self.fileentry_executable_file.grid(column=1, row=0, columnspan=2, sticky='EW')
+        self.file_entry_executable_file.grid(column=1, row=0, columnspan=2, sticky='EW')
 
         tk.Label(self, text='DF executable translation file:').grid()
 
@@ -234,7 +233,7 @@ class PatchExecutableFrame(tk.Frame):
                 ('Translation files', '*.po'),
                 # ('csv file', '*.csv'), # @TODO: Currently not supported
             ],
-            default_path=config.get('df_exe_translation_file', ''),
+            default_path=self.config_section.get('df_exe_translation_file', ''),
             on_change=self.update_combo_encoding,
             change_color=True
         )
@@ -259,15 +258,15 @@ class PatchExecutableFrame(tk.Frame):
 
         self.combo_encoding.values = natsorted(codepages)
 
-        if 'last_encoding' in config:
-            self.combo_encoding.text = config['last_encoding']
+        if 'last_encoding' in self.config_section:
+            self.combo_encoding.text = self.config_section['last_encoding']
         elif self.combo_encoding.values:
             self.combo_encoding.current(0)
 
         def save_encoding_into_config(event):
-            config['last_encoding'] = event.widget.text
+            self.config_section['last_encoding'] = event.widget.text
             if self.translation_file_language:
-                config['language_codepages'][self.translation_file_language] = event.widget.text
+                self.config_section['language_codepages'][self.translation_file_language] = event.widget.text
 
         self.combo_encoding.bind('<<ComboboxSelected>>', func=save_encoding_into_config)
 

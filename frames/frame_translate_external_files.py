@@ -7,7 +7,7 @@ from dfrus.patch_charmap import get_codepages
 from natsort import natsorted
 from pathlib import Path
 
-from config import check_and_save_path, init_section, Config
+from config import Config
 from widgets.custom_widgets import FileEntry, ComboboxCustom, ListboxCustom
 from cleanup import cleanup_special_symbols
 
@@ -25,8 +25,7 @@ class TranslateExternalFiles(tk.Frame):
 
         return sorted(languages)
 
-    def on_change_translation_files_path(self, config, key, directory):
-        check_and_save_path(config, key, directory)
+    def update_combo_languages(self, directory):
         if Path(directory).exists():
             languages = self.get_languages(directory)
             self.combo_language.values = languages
@@ -42,6 +41,10 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_language.values = tuple()
             self.combo_language.text = ''
 
+    def on_change_translation_files_path(self, config, key, directory):
+        config.check_and_save_path(key, directory)
+        self.update_combo_languages(directory)
+
     @staticmethod
     def filter_files_by_language(directory: Path, language):
         for filename in directory.glob("*.po"):
@@ -51,13 +54,13 @@ class TranslateExternalFiles(tk.Frame):
 
     def update_listbox_translation_files(self, _=None, language=None):
         language = self.combo_language.text if not language else language
-        directory = Path(self.fileentry_translation_files.text)
+        directory = Path(self.file_entry_translation_files.text)
         files = self.filter_files_by_language(directory, language) if directory.exists() else tuple()
         self.listbox_translation_files.values = files
 
     def update_combo_encoding(self, _=None):
         language = self.combo_language.text
-        directory = Path(self.fileentry_translation_files.text)
+        directory = Path(self.file_entry_translation_files.text)
         # TODO: Unify with PatchExecutableFrame.update_combo_encoding()
         if directory.exists():
             files = self.filter_files_by_language(directory, language)
@@ -97,8 +100,8 @@ class TranslateExternalFiles(tk.Frame):
 
         # TODO: add progressbar
         self.listbox_found_directories.clear()
-        base_path = self.fileentry_df_root_path.text
-        po_directory = Path(self.fileentry_translation_files.text)
+        base_path = self.file_entry_df_root_path.text
+        po_directory = Path(self.file_entry_translation_files.text)
         for cur_dir in Path(base_path).rglob("*"):
             if cur_dir.is_dir():
                 for pattern in patterns:
@@ -130,34 +133,35 @@ class TranslateExternalFiles(tk.Frame):
 
     def __init__(self, master, config: Config, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.config = init_section(config, section_name='translate_external_files')
-        config = self.config
+        self.config_section = config.init_section(section_name='translate_external_files')
+        config_section = self.config_section
 
         tk.Label(self, text='Dwarf Fortress root path:').grid()
 
-        self.fileentry_df_root_path = FileEntry(
+        self.file_entry_df_root_path = FileEntry(
             self,
             dialogtype='askdirectory',
-            default_path=config.get('df_root_path', ''),
-            on_change=lambda text: check_and_save_path(self.config, 'df_root_path', text),
+            default_path=config_section.get('df_root_path', ''),
+            on_change=lambda text: self.config_section.check_and_save_path('df_root_path', text),
         )
-        self.fileentry_df_root_path.grid(row=0, column=1, sticky='WE')
+        self.file_entry_df_root_path.grid(row=0, column=1, sticky='WE')
 
         tk.Label(self, text="Translation files' directory:").grid()
 
-        self.fileentry_translation_files = FileEntry(
+        self.file_entry_translation_files = FileEntry(
             self,
             dialogtype='askdirectory',
-            default_path=config.get('translation_files_path', ''),
-            on_change=lambda text: self.on_change_translation_files_path(self.config, 'translation_files_path', text),
+            default_path=config_section.get('translation_files_path', ''),
+            on_change=lambda path: self.on_change_translation_files_path(self.config_section,
+                                                                         'translation_files_path', path),
         )
-        self.fileentry_translation_files.grid(row=1, column=1, sticky='WE')
+        self.file_entry_translation_files.grid(row=1, column=1, sticky='WE')
 
         tk.Label(self, text="Language:").grid()
         self.combo_language = ComboboxCustom(self)
         self.combo_language.grid(row=2, column=1, sticky='WE')
 
-        directory = Path(self.fileentry_translation_files.text)
+        directory = Path(self.file_entry_translation_files.text)
         if directory.exists():
             languages = self.get_languages(directory)
             self.combo_language.values = languages

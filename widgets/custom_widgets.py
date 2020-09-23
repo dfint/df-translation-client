@@ -170,14 +170,14 @@ class FileEntry(tk.Frame):
         self.default_path = Path(self.entry.text or self.default_path)
         if self.dialogtype == 'askopenfilename':
             if self.default_path.is_file():
-                initialdir = self.default_path.parent
-                initialfile = self.default_path.name
+                initial_dir = self.default_path.parent
+                initial_file = self.default_path.name
             else:
-                initialdir = self.default_path
-                initialfile = ''
+                initial_dir = self.default_path
+                initial_file = ''
 
             file_path = filedialog.askopenfilename(filetypes=self.filetypes,
-                                                   initialdir=initialdir, initialfile=initialfile)
+                                                   initialdir=initial_dir, initialfile=initial_file)
         elif self.dialogtype == 'askdirectory':
             file_path = filedialog.askdirectory(initialdir=self.default_path)
 

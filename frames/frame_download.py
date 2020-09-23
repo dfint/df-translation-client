@@ -6,7 +6,7 @@ import subprocess
 import sys
 import requests
 
-from config import check_and_save_path, init_section, Config
+from config import Config
 from widgets.custom_widgets import ComboboxCustom, EntryCustom, FileEntry, TwoStateButton, ListboxCustom
 from os import path
 from tkinter import messagebox
@@ -50,7 +50,7 @@ class DownloadTranslationsFrame(tk.Frame):
             messagebox.showerror('Unexpected error', traceback.format_exc())
         else:
             self.combo_languages.values = sorted(languages)
-            last_language = self.config.get('language', None)
+            last_language = self.config_section.get('language', None)
             if last_language and last_language in languages:
                 self.combo_languages.text = last_language
             else:
@@ -59,9 +59,9 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources.clear()
             self.listbox_resources.values = tuple(res['name'] for res in self.resources)
             
-            self.config['username'] = username
+            self.config_section['username'] = username
 
-            recent_projects = self.config['recent_projects']
+            recent_projects = self.config_section['recent_projects']
             if recent_projects or project != recent_projects[0]:
                 if project in recent_projects:
                     recent_projects.remove(project)
@@ -103,7 +103,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.button_download.reset_state()
                 self.download_started = False
 
-                self.config['language'] = language
+                self.config_section['language'] = language
 
                 if sys.platform == 'win32':
                     subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
@@ -147,7 +147,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 messagebox.showwarning('Directory not specified', 'Specify download directory first')
                 return
             else:
-                self.config['download_to'] = download_dir
+                self.config_section['download_to'] = download_dir
             
             if not path.exists(download_dir):
                 messagebox.showerror('Directory does not exist', 'Specify existing directory first')
@@ -179,21 +179,21 @@ class DownloadTranslationsFrame(tk.Frame):
     def __init__(self, master, config: Config):
         super().__init__(master)
         
-        self.config = init_section(
-            config, section_name='download_translations',
+        self.config_section = config.init_section(
+            section_name='download_translations',
             defaults=dict(recent_projects=['dwarf-fortress'])
         )
 
         tk.Label(self, text='Transifex project:').grid()
 
-        self.combo_projects = ComboboxCustom(self, values=self.config['recent_projects'])
+        self.combo_projects = ComboboxCustom(self, values=self.config_section['recent_projects'])
         self.combo_projects.current(0)
         self.combo_projects.grid(column=1, row=0, sticky=tk.W + tk.E)
         
         tk.Label(self, text='Username:').grid(column=0, row=1)
         
         self.entry_username = EntryCustom(self)
-        self.entry_username.text = self.config.get('username', '')
+        self.entry_username.text = self.config_section.get('username', '')
         self.entry_username.grid(column=1, row=1, sticky=tk.W + tk.E)
         
         tk.Label(self, text='Password:').grid(column=0, row=2)
@@ -221,8 +221,8 @@ class DownloadTranslationsFrame(tk.Frame):
         self.fileentry_download_to = FileEntry(
             self,
             dialogtype='askdirectory',
-            default_path=self.config.get('download_to', ''),
-            on_change=lambda text: check_and_save_path(self.config, 'download_to', text),
+            default_path=self.config_section.get('download_to', ''),
+            on_change=lambda text: self.config_section.check_and_save_path('download_to', text),
         )
         
         self.fileentry_download_to.grid(column=1, row=6, columnspan=2, sticky='WE')

@@ -17,7 +17,7 @@ class MainWindow(tk.Tk):
         if hasattr(self, 'notebook'):
             nb = self.notebook
             if nb.tabs():
-                config['last_tab_opened'] = nb.tabs().index(nb.select())
+                self.config_section['last_tab_opened'] = nb.tabs().index(nb.select())
 
         self.after(delay, self.save_settings_repeatedly, config, delay)
         config.save_settings()
@@ -30,7 +30,7 @@ class MainWindow(tk.Tk):
         notebook.add(PatchExecutableFrame(notebook, config, debug=self.app.debug), text='Patch executable file')
         notebook.add(TranslateExternalFiles(notebook, config), text='Translate external text files')
 
-        tab = config['last_tab_opened']
+        tab = self.config_section.get('last_tab_opened', 0)
         if 0 <= tab < len(notebook.tabs()):
             notebook.select(tab)
 
@@ -54,7 +54,9 @@ class MainWindow(tk.Tk):
         super().__init__()
         self.app = app
         self.init_error_handler()
-        self.notebook = self.init_notebook(self.app.config)
+        config = self.app.config
+        self.config_section = config.init_section('application')
+        self.notebook = self.init_notebook(config)
 
 
 class App:
@@ -62,7 +64,7 @@ class App:
         config_name = '.df-translate.json'
         user_directory = path.expanduser('~')
 
-        default_config = dict(last_tab_opened=0)
+        default_config = dict(application=dict(last_tab_opened=0))
         config = Config(default_config)
 
         if not self.ignore_config_file:
