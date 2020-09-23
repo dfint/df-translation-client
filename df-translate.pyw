@@ -34,6 +34,8 @@ class MainWindow(tk.Tk):
         if 0 <= tab < len(notebook.tabs()):
             notebook.select(tab)
 
+        notebook.bind('<<NotebookTabChanged>>', lambda _event: notebook.nametowidget(notebook.select()).update())
+
         return notebook
 
     def check_for_errors(self, stderr, delay=100):
@@ -72,7 +74,7 @@ class App:
 
         return config
 
-    def autosave_config(self):
+    def setup_config_autosave(self):
         if not self.ignore_config_file:
             self.window.bind('<Destroy>', lambda _: self.config.save_settings())  # Save settings on quit
             self.window.save_settings_repeatedly(self.config, delay=500)  # Save settings every 500 ms
@@ -82,7 +84,7 @@ class App:
         self.debug = debug
         self.config = self.init_config()
         self.window = MainWindow(self)
-        self.autosave_config()
+        self.setup_config_autosave()
         self.window.mainloop()
 
 

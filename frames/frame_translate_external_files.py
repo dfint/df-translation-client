@@ -190,3 +190,9 @@ class TranslateExternalFiles(tk.Frame):
         self.listbox_found_directories.grid(columnspan=2, sticky='NSWE')
 
         self.grid_columnconfigure(1, weight=1)
+
+    def update(self):
+        super().update()
+        self.update_listbox_translation_files()
+        self.update_combo_encoding()
+        self.update_combo_languages(self.file_entry_translation_files.text)
