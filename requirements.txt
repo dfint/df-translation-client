@@ -1,6 +1,6 @@
 pyinstaller
 natsort~=7.0.1
-requests>=2.23.0
+requests
 python-transifex @ https://github.com/insolor/python-transifex/archive/master.zip
 dfrus @ https://github.com/dfint/dfrus/archive/develop.zip
 df-gettext-toolkit @ https://github.com/dfint/df-gettext-toolkit/archive/develop.zip
