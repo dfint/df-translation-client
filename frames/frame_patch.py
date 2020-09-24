@@ -126,7 +126,8 @@ class PatchExecutableFrame(tk.Frame):
                     trans_table=dictionary,
                     codepage=self.combo_encoding.text,
                     debug=self.chk_debug_output.is_checked,
-                    stdout=ProcessMessageWrapper(child_conn)
+                    stdout=ProcessMessageWrapper(child_conn),
+                    stderr=ProcessMessageWrapper(child_conn)
                 )
             )
             self.dfrus_process.start()
