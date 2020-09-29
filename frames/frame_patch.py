@@ -66,8 +66,12 @@ class DebugFrame(tk.Frame):
 class PatchExecutableFrame(tk.Frame):
     def update_log(self, message_queue):
         try:
+            message = []
+            
             while message_queue.poll():
-                self.log_field.write(message_queue.recv())
+                message.append(message_queue.recv())
+            
+            self.log_field.write(''.join(message))
 
             if not self.dfrus_process.is_alive():
                 self.log_field.write('\n[PROCESS FINISHED]')
