@@ -1,10 +1,10 @@
 import json
 
 from pathlib import Path
-from collections import defaultdict, UserDict
+from collections import defaultdict
 
 
-class ConfigSection(UserDict):
+class ConfigSection(dict):
     def check_and_save_path(self, key, file_path):
         if Path(file_path).exists():
             self[key] = file_path
@@ -17,7 +17,8 @@ class Config:
 
     def save_settings(self):
         with open(self.config_path, 'w', encoding='utf-8') as config_file:
-            json.dump({key: dict(section) for key, section in self._sections.items()},
+            json.dump({key: dict(section) for key, section in self._sections.items()
+                       if isinstance(section, dict)},  # ignore non-dict values (to avoid errors with old config)
                       config_file, indent=4, sort_keys=True)
 
     def load_settings(self, config_path=None):
