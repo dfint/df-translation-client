@@ -226,6 +226,10 @@ class PatchExecutableFrame(tk.Frame):
 
         tk.Label(self, text='DF executable translation file:').grid()
 
+        def on_translation_file_change(text):
+            self.update_combo_encoding(text)
+            self._dictionary = None  # Clear cached dictionary
+
         self.fileentry_translation_file = FileEntry(
             self,
             dialog_type='askopenfilename',
@@ -235,7 +239,7 @@ class PatchExecutableFrame(tk.Frame):
                 # ('csv file', '*.csv'), # @TODO: Currently not supported
             ],
             default_path=self.config_section.get('df_exe_translation_file', ''),
-            on_change=self.update_combo_encoding,
+            on_change=on_translation_file_change,
             change_color=True
         )
         self.fileentry_translation_file.grid(column=1, row=1, columnspan=2, sticky='EW')
