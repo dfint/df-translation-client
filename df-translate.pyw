@@ -1,5 +1,6 @@
 import multiprocessing as mp
 import sys
+import os
 
 from config import Config
 from pathlib import Path
@@ -8,14 +9,16 @@ from main_window import MainWindow
 
 class App:
     def init_config(self):
-        config_name = '.df-translate.json'
-        user_directory = Path('~').expanduser()
-
         config = Config()
 
         if not self.ignore_config_file:
-            config_path = user_directory / config_name
-            config.load_settings(config_path)
+            config_name = '.df-translate.json'
+            config_path = Path(sys.argv[0]).parent
+            
+            if not os.access(config_path, os.W_OK):
+                config_path = Path.home()
+
+            config.load_settings(config_path / config_name)
 
         return config
 

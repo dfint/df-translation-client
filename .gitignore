@@ -5,3 +5,4 @@ venv
 *.po
 *.pot
 *.mo
+.df-translate.json
