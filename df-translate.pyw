@@ -8,32 +8,35 @@ from main_window import MainWindow
 
 
 class App:
-    def init_config(self):
-        config = Config()
+    @staticmethod
+    def get_config_path():
+        config_name = '.df-translate.json'
+        config_path = Path(__file__).parent
 
-        if not self.ignore_config_file:
-            config_name = '.df-translate.json'
-            config_path = Path(__file__).parent
-            
-            if not os.access(config_path, os.W_OK):
-                config_path = Path.home()
+        if not os.access(config_path, os.W_OK):
+            config_path = Path.home()
 
-            config.load_settings(config_path / config_name)
+        return config_path / config_name
 
-        return config
-
-    def setup_config_autosave(self):
-        if not self.ignore_config_file:
-            self.window.bind('<Destroy>', lambda _: self.config.save_settings())  # Save settings on quit
-            self.window.save_settings_repeatedly(self.config, delay=500)  # Save settings every 500 ms
+    @staticmethod
+    def setup_config_autosave(window: MainWindow, config: Config):
+        window.bind('<Destroy>', lambda _: config.save_settings())  # Save settings on quit
+        window.save_settings_repeatedly(config, delay=500)  # Save settings every 500 ms
 
     def __init__(self, ignore_config_file=False, debug=False):
-        self.ignore_config_file = ignore_config_file
         self.debug = debug
-        self.config = self.init_config()
-        self.window = MainWindow(self)
-        self.setup_config_autosave()
-        self.window.mainloop()
+
+        self.config = Config()
+
+        if not ignore_config_file:
+            self.config.load_settings(self.get_config_path())
+
+        main_window = MainWindow(self)
+
+        if not ignore_config_file:
+            self.setup_config_autosave(main_window, self.config)
+
+        main_window.mainloop()
 
 
 if __name__ == '__main__':
