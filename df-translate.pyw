@@ -13,7 +13,7 @@ class App:
 
         if not self.ignore_config_file:
             config_name = '.df-translate.json'
-            config_path = Path(sys.argv[0]).parent
+            config_path = Path(__file__).parent
             
             if not os.access(config_path, os.W_OK):
                 config_path = Path.home()
