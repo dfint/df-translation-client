@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
+from df_gettext_toolkit.translate_compressed import translate_compressed
 from df_gettext_toolkit.translate_plain_text import translate_plain_text
 from df_gettext_toolkit.translate_raws import translate_raws
 from dfrus.patch_charmap import get_codepages
@@ -72,7 +73,7 @@ class TranslateExternalFiles(tk.Frame):
                     strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
                 codepages = filter_codepages(codepages, strings)
             self.combo_encoding.values = natsorted(codepages)
-            
+
             if self.combo_encoding.values:
                 self.combo_encoding.current(0)
             else:
@@ -84,11 +85,10 @@ class TranslateExternalFiles(tk.Frame):
                 po_filename='raw-objects',
                 func=translate_raws,
             ),
-            # Switched off for now
-            # 'data_src': dict(
-            #     po_filename='uncompressed',
-            #     func=lambda *args: translate_plain_text(*args, join_paragraphs=True),
-            # ),
+            'data': dict(
+                po_filename='uncompressed',
+                func=lambda *args: translate_compressed(*args),
+            ),
             'data/speech': dict(
                 po_filename='speech',
                 func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
@@ -104,11 +104,12 @@ class TranslateExternalFiles(tk.Frame):
         base_path = self.file_entry_df_root_path.text
         po_directory = Path(self.file_entry_translation_files.text)
         for cur_dir in Path(base_path).rglob("*"):
-            if cur_dir.is_dir():
+            # Excluding the Lib folder (for Python) from processing
+            if cur_dir.is_dir() and not cur_dir.is_relative_to(f'{base_path}/Lib'):
                 for pattern in patterns:
                     if cur_dir.match('*/' + pattern):
                         self.listbox_found_directories.append(f"Matched {pattern} pattern")
-                        postfix = '_{}.po'.format(self.combo_language.text)
+                        postfix = f'_{self.combo_language.text}.po'
                         po_filename = patterns[pattern]['po_filename'] + postfix
 
                         po_file_path = po_directory / po_filename
