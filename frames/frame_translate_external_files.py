@@ -1,3 +1,4 @@
+from operator import pos
 import tkinter as tk
 from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
@@ -104,13 +105,13 @@ class TranslateExternalFiles(tk.Frame):
         base_path = self.file_entry_df_root_path.text
         po_directory = Path(self.file_entry_translation_files.text)
         for cur_dir in Path(base_path).rglob("*"):
-            # Excluding the Lib folder (for Python) from processing
-            if cur_dir.is_dir() and not cur_dir.is_relative_to(f'{base_path}/Lib'):
+            if cur_dir.is_dir():
                 for pattern in patterns:
                     if cur_dir.match('*/' + pattern):
                         self.listbox_found_directories.append(f"Matched {pattern} pattern")
-                        postfix = f'_{self.combo_language.text}.po'
-                        po_filename = patterns[pattern]['po_filename'] + postfix
+                        base_name = patterns[pattern]['po_filename']
+                        postfix = self.combo_language.text
+                        po_filename = f"{base_name}_{postfix}.po"
 
                         po_file_path = po_directory / po_filename
 
