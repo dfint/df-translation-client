@@ -1,4 +1,3 @@
-from operator import pos
 import tkinter as tk
 from tkinter import messagebox, ttk
 from df_gettext_toolkit import po
