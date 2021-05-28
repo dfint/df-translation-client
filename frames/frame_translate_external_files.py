@@ -1,18 +1,18 @@
 import tkinter as tk
+from pathlib import Path
 from tkinter import messagebox, ttk
+
 from df_gettext_toolkit import po
+from df_gettext_toolkit.fix_translated_strings import cleanup_string
 from df_gettext_toolkit.translate_compressed import translate_compressed
 from df_gettext_toolkit.translate_plain_text import translate_plain_text
 from df_gettext_toolkit.translate_raws import translate_raws
 from dfrus.patch_charmap import get_codepages
 from natsort import natsorted
-from pathlib import Path
 
 from config import Config
 from widgets import FileEntry, ScrollableListbox
 from widgets.custom_widgets import Combobox
-from cleanup import cleanup_special_symbols
-
 from .frame_patch import filter_codepages
 
 
@@ -70,7 +70,7 @@ class TranslateExternalFiles(tk.Frame):
             for file in files:
                 with open(directory / file, 'r', encoding='utf-8') as fn:
                     pofile = po.PoReader(fn)
-                    strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
+                    strings = [cleanup_string(entry['msgstr']) for entry in pofile]
                 codepages = filter_codepages(codepages, strings)
             self.combo_encoding.values = natsorted(codepages)
 

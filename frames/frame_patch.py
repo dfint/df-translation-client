@@ -2,19 +2,19 @@ import codecs
 import importlib
 import multiprocessing as mp
 import tkinter as tk
-
-from dfrus import dfrus
 from collections import OrderedDict
 from pathlib import Path
 from tkinter import messagebox, ttk
+
 from df_gettext_toolkit import po
-from cleanup import cleanup_spaces, cleanup_special_symbols
-from config import Config
-from widgets import FileEntry, BisectTool, CustomScrollableText, TwoStateButton
-from widgets.custom_widgets import Checkbutton, Combobox
+from df_gettext_toolkit.fix_translated_strings import fix_spaces, cleanup_string
+from dfrus import dfrus
 from dfrus.patch_charmap import get_codepages, get_encoder
 from natsort import natsorted
 
+from config import Config
+from widgets import FileEntry, BisectTool, CustomScrollableText, TwoStateButton
+from widgets.custom_widgets import Checkbutton, Combobox
 from .dialog_do_not_fix_spaces import DialogDoNotFixSpaces
 
 
@@ -86,9 +86,11 @@ class PatchExecutableFrame(tk.Frame):
         with open(translation_file, 'r', encoding='utf-8') as fn:
             pofile = po.PoReader(fn)
             meta = pofile.meta
+            exclusions = self.exclusions.get(meta['Language'], self.exclusions)
             dictionary = OrderedDict(
-                cleanup_spaces(((entry['msgid'], cleanup_special_symbols(entry['msgstr'])) for entry in pofile),
-                               self.exclusions.get(meta['Language'], self.exclusions))
+                (entry['msgid'],
+                 fix_spaces(entry['msgid'], cleanup_string(entry['msgstr']), exclusions, exclusions))
+                for entry in pofile
             )
         return dictionary
 
@@ -188,7 +190,7 @@ class PatchExecutableFrame(tk.Frame):
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
-                strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
+                strings = [cleanup_string(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
         self.combo_encoding.values = natsorted(codepages)
 
@@ -262,7 +264,7 @@ class PatchExecutableFrame(tk.Frame):
             with open(translation_file, 'r', encoding='utf-8') as fn:
                 pofile = po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
-                strings = [cleanup_special_symbols(entry['msgstr']) for entry in pofile]
+                strings = [cleanup_string(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
 
         self.combo_encoding.values = natsorted(codepages)
