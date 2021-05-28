@@ -107,7 +107,7 @@ class TranslateExternalFiles(tk.Frame):
             if cur_dir.is_dir():
                 for pattern in patterns:
                     if cur_dir.match('*/' + pattern):
-                        self.listbox_found_directories.append(f"Matched {pattern} pattern")
+                        self.listbox_found_directories.append(f"Matched {pattern!r} pattern")
                         base_name = patterns[pattern]['po_filename']
                         postfix = self.combo_language.text
                         po_filename = f"{base_name}_{postfix}.po"
