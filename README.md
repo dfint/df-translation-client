@@ -19,4 +19,5 @@ A GUI client intended to simplify usage of all the utils of the localization pro
     `python df-translate.pyw`
  
     (use `python3` instead of `python` on Linux)
- 
+
+![screenshot](screenshot.png)
