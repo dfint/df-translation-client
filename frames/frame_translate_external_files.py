@@ -2,7 +2,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
 
-from df_gettext_toolkit import po
+from df_gettext_toolkit import parse_po
 from df_gettext_toolkit.fix_translated_strings import cleanup_string
 from df_gettext_toolkit.translate_compressed import translate_compressed
 from df_gettext_toolkit.translate_plain_text import translate_plain_text
@@ -21,9 +21,9 @@ class TranslateExternalFiles(tk.Frame):
     def get_languages(directory):
         languages = set()
         directory = Path(directory)
-        for filename in directory.glob('*.po'):
+        for filename in directory.glob('*.parse_po'):
             with open(directory / filename, encoding='utf-8') as file:
-                languages.add(po.PoReader(file).meta['Language'])
+                languages.add(parse_po.PoReader(file).meta['Language'])
 
         return sorted(languages)
 
@@ -49,9 +49,9 @@ class TranslateExternalFiles(tk.Frame):
 
     @staticmethod
     def filter_files_by_language(directory: Path, language):
-        for filename in directory.glob("*.po"):
+        for filename in directory.glob("*.parse_po"):
             with open(filename, encoding='utf-8') as file:
-                if po.PoReader(file).meta['Language'] == language:
+                if parse_po.PoReader(file).meta['Language'] == language:
                     yield filename.name
 
     def update_listbox_translation_files(self, language=None):
@@ -69,7 +69,7 @@ class TranslateExternalFiles(tk.Frame):
             codepages = get_codepages().keys()
             for file in files:
                 with open(directory / file, 'r', encoding='utf-8') as fn:
-                    pofile = po.PoReader(fn)
+                    pofile = parse_po.PoReader(fn)
                     strings = [cleanup_string(entry['msgstr']) for entry in pofile]
                 codepages = filter_codepages(codepages, strings)
             self.combo_encoding.values = natsorted(codepages)
@@ -110,7 +110,7 @@ class TranslateExternalFiles(tk.Frame):
                         self.listbox_found_directories.append(f"Matched {pattern!r} pattern")
                         base_name = patterns[pattern]['po_filename']
                         postfix = self.combo_language.text
-                        po_filename = f"{base_name}_{postfix}.po"
+                        po_filename = f"{base_name}_{postfix}.parse_po"
 
                         po_file_path = po_directory / po_filename
 

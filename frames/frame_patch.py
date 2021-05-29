@@ -6,7 +6,7 @@ from collections import OrderedDict
 from pathlib import Path
 from tkinter import messagebox, ttk
 
-from df_gettext_toolkit import po
+from df_gettext_toolkit import parse_po
 from df_gettext_toolkit.fix_translated_strings import fix_spaces, cleanup_string
 from dfrus import dfrus
 from dfrus.patch_charmap import get_codepages, get_encoder
@@ -84,7 +84,7 @@ class PatchExecutableFrame(tk.Frame):
 
     def load_dictionary(self, translation_file):
         with open(translation_file, 'r', encoding='utf-8') as fn:
-            pofile = po.PoReader(fn)
+            pofile = parse_po.PoReader(fn)
             meta = pofile.meta
             exclusions = self.exclusions.get(meta['Language'], self.exclusions)
             dictionary = OrderedDict(
@@ -159,7 +159,7 @@ class PatchExecutableFrame(tk.Frame):
         dictionary = None
         if translation_file and Path(translation_file).exists():
             with open(translation_file, 'r', encoding='utf-8') as fn:
-                pofile = po.PoReader(fn)
+                pofile = parse_po.PoReader(fn)
                 meta = pofile.meta
                 language = meta['Language']
                 dictionary = {entry['msgid']: entry['msgstr'] for entry in pofile}
@@ -188,7 +188,7 @@ class PatchExecutableFrame(tk.Frame):
         if self.fileentry_translation_file.path_is_valid():
             translation_file = self.fileentry_translation_file.text
             with open(translation_file, 'r', encoding='utf-8') as fn:
-                pofile = po.PoReader(fn)
+                pofile = parse_po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
                 strings = [cleanup_string(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
@@ -240,8 +240,8 @@ class PatchExecutableFrame(tk.Frame):
             self,
             dialog_type='askopenfilename',
             filetypes=[
-                ("Hardcoded strings' translation", '*hardcoded*.po'),
-                ('Translation files', '*.po'),
+                ("Hardcoded strings' translation", '*hardcoded*.parse_po'),
+                ('Translation files', '*.parse_po'),
                 # ('csv file', '*.csv'), # @TODO: Currently not supported
             ],
             default_path=self.config_section.get('df_exe_translation_file', ''),
@@ -262,7 +262,7 @@ class PatchExecutableFrame(tk.Frame):
         else:
             translation_file = self.fileentry_translation_file.text
             with open(translation_file, 'r', encoding='utf-8') as fn:
-                pofile = po.PoReader(fn)
+                pofile = parse_po.PoReader(fn)
                 self.translation_file_language = pofile.meta['Language']
                 strings = [cleanup_string(entry['msgstr']) for entry in pofile]
             codepages = filter_codepages(codepages, strings)
