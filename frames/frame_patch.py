@@ -165,8 +165,9 @@ class PatchExecutableFrame(tk.Frame):
                 dictionary = {entry['msgid']: entry['msgstr'] for entry in pofile}
 
         dialog = DialogDoNotFixSpaces(self, self.config_section['fix_space_exclusions'], language, dictionary)
-        self.config_section['fix_space_exclusions'] = dialog.exclusions or self.config_section['fix_space_exclusions']
-        self.exclusions = self.config_section['fix_space_exclusions']
+        exclusions = dialog.wait_result()
+        self.exclusions = exclusions or self.config_section['fix_space_exclusions']
+        self.config_section['fix_space_exclusions'] = self.exclusions
 
     def setup_checkbutton(self, text, config_key, default_state):
         config = self.config_section

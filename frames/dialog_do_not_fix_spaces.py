@@ -1,6 +1,8 @@
 import re
 import tkinter as tk
+from copy import deepcopy
 from tkinter import ttk as ttk
+from typing import MutableMapping, List, Mapping
 
 from widgets import ScrollbarFrame
 from widgets.custom_widgets import Listbox, Combobox, Entry
@@ -41,14 +43,17 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         index = self.listbox_exclusions_hints.curselection()
         if index:
             item = self.restore_strings[self.listbox_exclusions_hints.values[index[0]]]
-            self.exclusions[self.combo_language.text].append(item)
+            exclusions = set(self.exclusions[self.combo_language.text])
+            exclusions.add(item)
+            self.exclusions[self.combo_language.text] = list(exclusions)
             self.update_listbox_exclusions()
 
-    def __init__(self, parent, exclusions: dict, language: str, dictionary: dict, *args, **kwargs):
+    def __init__(self, parent, exclusions: MutableMapping[str, List[str]], language: str, dictionary: Mapping[str, str],
+                 *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.grab_set()
 
-        self.exclusions = exclusions
+        self.exclusions = deepcopy(exclusions)
 
         self.title("Choose exclusions")
 
@@ -60,7 +65,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         self.language = language
 
         self.dictionary = dictionary or dict()
-        self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
+        self.strings = sorted((key for key in self.dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
         self.restore_strings = {show_spaces(s): s for s in self.strings}
 
@@ -119,3 +124,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
+
+    def wait_result(self):
+        self.wait_window()
+        return self.exclusions
