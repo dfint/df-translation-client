@@ -11,8 +11,8 @@ from dfrus.patch_charmap import get_codepages
 from natsort import natsorted
 
 from config import Config
-from widgets import FileEntry, ScrollableListbox
-from widgets.custom_widgets import Combobox
+from widgets import FileEntry, ScrollbarFrame
+from widgets.custom_widgets import Combobox, Listbox
 from .frame_patch import filter_codepages
 
 
@@ -21,7 +21,7 @@ class TranslateExternalFiles(tk.Frame):
     def get_languages(directory):
         languages = set()
         directory = Path(directory)
-        for filename in directory.glob('*.parse_po'):
+        for filename in directory.glob('*.po'):
             with open(directory / filename, encoding='utf-8') as file:
                 languages.add(parse_po.PoReader(file).meta['Language'])
 
@@ -49,7 +49,7 @@ class TranslateExternalFiles(tk.Frame):
 
     @staticmethod
     def filter_files_by_language(directory: Path, language):
-        for filename in directory.glob("*.parse_po"):
+        for filename in directory.glob("*.po"):
             with open(filename, encoding='utf-8') as file:
                 if parse_po.PoReader(file).meta['Language'] == language:
                     yield filename.name
@@ -110,7 +110,7 @@ class TranslateExternalFiles(tk.Frame):
                         self.listbox_found_directories.append(f"Matched {pattern!r} pattern")
                         base_name = patterns[pattern]['po_filename']
                         postfix = self.combo_language.text
-                        po_filename = f"{base_name}_{postfix}.parse_po"
+                        po_filename = f"{base_name}_{postfix}.po"
 
                         po_file_path = po_directory / po_filename
 
@@ -177,19 +177,24 @@ class TranslateExternalFiles(tk.Frame):
 
         tk.Label(self, text="Encoding:").grid()
         self.combo_encoding = Combobox(self)
-        self.combo_encoding.grid(row=3, column=1, sticky='WE')
+        self.combo_encoding.grid(row=3, column=1, sticky=tk.EW)
 
         self.update_combo_encoding()
 
-        self.listbox_translation_files = ScrollableListbox(self)
-        self.listbox_translation_files.grid(columnspan=2, sticky='NSWE')
+        scrollbar_frame = ScrollbarFrame(self, Listbox, show_scrollbars=tk.VERTICAL)
+        scrollbar_frame.grid(columnspan=2, sticky=tk.NSEW)
+
+        self.listbox_translation_files: Listbox = scrollbar_frame.widget
         self.update_listbox_translation_files(language=self.combo_language.text)
 
         ttk.Button(self, text='Search', command=self.bt_search).grid()
         ttk.Button(self, text='Translate', command=lambda: self.bt_search(translate=True)).grid(row=5, column=1)
 
-        self.listbox_found_directories = ScrollableListbox(self)
-        self.listbox_found_directories.grid(columnspan=2, sticky='NSWE')
+        scrollbar_frame = ScrollbarFrame(self, Listbox, show_scrollbars=tk.VERTICAL)
+        scrollbar_frame.grid(columnspan=2, sticky=tk.NSEW)
+        self.grid_rowconfigure(scrollbar_frame.grid_info()['row'], weight=1)
+
+        self.listbox_found_directories: Listbox = scrollbar_frame.widget
 
         self.grid_columnconfigure(1, weight=1)
 

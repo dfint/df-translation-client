@@ -2,8 +2,8 @@ import re
 import tkinter as tk
 from tkinter import ttk as ttk
 
-from widgets import ScrollableListbox
-from widgets.custom_widgets import Combobox, Entry
+from widgets import ScrollbarFrame
+from widgets.custom_widgets import Listbox, Combobox, Entry
 
 
 def show_spaces(s):
@@ -77,10 +77,13 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
 
         bt = ttk.Button(self, text='-- Remove selected --', command=self.bt_remove_selected)
-        bt.grid(column=0, row=1, sticky=tk.W+tk.E)
+        bt.grid(column=0, row=1, sticky=tk.EW)
 
-        self.listbox_exclusions = ScrollableListbox(self, width=40, height=20)
-        self.listbox_exclusions.grid(sticky='NSWE')
+        scrollable_listbox = ScrollbarFrame(self, Listbox, widget_args=dict(width=40, height=20),
+                                            show_scrollbars=tk.VERTICAL)
+        scrollable_listbox.grid(sticky=tk.NSEW)
+
+        self.listbox_exclusions: Listbox = scrollable_listbox.widget
 
         self.update_listbox_exclusions()
 
@@ -96,8 +99,11 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         bt = ttk.Button(self, text='<< Add selected <<', command=self.bt_add_selected)
         bt.grid(column=1, row=1, sticky=tk.W+tk.E)
 
-        self.listbox_exclusions_hints = ScrollableListbox(self, width=40, height=20)
-        self.listbox_exclusions_hints.grid(column=1, row=2, sticky='NSWE')
+        scrollbar_frame = ScrollbarFrame(self, Listbox, widget_args=dict(width=40, height=20),
+                                         show_scrollbars=tk.VERTICAL)
+        scrollbar_frame.grid(column=1, row=2, sticky=tk.NSEW)
+
+        self.listbox_exclusions_hints: Listbox = scrollbar_frame.widget
         self.update_listbox_exclusions_hints()
 
         button = ttk.Button(self, text="OK", command=self.destroy)

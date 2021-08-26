@@ -1,17 +1,18 @@
 import multiprocessing as mp
+import subprocess
+import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 import traceback
-import subprocess
-import sys
-import requests
-
-from config import Config
-from widgets import FileEntry, ScrollableListbox, TwoStateButton
-from widgets.custom_widgets import Combobox, Entry
 from pathlib import Path
 from tkinter import messagebox
+
+import requests
 from transifex.api import TransifexAPI, TransifexAPIException
+
+from config import Config
+from widgets import FileEntry, TwoStateButton, ScrollbarFrame
+from widgets.custom_widgets import Combobox, Entry, Listbox
 
 
 def downloader(conn, tx, project, language, resources, file_path_pattern):
@@ -226,19 +227,20 @@ class DownloadTranslationsFrame(tk.Frame):
             on_change=lambda text: self.config_section.check_and_save_path('download_to', text),
         )
         
-        self.fileentry_download_to.grid(column=1, row=6, columnspan=2, sticky='WE')
+        self.fileentry_download_to.grid(column=1, row=6, columnspan=2, sticky=tk.EW)
         
         self.button_download = TwoStateButton(self, text='Download translations', command=self.bt_download,
                                               text2='Stop', command2=self.bt_stop_downloading)
-        self.button_download.grid(sticky=tk.W + tk.E)
+        self.button_download.grid(sticky=tk.EW)
         
         self.progressbar = ttk.Progressbar(self)
-        self.progressbar.grid(column=1, row=7, columnspan=2, sticky=tk.W + tk.E)
+        self.progressbar.grid(column=1, row=7, columnspan=2, sticky=tk.EW)
         
         tk.Label(self, text='Resources:').grid(columnspan=3)
 
-        self.listbox_resources = ScrollableListbox(self)
-        self.listbox_resources.grid(column=0, columnspan=3, sticky=tk.E + tk.W + tk.N + tk.S)
+        scrollbar_frame = ScrollbarFrame(self, Listbox, show_scrollbars=tk.VERTICAL)
+        scrollbar_frame.grid(column=0, columnspan=3, sticky=tk.NSEW)
+        self.listbox_resources: Listbox = scrollbar_frame.widget
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(9, weight=1)

@@ -13,8 +13,8 @@ from dfrus.patch_charmap import get_codepages, get_encoder
 from natsort import natsorted
 
 from config import Config
-from widgets import FileEntry, BisectTool, CustomScrollableText, TwoStateButton
-from widgets.custom_widgets import Checkbutton, Combobox
+from widgets import FileEntry, BisectTool, TwoStateButton, ScrollbarFrame
+from widgets.custom_widgets import Checkbutton, Combobox, Text
 from .dialog_do_not_fix_spaces import DialogDoNotFixSpaces
 
 
@@ -240,8 +240,8 @@ class PatchExecutableFrame(tk.Frame):
             self,
             dialog_type='askopenfilename',
             filetypes=[
-                ("Hardcoded strings' translation", '*hardcoded*.parse_po'),
-                ('Translation files', '*.parse_po'),
+                ("Hardcoded strings' translation", '*hardcoded*.po'),
+                ('Translation files', '*.po'),
                 # ('csv file', '*.csv'), # @TODO: Currently not supported
             ],
             default_path=self.config_section.get('df_exe_translation_file', ''),
@@ -316,9 +316,13 @@ class PatchExecutableFrame(tk.Frame):
                                            text2='Stop!', command2=self.bt_stop)
         self.button_patch.grid(row=6, column=2)
 
-        self.log_field = CustomScrollableText(self, width=48, height=8, enabled=False)
-        self.log_field.grid(columnspan=3, sticky='NSWE')
-        self.grid_rowconfigure(self.log_field.grid_info()['row'], weight=1)
+        scrollbar_frame = ScrollbarFrame(self, Text,
+                                         widget_args=dict(width=48, height=8, enabled=False),
+                                         show_scrollbars=tk.VERTICAL)
+        scrollbar_frame.grid(columnspan=3, sticky=tk.NSEW)
+        self.grid_rowconfigure(scrollbar_frame.grid_info()['row'], weight=1)
+
+        self.log_field: Text = scrollbar_frame.widget
 
         self.grid_columnconfigure(1, weight=1)
         
