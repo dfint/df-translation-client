@@ -33,16 +33,16 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         self.update_listbox_exclusions_hints()
 
     def bt_remove_selected(self):
-        index = self.listbox_exclusions.curselection()
-        if index:
-            item = self.restore_strings[self.listbox_exclusions.values[index[0]]]
+        selected = self.listbox_exclusions.selected()
+        if selected:
+            item = self.restore_strings[selected[0]]
             self.exclusions[self.combo_language.text].remove(item)
             self.update_listbox_exclusions()
 
     def bt_add_selected(self):
-        index = self.listbox_exclusions_hints.curselection()
-        if index:
-            item = self.restore_strings[self.listbox_exclusions_hints.values[index[0]]]
+        selected = self.listbox_exclusions_hints.selected()
+        if selected:
+            item = self.restore_strings[selected[0]]
             exclusions = set(self.exclusions[self.combo_language.text])
             exclusions.add(item)
             self.exclusions[self.combo_language.text] = list(exclusions)

@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+from typing import TypeVar, Generic, Iterable, List
 
 
 class Checkbutton(ttk.Checkbutton):
@@ -58,29 +59,39 @@ class Combobox(ttk.Combobox):
         self['values'] = tuple(values)
 
 
-class Listbox(tk.Listbox):
+TListboxValue = TypeVar("TListboxValue")
+
+
+class Listbox(tk.Listbox, Generic[TListboxValue]):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-        self._var = tk.Variable()
-        self.config(listvariable=self._var)
+        self.__var = tk.Variable()
+        self.config(listvariable=self.__var)
+        self.__values: List[TListboxValue] = list()
 
     @property
     def values(self):
-        return self._var.get()
+        return self.__values
 
     @values.setter
-    def values(self, values):
-        self._var.set(tuple(values))
+    def values(self, values: Iterable[TListboxValue]):
+        self.__values = list(values)
+        self.__var.set(tuple(map(str, self.__values)))
 
     def clear(self):
+        self.__values = list()
         self.delete(0, tk.END)
         self.update()
 
-    def append(self, item):
-        self.insert(tk.END, item)
+    def append(self, item: TListboxValue):
+        self.insert(tk.END, str(item))
         self.yview_moveto('1.0')
         self.update()
+
+    def selected(self) -> List[TListboxValue]:
+        current_selection = self.curselection()
+        return [self.__values[i] for i in current_selection]
 
 
 class Text(tk.Text):
