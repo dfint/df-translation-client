@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from typing import TypeVar, Generic, Iterable, List
+from typing import TypeVar, Generic, Iterable, List, Tuple
 
 
 class Checkbutton(ttk.Checkbutton):
@@ -68,15 +68,15 @@ class Listbox(tk.Listbox, Generic[TListboxValue]):
 
         self.__var = tk.Variable()
         self.config(listvariable=self.__var)
-        self.__values: List[TListboxValue] = list()
+        self.__values: Tuple[TListboxValue] = tuple()
 
     @property
-    def values(self):
-        return self.__values
+    def values(self) -> List[TListboxValue]:
+        return list(self.__values)
 
     @values.setter
     def values(self, values: Iterable[TListboxValue]):
-        self.__values = list(values)
+        self.__values = tuple(values)
         self.__var.set(tuple(map(str, self.__values)))
 
     def clear(self):
