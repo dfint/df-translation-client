@@ -8,25 +8,31 @@ from widgets import ScrollbarFrame
 from widgets.custom_widgets import Listbox, Combobox, Entry
 
 
-def show_spaces(s):
-    parts = re.search(r'^(\s*)(.*?)(\s*)$', s)
-    return '\u2022' * len(parts.group(1)) + parts.group(2) + '\u2022' * len(parts.group(3))
+class HighlightedSpacesItem:
+    @staticmethod
+    def highlight_spaces(s):
+        parts = re.search(r'^(\s*)(.*?)(\s*)$', s)
+        return '\u2022' * len(parts.group(1)) + parts.group(2) + '\u2022' * len(parts.group(3))
+
+    def __init__(self, value: str):
+        self.value = value
+
+    def __str__(self):
+        return self.highlight_spaces(self.value)
 
 
 class DialogDoNotFixSpaces(tk.Toplevel):
     def update_listbox_exclusions(self):
         exclusions = self.exclusions.get(self.combo_language.text, list())
-        self.listbox_exclusions.values = sorted(show_spaces(item) for item in exclusions)
-        self.restore_strings.update({show_spaces(s): s for s in exclusions})
+        self.listbox_exclusions.values = sorted(map(HighlightedSpacesItem, exclusions), key=lambda x: x.value)
 
     def combo_language_change_selection(self, _):
         self.update_listbox_exclusions()
         self.update_listbox_exclusions_hints()
 
     def update_listbox_exclusions_hints(self):
-        text = self.entry_search.text
-        values = ((show_spaces(key) for key in self.strings if text.lower() in key.lower())
-                  if self.language == self.combo_language.text else tuple())
+        text: str = self.entry_search.text.casefold()
+        values = (HighlightedSpacesItem(string) for string in self.strings if text in string.casefold())
         self.listbox_exclusions_hints.values = values
 
     def entry_search_key_release(self, _):
@@ -35,39 +41,44 @@ class DialogDoNotFixSpaces(tk.Toplevel):
     def bt_remove_selected(self):
         selected = self.listbox_exclusions.selected()
         if selected:
-            item = self.restore_strings[selected[0]]
+            item = selected[0].value
             self.exclusions[self.combo_language.text].remove(item)
             self.update_listbox_exclusions()
 
     def bt_add_selected(self):
         selected = self.listbox_exclusions_hints.selected()
         if selected:
-            item = self.restore_strings[selected[0]]
-            exclusions = set(self.exclusions[self.combo_language.text])
+            item = selected[0].value
+            exclusions = set(self.exclusions.get(self.combo_language.text, set()))
             exclusions.add(item)
             self.exclusions[self.combo_language.text] = list(exclusions)
             self.update_listbox_exclusions()
 
-    def __init__(self, parent, exclusions: MutableMapping[str, List[str]], language: str, dictionary: Mapping[str, str],
-                 *args, **kwargs):
+    def __init__(self, parent, exclusions: Mapping[str, List[str]],
+                 dictionary: Mapping[str, str],
+                 *args,
+                 default_language: str = None,
+                 **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.grab_set()
 
-        self.exclusions = deepcopy(exclusions)
+        self.exclusions: MutableMapping[str, List[str]] = dict(deepcopy(exclusions))
 
         self.title("Choose exclusions")
 
-        language_list = list(self.exclusions)
-        if language:
-            if language in language_list:
-                language_list.remove(language)
-            language_list.insert(0, language)
-        self.language = language
+        language_list = sorted(self.exclusions.keys())
+
+        # Move the default language to the top
+        if default_language:
+            if default_language in language_list:
+                language_list.remove(default_language)
+            language_list.insert(0, default_language)
+
+        self.language = default_language
 
         self.dictionary = dictionary or dict()
         self.strings = sorted((key for key in self.dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
-        self.restore_strings = {show_spaces(s): s for s in self.strings}
 
         parent_frame = tk.Frame(self)
         tk.Label(parent_frame, text='Language:').pack(side=tk.LEFT)
@@ -88,7 +99,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
                                             show_scrollbars=tk.VERTICAL)
         scrollable_listbox.grid(sticky=tk.NSEW)
 
-        self.listbox_exclusions: Listbox = scrollable_listbox.widget
+        self.listbox_exclusions: Listbox[HighlightedSpacesItem] = scrollable_listbox.widget
 
         self.update_listbox_exclusions()
 
@@ -108,7 +119,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
                                          show_scrollbars=tk.VERTICAL)
         scrollbar_frame.grid(column=1, row=2, sticky=tk.NSEW)
 
-        self.listbox_exclusions_hints: Listbox = scrollbar_frame.widget
+        self.listbox_exclusions_hints: Listbox[HighlightedSpacesItem] = scrollbar_frame.widget
         self.update_listbox_exclusions_hints()
 
         button = ttk.Button(self, text="OK", command=self.destroy)

@@ -164,7 +164,9 @@ class PatchExecutableFrame(tk.Frame):
                 language = meta['Language']
                 dictionary = {entry['msgid']: entry['msgstr'] for entry in pofile}
 
-        dialog = DialogDoNotFixSpaces(self, self.config_section['fix_space_exclusions'], language, dictionary)
+        dialog = DialogDoNotFixSpaces(self, self.config_section['fix_space_exclusions'], dictionary,
+                                      default_language=language)
+
         exclusions = dialog.wait_result()
         self.exclusions = exclusions or self.config_section['fix_space_exclusions']
         self.config_section['fix_space_exclusions'] = self.exclusions
