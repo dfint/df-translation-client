@@ -12,7 +12,7 @@ class HighlightedSpacesItem:
     @staticmethod
     def highlight_spaces(s):
         parts = re.search(r'^(\s*)(.*?)(\s*)$', s)
-        return '\u2022' * len(parts.group(1)) + parts.group(2) + '\u2022' * len(parts.group(3))
+        return '•' * len(parts.group(1)) + parts.group(2) + '•' * len(parts.group(3))
 
     def __init__(self, value: str):
         self.value = value

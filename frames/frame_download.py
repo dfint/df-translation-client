@@ -200,7 +200,7 @@ class DownloadTranslationsFrame(tk.Frame):
         
         tk.Label(self, text='Password:').grid(column=0, row=2)
         
-        self.entry_password = Entry(self, show='\u2022')  # 'bullet' symbol
+        self.entry_password = Entry(self, show='•')
         self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
         
         button_connect = ttk.Button(self, text='Connect...', command=self.bt_connect)
