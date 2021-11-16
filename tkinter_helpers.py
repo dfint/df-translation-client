@@ -78,8 +78,7 @@ class Grid(AbstractContextManager):
         cells = row.add_cells(*args)
 
         if cells:
-            cell = cells[-1]
-            self.column = cell.grid_options["column"] + cell.grid_options["columnspan"]
+            self.column = 0
             self.row += 1
 
         return row
