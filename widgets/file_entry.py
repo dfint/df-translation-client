@@ -61,12 +61,12 @@ class FileEntry(tk.Frame):
         self.dialog_type = dialog_type
 
         self.button = ttk.Button(self, text=button_text, command=self._bt_browse)
-        self.button.pack(side='right')
+        self.button.pack(side='right', padx=2)
 
         self.entry = Entry(self)
         self.entry.text = self.default_path
         self._prev_value = self.default_path
-        self.entry.pack(fill='x', expand=1)
+        self.entry.pack(fill=tk.BOTH, expand=1)
         if self.on_change is not None:
             self.entry.bind('<KeyRelease>', func=self._on_entry_key_release)
 

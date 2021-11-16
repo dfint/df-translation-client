@@ -11,27 +11,28 @@ import requests
 from transifex.api import TransifexAPI, TransifexAPIException
 
 from config import Config
+from tkinter_helpers import Grid
 from widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from widgets.custom_widgets import Combobox, Entry, Listbox
 
 
 def downloader(conn, tx, project, language, resources, file_path_pattern):
-    exception_info = 'Everything is ok! (If you see this message, contact the developer)'
+    exception_info = "Everything is ok! (If you see this message, contact the developer)"
     for i, res in enumerate(resources):
-        conn.send((i, 'downloading...'))
+        conn.send((i, "downloading..."))
         for j in range(10):
             try:
-                tx.get_translation(project, res['slug'], language, file_path_pattern % res['slug'])
+                tx.get_translation(project, res["slug"], language, file_path_pattern % res["slug"])
                 break
-            except:
-                conn.send((i, 'retry... (%d)' % (10 - j)))
+            except Exception:
+                conn.send((i, "retry... (%d)" % (10 - j)))
                 exception_info = traceback.format_exc()
         else:
-            conn.send((i, 'failed'))
+            conn.send((i, "failed"))
             conn.send(exception_info)
             return
-        conn.send((i, 'ok!'))
-    conn.send((None, 'completed'))
+        conn.send((i, "ok!"))
+    conn.send((None, "completed"))
 
 
 class DownloadTranslationsFrame(tk.Frame):
@@ -41,29 +42,29 @@ class DownloadTranslationsFrame(tk.Frame):
         project = self.combo_projects.text
         try:
             # Todo: make connection in separate thread
-            self.tx = TransifexAPI(username, password, 'https://www.transifex.com')
-            assert self.tx.ping(), 'No connection to the server'
+            self.tx = TransifexAPI(username, password, "https://www.transifex.com")
+            assert self.tx.ping(), "No connection to the server"
             assert self.tx.project_exists(project), "Project %r does not exist" % project
             self.resources = self.tx.list_resources(project)
-            languages = self.tx.list_languages(project, resource_slug=self.resources[0]['slug'])
+            languages = self.tx.list_languages(project, resource_slug=self.resources[0]["slug"])
         except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
-            messagebox.showerror('Error', err)
-        except:
-            messagebox.showerror('Unexpected error', traceback.format_exc())
+            messagebox.showerror("Error", err)
+        except Exception:
+            messagebox.showerror("Unexpected error", traceback.format_exc())
         else:
             self.combo_languages.values = sorted(languages)
-            last_language = self.config_section.get('default_language', None)
+            last_language = self.config_section.get("default_language", None)
             if last_language and last_language in languages:
                 self.combo_languages.text = last_language
             else:
                 self.combo_languages.current(0)
             
             self.listbox_resources.clear()
-            self.listbox_resources.values = tuple(res['name'] for res in self.resources)
+            self.listbox_resources.values = tuple(res["name"] for res in self.resources)
             
-            self.config_section['username'] = username
+            self.config_section["username"] = username
 
-            recent_projects = self.config_section['recent_projects']
+            recent_projects = self.config_section["recent_projects"]
             if recent_projects or project != recent_projects[0]:
                 if project in recent_projects:
                     recent_projects.remove(project)
@@ -73,7 +74,7 @@ class DownloadTranslationsFrame(tk.Frame):
     def download_waiter(self, resources, language, project, download_dir, parent_conn=None,
                         initial_names=None, resource_names=None, i=0):
         if initial_names is None:
-            initial_names = [res['name'] for res in self.resources]
+            initial_names = [res["name"] for res in self.resources]
             resource_names = initial_names.copy()
 
         if self.download_process is None:
@@ -87,7 +88,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     project=project,
                     language=language,
                     resources=resources,
-                    file_path_pattern=str(Path(download_dir) / ('%s_' + language + '.po'))
+                    file_path_pattern=str(Path(download_dir) / ("%s_" + language + ".po"))
                 )
             )
             self.download_process.start()
@@ -96,40 +97,40 @@ class DownloadTranslationsFrame(tk.Frame):
             if parent_conn.poll():
                 i, message = parent_conn.recv()
             else:
-                i, message = i, 'stopped'
+                i, message = i, "stopped"
 
-            if message == 'completed':
+            if message == "completed":
                 # Everything is downloaded
                 self.download_process.join()
                 self.download_process = None
                 self.button_download.reset_state()
                 self.download_started = False
 
-                self.config_section['default_language'] = language
+                self.config_section["default_language"] = language
 
-                if sys.platform == 'win32':
-                    subprocess.Popen('explorer "%s"' % (download_dir.replace('/', '\\')))
+                if sys.platform == "win32":
+                    subprocess.Popen('explorer "%s"' % (download_dir.replace("/", "\\")))
                 else:
                     pass  # Todo: open the directory in a file manager on linux
 
                 return
 
-            resource_names[i] = '{} - {}'.format(initial_names[i], message)
+            resource_names[i] = "{} - {}".format(initial_names[i], message)
             self.listbox_resources.values = resource_names
             self.update()
 
-            if message == 'ok!':
+            if message == "ok!":
                 self.progressbar.step()
                 break
-            elif message == 'failed':
+            elif message == "failed":
                 error = parent_conn.recv()
                 self.download_process.join()
                 self.download_process = None
                 self.button_download.reset_state()
                 self.download_started = False
-                messagebox.showerror('Downloading error', error)
+                messagebox.showerror("Downloading error", error)
                 return
-            elif message == 'stopped':
+            elif message == "stopped":
                 self.download_process = None
                 self.button_download.reset_state()
                 self.download_started = False
@@ -141,24 +142,24 @@ class DownloadTranslationsFrame(tk.Frame):
     
     def bt_download(self):
         if self.tx and self.resources and not self.download_started:
-            self.progressbar['maximum'] = len(self.resources) * 1.001
-            self.progressbar['value'] = 0
+            self.progressbar["maximum"] = len(self.resources) * 1.001
+            self.progressbar["value"] = 0
             
             download_dir = self.fileentry_download_to.text
             if not download_dir:
-                messagebox.showwarning('Directory not specified', 'Specify download directory first')
+                messagebox.showwarning("Directory not specified", "Specify download directory first")
                 return
             else:
-                self.config_section['download_to'] = download_dir
+                self.config_section["download_to"] = download_dir
             
             if not Path(download_dir).exists():
-                messagebox.showerror('Directory does not exist', 'Specify existing directory first')
+                messagebox.showerror("Directory does not exist", "Specify existing directory first")
                 return
             
             project = self.combo_projects.get()
             language = self.combo_languages.get()
             
-            initial_names = [res['name'] for res in self.resources]
+            initial_names = [res["name"] for res in self.resources]
             resource_names = list(initial_names)
             
             self.listbox_resources.values = resource_names
@@ -167,8 +168,8 @@ class DownloadTranslationsFrame(tk.Frame):
             return True
 
     def bt_stop_downloading(self):
-        r = messagebox.showwarning('Are you sure?', 'Stop downloading?', type=messagebox.OKCANCEL)
-        if r == 'cancel':
+        r = messagebox.showwarning("Are you sure?", "Stop downloading?", type=messagebox.OKCANCEL)
+        if r == "cancel":
             return False
         else:
             self.download_process.terminate()
@@ -182,72 +183,60 @@ class DownloadTranslationsFrame(tk.Frame):
         super().__init__(master)
         
         self.config_section = config.init_section(
-            section_name='download_translations',
-            defaults=dict(recent_projects=['dwarf-fortress'])
+            section_name="download_translations",
+            defaults=dict(recent_projects=["dwarf-fortress"])
         )
 
-        tk.Label(self, text='Transifex project:').grid()
+        with Grid(self, sticky=tk.EW, padx=3, pady=3) as grid:
+            self.combo_projects = Combobox(values=self.config_section["recent_projects"])
+            self.combo_projects.current(0)
+            grid.add_row("Transifex project:", self.combo_projects)
 
-        self.combo_projects = Combobox(self, values=self.config_section['recent_projects'])
-        self.combo_projects.current(0)
-        self.combo_projects.grid(column=1, row=0, sticky=tk.W + tk.E)
-        
-        tk.Label(self, text='Username:').grid(column=0, row=1)
-        
-        self.entry_username = Entry(self)
-        self.entry_username.text = self.config_section.get('username', '')
-        self.entry_username.grid(column=1, row=1, sticky=tk.W + tk.E)
-        
-        tk.Label(self, text='Password:').grid(column=0, row=2)
-        
-        self.entry_password = Entry(self, show='•')
-        self.entry_password.grid(column=1, row=2, sticky=tk.W + tk.E)
-        
-        button_connect = ttk.Button(self, text='Connect...', command=self.bt_connect)
-        button_connect.grid(row=0, column=2, rowspan=3, sticky=tk.N + tk.S + tk.W + tk.E)
-        
-        ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
-        
-        tk.Label(self, text='Choose default_language:').grid(column=0)
-        
-        self.combo_languages = Combobox(self)
-        self.combo_languages.grid(column=1, row=4, sticky=tk.W + tk.E)
-        
-        # self.chk_all_languages = CheckbuttonVar(self, text='All languages (backup)')
-        # self.chk_all_languages.grid(column=1)
-        
-        ttk.Separator(self, orient=tk.HORIZONTAL).grid(columnspan=3, sticky=tk.W + tk.E, pady=5)
-        
-        tk.Label(self, text='Download to:').grid()
-        
-        self.fileentry_download_to = FileEntry(
-            self,
-            dialog_type='askdirectory',
-            default_path=self.config_section.get('download_to', ''),
-            on_change=lambda text: self.config_section.check_and_save_path('download_to', text),
-        )
-        
-        self.fileentry_download_to.grid(column=1, row=6, columnspan=2, sticky=tk.EW)
-        
-        self.button_download = TwoStateButton(self, text='Download translations', command=self.bt_download,
-                                              text2='Stop', command2=self.bt_stop_downloading)
-        self.button_download.grid(sticky=tk.EW)
-        
-        self.progressbar = ttk.Progressbar(self)
-        self.progressbar.grid(column=1, row=7, columnspan=2, sticky=tk.EW)
-        
-        tk.Label(self, text='Resources:').grid(columnspan=3)
+            self.entry_username = Entry()
+            self.entry_username.text = self.config_section.get("username", "")
+            grid.add_row("Username:", self.entry_username)
 
-        scrollbar_frame = ScrollbarFrame(self, Listbox, show_scrollbars=tk.VERTICAL)
-        scrollbar_frame.grid(column=0, columnspan=3, sticky=tk.NSEW)
-        self.listbox_resources: Listbox = scrollbar_frame.widget
+            self.entry_password = Entry(show="•")
+            grid.add_row("Password:", self.entry_password)
 
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(9, weight=1)
+            button_connect = ttk.Button(text="Connect...", command=self.bt_connect)
+            grid.add(button_connect, row=0, column=2, rowspan=3, sticky=tk.NSEW)
+
+            grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
+
+            self.combo_languages = Combobox()
+            grid.add_row("Choose default_language:", self.combo_languages)
+
+            grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
+
+            self.fileentry_download_to = FileEntry(
+                self,
+                dialog_type="askdirectory",
+                default_path=self.config_section.get("download_to", ""),
+                on_change=lambda text: self.config_section.check_and_save_path("download_to", text),
+            )
+            grid.add_row("Download to:", self.fileentry_download_to, ...)
+
+            self.button_download = TwoStateButton(self, text="Download translations", command=self.bt_download,
+                                                  text2="Stop", command2=self.bt_stop_downloading)
+
+            self.progressbar = ttk.Progressbar(self)
+
+            grid.add_row(self.button_download, self.progressbar, ...)
+
+            grid.add_row(tk.Label(text="Resources:"), ..., ...)
+
+            scrollbar_frame = ScrollbarFrame(self, Listbox, show_scrollbars=tk.VERTICAL)
+            grid.add(scrollbar_frame, column=0, columnspan=3, sticky=tk.NSEW)
+
+            self.listbox_resources: Listbox = scrollbar_frame.widget
+
+            grid.columnconfigure(1, weight=1)
+            grid.rowconfigure(grid.row, weight=1)
 
         self.resources = None
         self.tx = None
         self.download_started = False
         self.download_process = None
 
-        self.bind('<Destroy>', self.kill_processes)
+        self.bind("<Destroy>", self.kill_processes)
