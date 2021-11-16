@@ -294,8 +294,7 @@ class PatchExecutableFrame(tk.Frame):
 
             if debug:
                 self.debug_frame = DebugFrame(dictionary=self.dictionary)
-                grid.add_row(Cell(self.debug_frame, sticky=tk.NSEW, columnspan=3))
-                grid.rowconfigure(grid.row-1, weight=1)
+                grid.add_row(Cell(self.debug_frame, sticky=tk.NSEW, columnspan=3)).configure(weight=1)
             else:
                 self.debug_frame = None
 
@@ -319,9 +318,7 @@ class PatchExecutableFrame(tk.Frame):
                                              widget_args=dict(width=48, height=8, enabled=False),
                                              show_scrollbars=tk.VERTICAL)
 
-            grid.add_row(Cell(scrollbar_frame, columnspan=3, sticky=tk.NSEW))
-
-            grid.rowconfigure(scrollbar_frame.grid_info()["row"], weight=1)
+            grid.add_row(Cell(scrollbar_frame, columnspan=3, sticky=tk.NSEW)).configure(weight=1)
 
             self.log_field: Text = scrollbar_frame.widget
 

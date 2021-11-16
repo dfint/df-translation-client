@@ -11,7 +11,7 @@ import requests
 from transifex.api import TransifexAPI, TransifexAPIException
 
 from config import Config
-from tkinter_helpers import Grid
+from tkinter_helpers import Grid, Cell
 from widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from widgets.custom_widgets import Combobox, Entry, Listbox
 
@@ -227,12 +227,11 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.add_row(tk.Label(text="Resources:"), ..., ...)
 
             scrollbar_frame = ScrollbarFrame(self, Listbox, show_scrollbars=tk.VERTICAL)
-            grid.add(scrollbar_frame, column=0, columnspan=3, sticky=tk.NSEW)
+            grid.add_row(Cell(scrollbar_frame, column=0, columnspan=3, sticky=tk.NSEW)).configure(weight=1)
 
             self.listbox_resources: Listbox = scrollbar_frame.widget
 
             grid.columnconfigure(1, weight=1)
-            grid.rowconfigure(grid.row, weight=1)
 
         self.resources = None
         self.tx = None

@@ -18,24 +18,13 @@ class Cell:
         self.grid_options['columnspan'] = columnspan
 
 
-class Grid(AbstractContextManager):
-    def __init__(self, parent=None, **kwargs):
+class Row:
+    def __init__(self, parent, index, grid_options):
         self.parent = parent
-        self.row = 0
-        self.column = 0
-        self.grid_options = kwargs
+        self.index = index
+        self.grid_options = grid_options
 
-    def add(self, widget, columnspan=1, **kwargs):
-        grid_options = dict(self.grid_options)
-        grid_options.update(dict(row=self.row, column=self.column))
-        grid_options.update(kwargs)
-
-        widget.grid(columnspan=columnspan,
-                    **grid_options)
-
-        self.column += columnspan
-
-    def add_row(self, *args: Union[str, type(...), Cell, tk.Widget]):
+    def add_cells(self, *args: Union[str, type(...), Cell, tk.Widget]):
         cells: List[Cell] = list()
 
         column = 0
@@ -59,12 +48,41 @@ class Grid(AbstractContextManager):
         for cell in cells:
             grid_options = dict(self.grid_options)
             grid_options.update(cell.grid_options)
-            cell.widget.grid(row=self.row, **grid_options)
+            cell.widget.grid(row=self.index, **grid_options)
+
+        return cells
+
+    def configure(self, **kwargs):
+        self.parent.grid_rowconfigure(self.index, **kwargs)
+
+
+class Grid(AbstractContextManager):
+    def __init__(self, parent=None, **kwargs):
+        self.parent = parent
+        self.row = 0
+        self.column = 0
+        self.grid_options = kwargs
+
+    def add(self, widget, columnspan=1, **kwargs):
+        grid_options = dict(self.grid_options)
+        grid_options.update(dict(row=self.row, column=self.column))
+        grid_options.update(kwargs)
+
+        widget.grid(columnspan=columnspan,
+                    **grid_options)
+
+        self.column += columnspan
+
+    def add_row(self, *args: Union[str, type(...), Cell, tk.Widget]) -> Row:
+        row = Row(self.parent, self.row, self.grid_options)
+        cells = row.add_cells(*args)
 
         if cells:
             cell = cells[-1]
             self.column = cell.grid_options["column"] + cell.grid_options["columnspan"]
             self.row += 1
+
+        return row
 
     def __enter__(self) -> "Grid":
         self._old_root = tk._default_root
