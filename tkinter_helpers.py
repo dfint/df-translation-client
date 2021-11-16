@@ -12,9 +12,10 @@ def set_parent(new_parent):
 
 
 class Cell:
-    def __init__(self, widget=None, **grid_options):
+    def __init__(self, widget=None, columnspan=1, **grid_options):
         self.widget = widget
         self.grid_options = grid_options
+        self.grid_options['columnspan'] = columnspan
 
 
 class Grid(AbstractContextManager):
@@ -65,7 +66,7 @@ class Grid(AbstractContextManager):
             self.column = cell.grid_options["column"] + cell.grid_options["columnspan"]
             self.row += 1
 
-    def __enter__(self):
+    def __enter__(self) -> "Grid":
         self._old_root = tk._default_root
         tk._default_root = self.parent
         return self
