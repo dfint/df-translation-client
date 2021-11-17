@@ -3,22 +3,27 @@ from contextlib import AbstractContextManager, contextmanager
 from typing import List, Union, Mapping, Any, Optional, Generic, TypeVar
 
 
-def get_default_root():
-    return tk._default_root
+class DefaultRootWrapper:
+    @property
+    def default_root(self):
+        return tk._default_root
+
+    @default_root.setter
+    def default_root(self, value):
+        tk._default_root = value
 
 
-def set_default_root(value):
-    tk._default_root = value
+default_root_wrapper = DefaultRootWrapper()
 
 
 @contextmanager
 def set_parent(new_parent):
-    old_root = get_default_root()
-    set_default_root(new_parent)
+    old_root = default_root_wrapper.default_root
+    default_root_wrapper.default_root = new_parent
     try:
         yield new_parent
     finally:
-        set_default_root(old_root)
+        default_root_wrapper.default_root = old_root
 
 
 T = TypeVar("T")
@@ -28,12 +33,12 @@ class ParentSetter(AbstractContextManager, Generic[T]):
     parent: tk.Widget
 
     def __enter__(self) -> T:
-        self._old_root = get_default_root()
-        set_default_root(self.parent)
+        self._old_root = default_root_wrapper.default_root
+        default_root_wrapper.default_root = self.parent
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        set_default_root(self._old_root)
+        default_root_wrapper.default_root = self._old_root
 
 
 class GridCell:
