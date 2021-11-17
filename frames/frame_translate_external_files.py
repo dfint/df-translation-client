@@ -157,8 +157,6 @@ class TranslateExternalFiles(tk.Frame):
             grid.add_row("Translation files' directory:", self.file_entry_translation_files)
 
             self.combo_language = Combobox()
-            self.combo_language.grid(row=2, column=1, sticky="WE")
-
             grid.add_row("Language:", self.combo_language)
 
             directory = Path(self.file_entry_translation_files.text)
