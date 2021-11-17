@@ -1,6 +1,6 @@
 import pytest
 
-from tkinter_helpers import Packer, set_parent, ParentSetter, Grid
+from tkinter_helpers import Packer, set_parent, ParentSetter, Grid, GridCell, Row
 
 
 @pytest.mark.parametrize("context_manager", [set_parent, ParentSetter, Grid, Packer])
@@ -37,3 +37,26 @@ def test_packer(mocker):
             raise ValueError
 
     assert default_root_wrapper.default_root == old_default_root
+
+
+def test_grid_cell(mocker):
+    widget = mocker.Mock(name="widget")
+
+    options = dict(column=1, row=2, rowspan=1, columnspan=1, sticky="nswe")
+    cell = GridCell(widget, **options)
+    cell.grid()
+    widget.grid.assert_called_with(**options)
+
+    cell.grid(sticky="ns")
+    widget.grid.assert_called_with(**options)  # initial options override arguments of .grid()
+
+
+def test_row(mocker):
+    mocker.patch("tkinter.Label", mocker.Mock(name="Label"))
+
+    row = Row(mocker.Mock(name="parent"), index=0, grid_options=dict(sticky="nswe", padx=5, pady=5))
+    cells = row.add_cells(..., "Test", ...,
+                          GridCell(mocker.Mock(name="Entry"), columnspan=3),
+                          mocker.Mock(name="Button"))
+
+    assert [(cell.column, cell.columnspan) for cell in cells] == [(1, 2), (3, 3), (6, 1)]
