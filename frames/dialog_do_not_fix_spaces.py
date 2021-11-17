@@ -88,7 +88,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
 
-        with Grid(self, sticky=tk.NSEW) as grid:
+        with Grid(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
             with set_parent(tk.Frame()) as language_frame:
                 tk.Label(text='Language:').pack(side=tk.LEFT)
                 self.combo_language = Combobox(values=language_list)
