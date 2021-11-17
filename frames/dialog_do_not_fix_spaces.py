@@ -2,8 +2,9 @@ import re
 import tkinter as tk
 from copy import deepcopy
 from tkinter import ttk as ttk
-from typing import MutableMapping, List, Mapping
+from typing import MutableMapping, List, Mapping, Optional
 
+from tkinter_helpers import set_parent, Grid
 from widgets import ScrollbarFrame
 from widgets.custom_widgets import Listbox, Combobox, Entry
 
@@ -22,6 +23,15 @@ class HighlightedSpacesItem:
 
 
 class DialogDoNotFixSpaces(tk.Toplevel):
+    combo_language: Combobox
+    listbox_exclusions: Listbox[HighlightedSpacesItem]
+
+    entry_filter: Entry
+    listbox_exclusions_hints: Listbox[HighlightedSpacesItem]
+
+    exclusions: Optional[MutableMapping[str, List[str]]]
+    strings: List[str]
+
     def update_listbox_exclusions(self):
         exclusions = self.exclusions.get(self.combo_language.text, list())
         self.listbox_exclusions.values = sorted(map(HighlightedSpacesItem, exclusions), key=lambda x: x.value)
@@ -31,7 +41,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         self.update_listbox_exclusions_hints()
 
     def update_listbox_exclusions_hints(self):
-        text: str = self.entry_search.text.casefold()
+        text: str = self.entry_filter.text.casefold()
         values = (HighlightedSpacesItem(string) for string in self.strings if text in string.casefold())
         self.listbox_exclusions_hints.values = values
 
@@ -62,7 +72,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         super().__init__(parent, *args, **kwargs)
         self.grab_set()
 
-        self.exclusions: MutableMapping[str, List[str]] = dict(deepcopy(exclusions))
+        self.exclusions = dict(deepcopy(exclusions))
 
         self.title("Choose exclusions")
 
@@ -74,67 +84,56 @@ class DialogDoNotFixSpaces(tk.Toplevel):
                 language_list.remove(default_language)
             language_list.insert(0, default_language)
 
-        self.language = default_language
-
-        self.dictionary = dictionary or dict()
-        self.strings = sorted((key for key in self.dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
+        dictionary = dictionary or dict()
+        self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
 
-        parent_frame = tk.Frame(self)
-        tk.Label(parent_frame, text='Language:').pack(side=tk.LEFT)
+        with Grid(self, sticky=tk.NSEW) as grid:
+            with set_parent(tk.Frame()) as language_frame:
+                tk.Label(text='Language:').pack(side=tk.LEFT)
+                self.combo_language = Combobox(values=language_list)
+                self.combo_language.pack(fill='both', expand=1)
+                self.combo_language.current(0)
+                self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
+                self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
 
-        self.combo_language = Combobox(parent_frame, values=language_list)
+            with set_parent(tk.Frame()) as filter_frame:
+                tk.Label(text='Filter:').pack(side=tk.LEFT)
+                self.entry_filter = Entry()
+                self.entry_filter.bind('<Any-KeyRelease>', self.entry_search_key_release)
+                self.entry_filter.pack(fill='both', expand=1)
 
-        self.combo_language.pack(fill='both', expand=1)
-        parent_frame.grid(sticky=tk.W+tk.E)
+            grid.add_row(language_frame, filter_frame)
 
-        self.combo_language.current(0)
-        self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
-        self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
+            grid.add_row(ttk.Button(text='-- Remove selected --', command=self.bt_remove_selected),
+                         ttk.Button(text='<< Add selected <<', command=self.bt_add_selected))
 
-        bt = ttk.Button(self, text='-- Remove selected --', command=self.bt_remove_selected)
-        bt.grid(column=0, row=1, sticky=tk.EW)
+            scrollable_listbox_exclusions = ScrollbarFrame(widget_factory=Listbox,
+                                                           widget_args=dict(width=40, height=20),
+                                                           show_scrollbars=tk.VERTICAL)
 
-        scrollable_listbox = ScrollbarFrame(self, Listbox, widget_args=dict(width=40, height=20),
-                                            show_scrollbars=tk.VERTICAL)
-        scrollable_listbox.grid(sticky=tk.NSEW)
+            self.listbox_exclusions = scrollable_listbox_exclusions.widget
+            self.update_listbox_exclusions()
 
-        self.listbox_exclusions: Listbox[HighlightedSpacesItem] = scrollable_listbox.widget
+            scrollable_listbox_hints = ScrollbarFrame(widget_factory=Listbox,
+                                                      widget_args=dict(width=40, height=20),
+                                                      show_scrollbars=tk.VERTICAL)
 
-        self.update_listbox_exclusions()
+            self.listbox_exclusions_hints = scrollable_listbox_hints.widget
+            self.update_listbox_exclusions_hints()
 
-        parent_frame = tk.Frame(self)
-        tk.Label(parent_frame, text='Filter:').pack(side=tk.LEFT)
+            grid.add_row(scrollable_listbox_exclusions,
+                         scrollable_listbox_hints).configure(weight=1)
 
-        self.entry_search = Entry(parent_frame)
-        self.entry_search.bind('<Any-KeyRelease>', self.entry_search_key_release)
-        self.entry_search.pack(fill='both', expand=1)
+            grid.add_row(ttk.Button(text="OK", command=self.destroy),
+                         ttk.Button(text="Cancel", command=self.cancel))
 
-        parent_frame.grid(column=1, row=0, sticky=tk.W+tk.E)
+            grid.columnconfigure(0, weight=1)
+            grid.columnconfigure(1, weight=1)
 
-        bt = ttk.Button(self, text='<< Add selected <<', command=self.bt_add_selected)
-        bt.grid(column=1, row=1, sticky=tk.W+tk.E)
-
-        scrollbar_frame = ScrollbarFrame(self, Listbox, widget_args=dict(width=40, height=20),
-                                         show_scrollbars=tk.VERTICAL)
-        scrollbar_frame.grid(column=1, row=2, sticky=tk.NSEW)
-
-        self.listbox_exclusions_hints: Listbox[HighlightedSpacesItem] = scrollbar_frame.widget
-        self.update_listbox_exclusions_hints()
-
-        button = ttk.Button(self, text="OK", command=self.destroy)
-        button.grid(row=3, column=0)
-
-        def cancel():
-            self.exclusions = None
-            self.destroy()
-
-        button = ttk.Button(self, text="Cancel", command=cancel)
-        button.grid(row=3, column=1)
-
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
+    def cancel(self):
+        self.exclusions = None
+        self.destroy()
 
     def wait_result(self):
         self.wait_window()
