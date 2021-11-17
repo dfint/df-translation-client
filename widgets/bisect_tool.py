@@ -11,7 +11,7 @@ class BisectTool(tk.Frame):
         super().__init__(*args, **kwargs)
         self._strings = strings
 
-        with Grid(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
+        with Grid(self, sticky=tk.NSEW, pady=2) as grid:
             self.tree = tree = ttk.Treeview()
             tree["columns"] = ("start", "end", "strings")
             tree["displaycolumns"] = tree["columns"][-1]
@@ -22,12 +22,12 @@ class BisectTool(tk.Frame):
                 self.insert_node(start=0, end=len(strings)-1)
 
             # TODO: Rewrite using ScrollableFrame
-            vertical_scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=tree.yview)
+            vertical_scroll = ttk.Scrollbar(orient=tk.VERTICAL, command=tree.yview)
             tree.configure(yscrollcommand=vertical_scroll.set)
 
             grid.add_row(tree, Cell(vertical_scroll, sticky=tk.NS)).configure(weight=1)
 
-            with set_parent(tk.Frame(self)) as toolbar:
+            with set_parent(tk.Frame()) as toolbar:
                 ttk.Button(text="Split",
                            command=self.split_selected_node).pack(side='left')
 
