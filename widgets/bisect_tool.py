@@ -1,45 +1,48 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from operator import itemgetter
 from itertools import islice
+from operator import itemgetter
+
+from tkinter_helpers import set_parent, Grid, Cell
 
 
 class BisectTool(tk.Frame):
     def __init__(self, *args, strings=None, **kwargs):
         super().__init__(*args, **kwargs)
         self._strings = strings
-        self.tree = tree = ttk.Treeview(self)
-        tree.grid(sticky='nswe')
-        tree["columns"] = ("start", "end", "strings")
-        tree["displaycolumns"] = tree["columns"][-1]
-        tree.heading('#0', text='Tree')
-        tree.heading('#1', text='Strings')
 
-        if strings:
-            self.insert_node(start=0, end=len(strings)-1)
+        with Grid(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
+            self.tree = tree = ttk.Treeview()
+            tree["columns"] = ("start", "end", "strings")
+            tree["displaycolumns"] = tree["columns"][-1]
+            tree.heading('#0', text='Tree')
+            tree.heading('#1', text='Strings')
 
-        vertical_scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=tree.yview)
-        tree.configure(yscrollcommand=vertical_scroll.set)
-        vertical_scroll.grid(row=0, column=1, sticky='ns')
-        
-        toolbar = tk.Frame(self)
+            if strings:
+                self.insert_node(start=0, end=len(strings)-1)
 
-        ttk.Button(toolbar, text="Split",
-                   command=self.split_selected_node).pack(side='left')
+            # TODO: Rewrite using ScrollableFrame
+            vertical_scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=tree.yview)
+            tree.configure(yscrollcommand=vertical_scroll.set)
 
-        ttk.Button(toolbar, text="Mark as bad",
-                   command=lambda: self.mark_selected_node(background='orange')).pack(side='left')
+            grid.add_row(tree, Cell(vertical_scroll, sticky=tk.NS)).configure(weight=1)
 
-        ttk.Button(toolbar, text="Mark as good",
-                   command=lambda: self.mark_selected_node(background='lightgreen')).pack(side='left')
+            with set_parent(tk.Frame(self)) as toolbar:
+                ttk.Button(text="Split",
+                           command=self.split_selected_node).pack(side='left')
 
-        ttk.Button(toolbar, text="Clear mark",
-                   command=lambda: self.mark_selected_node(background='white')).pack(side='left')
+                ttk.Button(text="Mark as bad",
+                           command=lambda: self.mark_selected_node(background='orange')).pack(side='left')
 
-        toolbar.grid()
+                ttk.Button(text="Mark as good",
+                           command=lambda: self.mark_selected_node(background='lightgreen')).pack(side='left')
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+                ttk.Button(text="Clear mark",
+                           command=lambda: self.mark_selected_node(background='white')).pack(side='left')
+
+                grid.add_row(toolbar, ...)
+
+            grid.columnconfigure(0, weight=1)
 
     def insert_node(self, parent_node='', index='end', start=0, end=0):
         if start == end:
