@@ -28,7 +28,7 @@ class BisectTool(tk.Frame):
             grid.add_row(tree, Cell(vertical_scroll, sticky=tk.NS)).configure(weight=1)
 
             with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
-                toolbar.add_all(
+                toolbar.pack_all(
                     ttk.Button(text="Split", command=self.split_selected_node),
                     ttk.Button(text="Mark as bad", command=lambda: self.mark_selected_node(background='orange')),
                     ttk.Button(text="Mark as good", command=lambda: self.mark_selected_node(background='lightgreen')),

@@ -186,7 +186,7 @@ class TranslateExternalFiles(tk.Frame):
             self.update_listbox_translation_files(language=self.combo_language.text)
 
             with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as buttons:
-                buttons.add_all(
+                buttons.pack_all(
                     ttk.Button(text="Search", command=self.bt_search),
                     ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True))
                 )

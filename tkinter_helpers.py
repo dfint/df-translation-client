@@ -118,7 +118,7 @@ class Packer(AbstractContextManager):
         self.column = 0
         self.options = kwargs
 
-    def add_all(self, *args: tk.Widget):
+    def pack_all(self, *args: tk.Widget):
         for item in args:
             item.pack(**self.options)
 
