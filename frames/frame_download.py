@@ -210,23 +210,22 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
 
             self.fileentry_download_to = FileEntry(
-                self,
                 dialog_type="askdirectory",
                 default_path=self.config_section.get("download_to", ""),
                 on_change=lambda text: self.config_section.check_and_save_path("download_to", text),
             )
             grid.add_row("Download to:", self.fileentry_download_to, ...)
 
-            self.button_download = TwoStateButton(self, text="Download translations", command=self.bt_download,
+            self.button_download = TwoStateButton(text="Download translations", command=self.bt_download,
                                                   text2="Stop", command2=self.bt_stop_downloading)
 
-            self.progressbar = ttk.Progressbar(self)
+            self.progressbar = ttk.Progressbar()
 
             grid.add_row(self.button_download, self.progressbar, ...)
 
             grid.add_row(tk.Label(text="Resources:"), ..., ...)
 
-            scrollbar_frame = ScrollbarFrame(self, Listbox, show_scrollbars=tk.VERTICAL)
+            scrollbar_frame = ScrollbarFrame(widget_factory=Listbox, show_scrollbars=tk.VERTICAL)
             grid.add_row(GridCell(scrollbar_frame, columnspan=3, sticky=tk.NSEW)).configure(weight=1)
 
             self.listbox_resources: Listbox = scrollbar_frame.widget

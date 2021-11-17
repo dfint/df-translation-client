@@ -314,7 +314,7 @@ class PatchExecutableFrame(tk.Frame):
 
             # ------------------------------------------------------------------------------------------
 
-            scrollbar_frame = ScrollbarFrame(self, Text,
+            scrollbar_frame = ScrollbarFrame(widget_factory=Text,
                                              widget_args=dict(width=48, height=8, enabled=False),
                                              show_scrollbars=tk.VERTICAL)
 

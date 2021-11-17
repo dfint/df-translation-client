@@ -10,14 +10,14 @@ class ScrollbarFrame(tk.Frame, Generic[TWidget]):
     """
     A frame with scrollbars which can be added to any widget which supports scrolling (eg. Text, Listbox, Entry, etc.)
     """
-    def __init__(self, parent=None,
+    def __init__(self, *args,
                  widget_factory: Callable[..., TWidget] = None,
                  widget_args: Mapping[str, Any] = None,
                  show_scrollbars=tk.BOTH,
                  scrollbar: Callable[..., Union[tk.Scrollbar, ttk.Scrollbar]] = ttk.Scrollbar,
                  **kwargs):
         
-        super().__init__(parent, **kwargs)
+        super().__init__(*args, **kwargs)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         
