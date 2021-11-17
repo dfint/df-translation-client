@@ -6,3 +6,4 @@ venv
 *.pot
 *.mo
 .df-translate.json
+.coverage
