@@ -11,7 +11,7 @@ from dfrus.patch_charmap import get_codepages
 from natsort import natsorted
 
 from config import Config
-from tkinter_helpers import Grid
+from tkinter_helpers import Grid, Packer
 from widgets import FileEntry, ScrollbarFrame
 from widgets.custom_widgets import Combobox, Listbox
 from .frame_patch import filter_codepages
@@ -185,12 +185,11 @@ class TranslateExternalFiles(tk.Frame):
             self.listbox_translation_files: Listbox = scrollbar_frame.widget
             self.update_listbox_translation_files(language=self.combo_language.text)
 
-            with Grid(tk.Frame(), sticky=tk.EW, padx=1) as buttons:
-                buttons.add_row(ttk.Button(text="Search", command=self.bt_search),
-                                ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True)))
-
-                buttons.columnconfigure(0, weight=1)
-                buttons.columnconfigure(1, weight=1)
+            with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as buttons:
+                buttons.add_all(
+                    ttk.Button(text="Search", command=self.bt_search),
+                    ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True))
+                )
 
                 grid.add_row(buttons.parent, ...)
 

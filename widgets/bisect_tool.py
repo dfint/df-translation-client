@@ -3,7 +3,7 @@ import tkinter.ttk as ttk
 from itertools import islice
 from operator import itemgetter
 
-from tkinter_helpers import set_parent, Grid, Cell
+from tkinter_helpers import Grid, Cell, Packer
 
 
 class BisectTool(tk.Frame):
@@ -27,20 +27,15 @@ class BisectTool(tk.Frame):
 
             grid.add_row(tree, Cell(vertical_scroll, sticky=tk.NS)).configure(weight=1)
 
-            with set_parent(tk.Frame()) as toolbar:
-                ttk.Button(text="Split",
-                           command=self.split_selected_node).pack(side='left')
+            with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
+                toolbar.add_all(
+                    ttk.Button(text="Split", command=self.split_selected_node),
+                    ttk.Button(text="Mark as bad", command=lambda: self.mark_selected_node(background='orange')),
+                    ttk.Button(text="Mark as good", command=lambda: self.mark_selected_node(background='lightgreen')),
+                    ttk.Button(text="Clear mark", command=lambda: self.mark_selected_node(background='white')),
+                )
 
-                ttk.Button(text="Mark as bad",
-                           command=lambda: self.mark_selected_node(background='orange')).pack(side='left')
-
-                ttk.Button(text="Mark as good",
-                           command=lambda: self.mark_selected_node(background='lightgreen')).pack(side='left')
-
-                ttk.Button(text="Clear mark",
-                           command=lambda: self.mark_selected_node(background='white')).pack(side='left')
-
-                grid.add_row(toolbar, ...)
+                grid.add_row(toolbar.parent, ...)
 
             grid.columnconfigure(0, weight=1)
 

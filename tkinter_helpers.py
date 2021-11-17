@@ -109,3 +109,23 @@ class Grid(AbstractContextManager):
 
     def rowconfigure(self, i, *args, **kwargs):
         self.parent.grid_rowconfigure(i, *args, **kwargs)
+
+
+class Packer(AbstractContextManager):
+    def __init__(self, parent=None, **kwargs):
+        self.parent = parent
+        self.row = 0
+        self.column = 0
+        self.options = kwargs
+
+    def add_all(self, *args: tk.Widget):
+        for item in args:
+            item.pack(**self.options)
+
+    def __enter__(self) -> "Packer":
+        self._old_root = tk._default_root
+        tk._default_root = self.parent
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        tk._default_root = self._old_root
