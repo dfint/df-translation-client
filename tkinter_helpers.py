@@ -15,7 +15,15 @@ class Cell:
     def __init__(self, widget=None, columnspan=1, **grid_options):
         self.widget = widget
         self.grid_options = grid_options
-        self.grid_options['columnspan'] = columnspan
+        self.grid_options["columnspan"] = columnspan
+
+    @property
+    def columnspan(self):
+        return self.grid_options["columnspan"]
+
+    @columnspan.setter
+    def columnspan(self, value):
+        self.grid_options["columnspan"] = value
 
 
 class Row:
@@ -35,14 +43,14 @@ class Row:
                 # or acts as a placeholder for an empty cell if there is no non-empty cells
                 # to the left in the current row
                 if cells:
-                    cells[-1].grid_options["columnspan"] += 1
+                    cells[-1].columnspan += 1
                 cell = None
             elif isinstance(item, str):
                 cell = Cell(tk.Label(self.parent, text=item), column=column, columnspan=1, sticky=tk.W)
             elif isinstance(item, Cell):
                 item.grid_options["column"] = column
                 cell = item
-                column_span = item.grid_options['columnspan']
+                column_span = item.columnspan
             else:
                 cell = Cell(item, column=column, columnspan=1)
 
