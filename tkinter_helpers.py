@@ -29,7 +29,11 @@ class Row:
 
         column = 0
         for item in args:
+            column_span = 1
             if item is ...:
+                # Ellipsis argument doesn't create a new cell, but just enlarges columnspan of the previous cell
+                # or acts as a placeholder for an empty cell if there is no non-empty cells
+                # to the left in the current row
                 if cells:
                     cells[-1].grid_options["columnspan"] += 1
                 cell = None
@@ -38,10 +42,11 @@ class Row:
             elif isinstance(item, Cell):
                 item.grid_options["column"] = column
                 cell = item
+                column_span = item.grid_options['columnspan']
             else:
                 cell = Cell(item, column=column, columnspan=1)
 
-            column += 1
+            column += column_span
             if cell:
                 cells.append(cell)
 
