@@ -3,7 +3,8 @@ import tkinter.ttk as ttk
 from itertools import islice
 from operator import itemgetter
 
-from tkinter_helpers import Grid, GridCell, Packer
+from tkinter_helpers import Grid, Packer
+from .scrollbar_frame import ScrollbarFrame
 
 
 class BisectTool(tk.Frame):
@@ -12,7 +13,9 @@ class BisectTool(tk.Frame):
         self._strings = strings
 
         with Grid(self, sticky=tk.NSEW, pady=2) as grid:
-            self.tree = tree = ttk.Treeview()
+            scrollbar_frame = ScrollbarFrame(widget_factory=ttk.Treeview,
+                                             show_scrollbars=tk.VERTICAL)
+            self.tree = tree = scrollbar_frame.widget
             tree["columns"] = ("start", "end", "strings")
             tree["displaycolumns"] = tree["columns"][-1]
             tree.heading('#0', text='Tree')
@@ -21,11 +24,7 @@ class BisectTool(tk.Frame):
             if strings:
                 self.insert_node(start=0, end=len(strings)-1)
 
-            # TODO: Rewrite using ScrollableFrame
-            vertical_scroll = ttk.Scrollbar(orient=tk.VERTICAL, command=tree.yview)
-            tree.configure(yscrollcommand=vertical_scroll.set)
-
-            grid.add_row(tree, GridCell(vertical_scroll, sticky=tk.NS)).configure(weight=1)
+            grid.add_row(scrollbar_frame).configure(weight=1)
 
             with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
                 toolbar.pack_all(
@@ -35,7 +34,7 @@ class BisectTool(tk.Frame):
                     ttk.Button(text="Clear mark", command=lambda: self.mark_selected_node(background='white')),
                 )
 
-                grid.add_row(toolbar.parent, ...)
+                grid.add_row(toolbar.parent)
 
             grid.columnconfigure(0, weight=1)
 
