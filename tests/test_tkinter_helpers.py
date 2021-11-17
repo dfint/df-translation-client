@@ -1,9 +1,10 @@
 import pytest
 
-from tkinter_helpers import Packer, set_parent
+from tkinter_helpers import Packer, set_parent, ParentSetter, Grid
 
 
-def test_set_parent(mocker):
+@pytest.mark.parametrize("context_manager", [set_parent, ParentSetter, Grid, Packer])
+def test_context_managers(context_manager, mocker):
     default_root_wrapper = mocker.Mock()
     mocker.patch("tkinter_helpers.default_root_wrapper", default_root_wrapper)
 
@@ -11,8 +12,9 @@ def test_set_parent(mocker):
     default_root_wrapper.default_root = old_default_root
 
     with pytest.raises(ValueError):
-        with set_parent(mocker.Mock(name="parent")) as parent:
-            assert default_root_wrapper.default_root == parent
+        with context_manager(mocker.Mock(name="parent")) as obj:
+            assert (default_root_wrapper.default_root == obj  # case for set_parent
+                    or default_root_wrapper.default_root == obj.parent)
             raise ValueError
 
     assert default_root_wrapper.default_root == old_default_root

@@ -32,6 +32,9 @@ T = TypeVar("T")
 class ParentSetter(AbstractContextManager, Generic[T]):
     parent: tk.Widget
 
+    def __init__(self, parent: tk.Widget):
+        self.parent = parent
+
     def __enter__(self) -> T:
         self._old_root = default_root_wrapper.default_root
         default_root_wrapper.default_root = self.parent
@@ -110,7 +113,8 @@ class Row:
 
 
 class Grid(ParentSetter["Grid"]):
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent)
         self.parent = parent
         self.row = 0
         self.column = 0
@@ -145,7 +149,8 @@ class Grid(ParentSetter["Grid"]):
 
 
 class Packer(ParentSetter["Packer"]):
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent)
         self.parent = parent
         self.row = 0
         self.column = 0
