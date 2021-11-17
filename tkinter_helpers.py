@@ -1,6 +1,6 @@
 import tkinter as tk
 from contextlib import AbstractContextManager, contextmanager
-from typing import List, Union, Mapping, Any, Optional
+from typing import List, Union, Mapping, Any, Optional, Generic, TypeVar
 
 
 @contextmanager
@@ -9,6 +9,21 @@ def set_parent(new_parent):
     tk._default_root = new_parent
     yield new_parent
     tk._default_root = old_root
+
+
+T = TypeVar("T")
+
+
+class ParentSetter(AbstractContextManager, Generic[T]):
+    parent: tk.Widget
+
+    def __enter__(self) -> T:
+        self._old_root = tk._default_root
+        tk._default_root = self.parent
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        tk._default_root = self._old_root
 
 
 class GridCell:
@@ -79,7 +94,7 @@ class Row:
         self.parent.grid_rowconfigure(self.index, **kwargs)
 
 
-class Grid(AbstractContextManager):
+class Grid(ParentSetter["Grid"]):
     def __init__(self, parent=None, **kwargs):
         self.parent = parent
         self.row = 0
@@ -107,14 +122,6 @@ class Grid(AbstractContextManager):
 
         return row
 
-    def __enter__(self) -> "Grid":
-        self._old_root = tk._default_root
-        tk._default_root = self.parent
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        tk._default_root = self._old_root
-
     def columnconfigure(self, i, *args, **kwargs):
         self.parent.grid_columnconfigure(i, *args, **kwargs)
 
@@ -122,7 +129,7 @@ class Grid(AbstractContextManager):
         self.parent.grid_rowconfigure(i, *args, **kwargs)
 
 
-class Packer(AbstractContextManager):
+class Packer(ParentSetter["Packer"]):
     def __init__(self, parent=None, **kwargs):
         self.parent = parent
         self.row = 0
@@ -132,11 +139,3 @@ class Packer(AbstractContextManager):
     def pack_all(self, *args: tk.Widget):
         for item in args:
             item.pack(**self.options)
-
-    def __enter__(self) -> "Packer":
-        self._old_root = tk._default_root
-        tk._default_root = self.parent
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        tk._default_root = self._old_root
