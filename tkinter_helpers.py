@@ -3,7 +3,7 @@ from contextlib import AbstractContextManager, contextmanager
 from typing import List, Union, Mapping, Any, Optional, Generic, TypeVar
 
 
-class DefaultRootWrapper:
+class DefaultRootWrapper:  # pragma: no cover
     @property
     def default_root(self):
         return tk._default_root
