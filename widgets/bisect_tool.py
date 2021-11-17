@@ -3,7 +3,7 @@ import tkinter.ttk as ttk
 from itertools import islice
 from operator import itemgetter
 
-from tkinter_helpers import Grid, Cell, Packer
+from tkinter_helpers import Grid, GridCell, Packer
 
 
 class BisectTool(tk.Frame):
@@ -25,7 +25,7 @@ class BisectTool(tk.Frame):
             vertical_scroll = ttk.Scrollbar(orient=tk.VERTICAL, command=tree.yview)
             tree.configure(yscrollcommand=vertical_scroll.set)
 
-            grid.add_row(tree, Cell(vertical_scroll, sticky=tk.NS)).configure(weight=1)
+            grid.add_row(tree, GridCell(vertical_scroll, sticky=tk.NS)).configure(weight=1)
 
             with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
                 toolbar.pack_all(
