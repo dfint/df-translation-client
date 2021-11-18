@@ -94,11 +94,3 @@ class BisectTool(tk.Frame):
 
                 strings = map(itemgetter(1), sorted(strings, key=itemgetter(0)))
                 return strings
-
-
-if __name__ == '__main__':
-    root = tk.Tk()
-    bisect = BisectTool(strings='Lorem ipsum dolor sit amet'.split())
-    bisect.pack(fill=tk.BOTH, expand=1)
-    ttk.Button(text='Get strings', command=lambda: print(list(bisect.filtered_strings))).pack()
-    root.mainloop()

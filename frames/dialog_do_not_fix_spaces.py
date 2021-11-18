@@ -4,7 +4,7 @@ from copy import deepcopy
 from tkinter import ttk as ttk
 from typing import MutableMapping, List, Mapping, Optional
 
-from tkinter_helpers import set_parent, Grid
+from tkinter_helpers import Grid, Packer
 from widgets import ScrollbarFrame
 from widgets.custom_widgets import Listbox, Combobox, Entry
 
@@ -89,21 +89,21 @@ class DialogDoNotFixSpaces(tk.Toplevel):
                               key=lambda x: x.lower().strip())
 
         with Grid(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
-            with set_parent(tk.Frame()) as language_frame:
-                tk.Label(text='Language:').pack(side=tk.LEFT)
+            with Packer(tk.Frame()) as language_frame_packer:
                 self.combo_language = Combobox(values=language_list)
-                self.combo_language.pack(fill='both', expand=1)
                 self.combo_language.current(0)
                 self.combo_language.bind('<<ComboboxSelected>>', self.combo_language_change_selection)
                 self.combo_language.bind('<Any-KeyRelease>', self.combo_language_change_selection)
 
-            with set_parent(tk.Frame()) as filter_frame:
-                tk.Label(text='Filter:').pack(side=tk.LEFT)
+                language_frame_packer.left(tk.Label(text='Language:')).expand(self.combo_language)
+
+            with Packer(tk.Frame()) as filter_frame_packer:
                 self.entry_filter = Entry()
                 self.entry_filter.bind('<Any-KeyRelease>', self.entry_search_key_release)
-                self.entry_filter.pack(fill='both', expand=1)
 
-            grid.add_row(language_frame, filter_frame)
+                filter_frame_packer.left(tk.Label(text='Filter:')).expand(self.entry_filter)
+
+            grid.add_row(language_frame_packer.parent, filter_frame_packer.parent)
 
             grid.add_row(ttk.Button(text='-- Remove selected --', command=self.bt_remove_selected),
                          ttk.Button(text='<< Add selected <<', command=self.bt_add_selected))

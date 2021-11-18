@@ -2,6 +2,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, ttk as ttk
 
+from tkinter_helpers import Packer
 from widgets.custom_widgets import Entry
 
 
@@ -60,13 +61,14 @@ class FileEntry(tk.Frame):
         self.default_path = default_path or ''
         self.dialog_type = dialog_type
 
-        self.button = ttk.Button(self, text=button_text, command=self._bt_browse)
-        self.button.pack(side='right', padx=2)
+        with Packer(self) as packer:
+            self.entry = Entry()
+            packer.right(ttk.Button(text=button_text, command=self._bt_browse), padx=2) \
+                  .expand(self.entry)
 
-        self.entry = Entry(self)
         self.entry.text = self.default_path
         self._prev_value = self.default_path
-        self.entry.pack(fill=tk.BOTH, expand=1)
+
         if self.on_change is not None:
             self.entry.bind('<KeyRelease>', func=self._on_entry_key_release)
 

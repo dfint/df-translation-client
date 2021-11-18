@@ -13,7 +13,7 @@ from dfrus.patch_charmap import get_codepages, get_encoder
 from natsort import natsorted
 
 from config import Config
-from tkinter_helpers import Grid, GridCell
+from tkinter_helpers import Grid, GridCell, Packer
 from widgets import FileEntry, BisectTool, TwoStateButton, ScrollbarFrame
 from widgets.custom_widgets import Checkbutton, Combobox, Text
 from .dialog_do_not_fix_spaces import DialogDoNotFixSpaces
@@ -59,9 +59,11 @@ class DebugFrame(tk.Frame):
 
     def __init__(self, *args, dictionary=None, **kwargs):
         super().__init__(*args, **kwargs)
-        ttk.Button(self, text="Reload dfrus", command=self.reload).pack()
-        self.bisect = BisectTool(self, strings=list(dictionary.items()))
-        self.bisect.pack(fill=tk.BOTH, expand=1)
+        with Packer(self) as packer:
+            self.bisect = BisectTool(self, strings=list(dictionary.items()))
+
+            packer.pack(ttk.Button(text="Reload dfrus", command=self.reload)) \
+                  .expand(self.bisect)
 
 
 class PatchExecutableFrame(tk.Frame):

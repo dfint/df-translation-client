@@ -1,12 +1,12 @@
 import tkinter as tk
 import traceback
-
 from tkinter import ttk as ttk, messagebox
 
 from config import Config
 from frames.frame_download import DownloadTranslationsFrame
 from frames.frame_patch import PatchExecutableFrame
 from frames.frame_translate_external_files import TranslateExternalFiles
+from tkinter_helpers import pack_expand
 
 
 class MainWindow(tk.Tk):
@@ -21,7 +21,7 @@ class MainWindow(tk.Tk):
 
     def init_notebook(self, config: Config):
         notebook = ttk.Notebook()
-        notebook.pack(fill='both', expand=1)
+        pack_expand(notebook)
 
         notebook.add(DownloadTranslationsFrame(notebook, config), text='Download translations')
         notebook.add(PatchExecutableFrame(notebook, config, debug=self.app.debug), text='Patch executable file')
