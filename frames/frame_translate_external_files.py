@@ -157,7 +157,7 @@ class TranslateExternalFiles(tk.Frame):
             self.listbox_translation_files: Listbox = scrollbar_frame.widget
             self.update_listbox_translation_files()
 
-            with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as buttons:
+            with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=2) as buttons:
                 buttons.pack_all(
                     ttk.Button(text="Search", command=self.bt_search),
                     ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True))

@@ -26,9 +26,12 @@ class MainWindow(tk.Tk):
 
     def init_notebook(self, config: Config) -> ttk.Notebook:
         with set_parent(ttk.Notebook(self)) as notebook:
-            notebook.add(DownloadTranslationsFrame(config=config), text="Download translations")
-            notebook.add(PatchExecutableFrame(config=config, debug=self.app.debug), text="Patch executable file")
-            notebook.add(TranslateExternalFiles(config=config), text="Translate external text files")
+            notebook.add(DownloadTranslationsFrame(config=config, borderwidth=3),
+                         text="Download translations")
+            notebook.add(PatchExecutableFrame(config=config, debug=self.app.debug, borderwidth=3),
+                         text="Patch executable file")
+            notebook.add(TranslateExternalFiles(config=config, borderwidth=3),
+                         text="Translate external text files")
 
             tab = self.config_section.get("last_tab_opened", 0)
             if 0 <= tab < len(notebook.tabs()):

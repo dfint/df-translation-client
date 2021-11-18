@@ -199,7 +199,7 @@ class PatchExecutableFrame(tk.Frame):
 
         self._dictionary = None
 
-        with Grid(self, sticky=tk.EW, padx=3, pady=3) as grid:
+        with Grid(self, sticky=tk.EW, padx=2, pady=2) as grid:
             self.file_entry_executable_file = FileEntry(
                 dialog_type="askopenfilename",
                 filetypes=[("Executable files", "*.exe")],

@@ -183,7 +183,7 @@ class DownloadTranslationsFrame(tk.Frame):
             defaults=dict(recent_projects=["dwarf-fortress"])
         )
 
-        with Grid(self, sticky=tk.EW, padx=3, pady=3) as grid:
+        with Grid(self, sticky=tk.EW, padx=2, pady=2) as grid:
             self.combo_projects = Combobox(values=self.config_section["recent_projects"])
             self.combo_projects.current(0)
             grid.add_row("Transifex project:", self.combo_projects)
