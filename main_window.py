@@ -20,7 +20,7 @@ class MainWindow(tk.Tk):
         config.save_settings()
 
     def init_notebook(self, config: Config):
-        with set_parent(ttk.Notebook()) as notebook:
+        with set_parent(ttk.Notebook(self)) as notebook:
             notebook.add(DownloadTranslationsFrame(config=config), text='Download translations')
             notebook.add(PatchExecutableFrame(config=config, debug=self.app.debug), text='Patch executable file')
             notebook.add(TranslateExternalFiles(config=config), text='Translate external text files')
