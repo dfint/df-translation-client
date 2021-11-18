@@ -139,7 +139,7 @@ class PatchExecutableFrame(tk.Frame):
         def save_checkbox_state(event, option_name):
             config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
 
-        check = Checkbutton(self, text=text)
+        check = Checkbutton(text=text)
         check.bind("<1>", lambda event: save_checkbox_state(event, config_key))
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
@@ -261,7 +261,6 @@ class PatchExecutableFrame(tk.Frame):
             )
 
             self.button_patch = TwoStateButton(
-                self,
                 text="Patch!", command=self.bt_patch,
                 text2="Stop!", command2=self.bt_stop
             )
