@@ -32,7 +32,7 @@ T = TypeVar("T")
 class ParentSetter(AbstractContextManager, Generic[T]):
     parent: tk.Widget
 
-    def __init__(self, parent: tk.Widget):
+    def __init__(self, parent: Union[tk.Tk, tk.Frame, tk.Toplevel]):
         self.parent = parent
 
     def __enter__(self) -> T:
