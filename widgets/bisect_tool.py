@@ -10,8 +10,6 @@ from .scrollbar_frame import ScrollbarFrame
 class BisectTool(tk.Frame):
     def __init__(self, *args, strings=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._strings = strings
-
         with Grid(self, sticky=tk.NSEW, pady=2) as grid:
             scrollbar_frame = ScrollbarFrame(widget_factory=ttk.Treeview,
                                              show_scrollbars=tk.VERTICAL)
@@ -21,8 +19,7 @@ class BisectTool(tk.Frame):
             tree.heading('#0', text='Tree')
             tree.heading('#1', text='Strings')
 
-            if strings:
-                self.insert_node(start=0, end=len(strings)-1)
+            self.strings = strings
 
             grid.add_row(scrollbar_frame).configure(weight=1)
 
@@ -37,6 +34,17 @@ class BisectTool(tk.Frame):
                 grid.add_row(toolbar.parent)
 
             grid.columnconfigure(0, weight=1)
+
+    @property
+    def strings(self):
+        return self._strings
+
+    @strings.setter
+    def strings(self, value):
+        self._strings = value
+        self.tree.delete(*self.tree.get_children())
+        if value:
+            self.insert_node(start=0, end=len(value) - 1)
 
     def insert_node(self, parent_node='', index='end', start=0, end=0):
         if start == end:

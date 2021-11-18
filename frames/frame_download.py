@@ -20,12 +20,12 @@ def downloader(conn, tx, project, language, resources, file_path_pattern):
     exception_info = "Everything is ok! (If you see this message, contact the developer)"
     for i, res in enumerate(resources):
         conn.send((i, "downloading..."))
-        for j in range(10):
+        for j in range(10, 0, -1):
             try:
-                tx.get_translation(project, res["slug"], language, file_path_pattern % res["slug"])
+                tx.get_translation(project, res["slug"], language, file_path_pattern.format(res["slug"]))
                 break
             except Exception:
-                conn.send((i, "retry... (%d)" % (10 - j)))
+                conn.send((i, f"retry... ({j})"))
                 exception_info = traceback.format_exc()
         else:
             conn.send((i, "failed"))
@@ -88,7 +88,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     project=project,
                     language=language,
                     resources=resources,
-                    file_path_pattern=str(Path(download_dir) / ("%s_" + language + ".po"))
+                    file_path_pattern=str(Path(download_dir) / f"{{}}_{language}.po")
                 )
             )
             self.download_process.start()
@@ -145,17 +145,13 @@ class DownloadTranslationsFrame(tk.Frame):
             self.progressbar["maximum"] = len(self.resources) * 1.001
             self.progressbar["value"] = 0
             
-            download_dir = self.fileentry_download_to.text
-            if not download_dir:
-                messagebox.showwarning("Directory not specified", "Specify download directory first")
-                return
-            else:
-                self.config_section["download_to"] = download_dir
-            
-            if not Path(download_dir).exists():
+            download_dir = self.fileentry_download_to.path
+            if not download_dir.exists():
                 messagebox.showerror("Directory does not exist", "Specify existing directory first")
                 return
-            
+            else:
+                self.config_section.check_and_save_path("download_to", download_dir)
+
             project = self.combo_projects.get()
             language = self.combo_languages.get()
             

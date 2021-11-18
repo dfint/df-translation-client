@@ -77,8 +77,12 @@ class FileEntry(tk.Frame):
             self._change_entry_color()
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.entry.text
 
-    def path_is_valid(self):
+    def path_is_valid(self) -> bool:
         return self.text and Path(self.text).exists()
+
+    @property
+    def path(self) -> Path:
+        return Path(self.text)
