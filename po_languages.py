@@ -44,21 +44,22 @@ def filter_codepages(encodings: List[str], strings: List[str]):
 def get_suitable_codepages_for_directory(directory: Path, language: str):
     files = filter_files_by_language(directory, language)
     codepages = get_codepages().keys()
+
     for file in files:
         with open(directory / file, "r", encoding="utf-8") as fn:
             pofile = parse_po.PoReader(fn)
             strings = [cleanup_string(entry["msgstr"]) for entry in pofile]
         codepages = filter_codepages(codepages, strings)
+
     return codepages
 
 
 def get_suitable_codepages_for_file(translation_file: Path):
     codepages = get_codepages().keys()
-    translation_file_language = None
-    if translation_file.exists():
-        with open(translation_file, "r", encoding="utf-8") as fn:
-            pofile = parse_po.PoReader(fn)
-            translation_file_language = pofile.meta["Language"]
-            strings = [cleanup_string(entry["msgstr"]) for entry in pofile]
-        codepages = filter_codepages(codepages, strings)
-    return codepages, translation_file_language
+
+    with open(translation_file, "r", encoding="utf-8") as fn:
+        pofile = parse_po.PoReader(fn)
+        translation_file_language = pofile.meta["Language"]
+        strings = [cleanup_string(entry["msgstr"]) for entry in pofile]
+
+    return filter_codepages(codepages, strings), translation_file_language

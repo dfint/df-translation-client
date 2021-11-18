@@ -152,7 +152,7 @@ class PatchExecutableFrame(tk.Frame):
             self.config_section["language_codepages"][self.translation_file_language] = event.widget.text
 
     def update_combo_encoding_list(self, translation_file):
-        if translation_file.exists():
+        if translation_file.exists() and translation_file.is_file():
             codepages, language = get_suitable_codepages_for_file(translation_file)
             self.combo_encoding.values = natsorted(codepages)
             self.translation_file_language = language
