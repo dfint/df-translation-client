@@ -16,7 +16,7 @@ from widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from widgets.custom_widgets import Combobox, Entry, Listbox
 
 
-def downloader(conn, tx, project, language, resources, file_path_pattern):
+def downloader(conn, tx: TransifexAPI, project: str, language: str, resources, file_path_pattern: str):
     exception_info = "Everything is ok! (If you see this message, contact the developer)"
     for i, res in enumerate(resources):
         conn.send((i, "downloading..."))
@@ -71,7 +71,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 recent_projects.insert(0, project)
             self.combo_projects.values = recent_projects
 
-    def download_waiter(self, resources, language, project, download_dir, parent_conn=None,
+    def download_waiter(self, resources, language: str, project: str, download_dir: Path, parent_conn=None,
                         initial_names=None, resource_names=None, i=0):
         if initial_names is None:
             initial_names = [res["name"] for res in self.resources]
@@ -88,7 +88,7 @@ class DownloadTranslationsFrame(tk.Frame):
                     project=project,
                     language=language,
                     resources=resources,
-                    file_path_pattern=str(Path(download_dir) / f"{{}}_{language}.po")
+                    file_path_pattern=str(download_dir / f"{{}}_{language}.po")
                 )
             )
             self.download_process.start()
@@ -109,7 +109,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.config_section["default_language"] = language
 
                 if sys.platform == "win32":
-                    subprocess.Popen('explorer "%s"' % (download_dir.replace("/", "\\")))
+                    subprocess.Popen(f'explorer "{download_dir}"')
                 else:
                     pass  # Todo: open the directory in a file manager on linux
 
@@ -144,13 +144,13 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.tx and self.resources and not self.download_started:
             self.progressbar["maximum"] = len(self.resources) * 1.001
             self.progressbar["value"] = 0
-            
-            download_dir = self.fileentry_download_to.path
-            if not download_dir.exists():
+
+            if not self.fileentry_download_to.path_is_valid():
                 messagebox.showerror("Directory does not exist", "Specify existing directory first")
                 return
-            else:
-                self.config_section.check_and_save_path("download_to", download_dir)
+
+            download_dir = self.fileentry_download_to.path
+            self.config_section.check_and_save_path("download_to", download_dir)
 
             project = self.combo_projects.get()
             language = self.combo_languages.get()
