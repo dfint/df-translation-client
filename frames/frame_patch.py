@@ -3,6 +3,7 @@ import tkinter as tk
 from collections import OrderedDict
 from pathlib import Path
 from tkinter import messagebox, ttk
+from typing import Optional
 
 from df_gettext_toolkit import parse_po
 from df_gettext_toolkit.fix_translated_strings import fix_spaces, cleanup_string
@@ -143,15 +144,25 @@ class PatchExecutableFrame(tk.Frame):
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
 
+    translation_file_language: Optional[str]
+
     def save_encoding_into_config(self, event):
         self.config_section["last_encoding"] = event.widget.text
         if self.translation_file_language:
             self.config_section["language_codepages"][self.translation_file_language] = event.widget.text
 
-    def config_combo_encoding(self):
-        translation_file = self.fileentry_translation_file.path
-        codepages, _ = get_suitable_codepages_for_file(translation_file)
-        self.combo_encoding.values = natsorted(codepages)
+    def update_combo_encoding_list(self, translation_file):
+        if translation_file.exists():
+            codepages, language = get_suitable_codepages_for_file(translation_file)
+            self.combo_encoding.values = natsorted(codepages)
+            self.translation_file_language = language
+        else:
+            self.translation_file_language = None
+            self.combo_encoding.values = tuple()
+
+    def config_combo_encoding(self, translation_file: Path):
+        self.update_combo_encoding_list(translation_file)
+
         if "last_encoding" in self.config_section:
             self.combo_encoding.text = self.config_section["last_encoding"]
         elif self.combo_encoding.values:
@@ -159,22 +170,17 @@ class PatchExecutableFrame(tk.Frame):
 
         self.combo_encoding.bind("<<ComboboxSelected>>", func=self.save_encoding_into_config)
 
-    def update_combo_encoding(self, text):
-        self.config_section.check_and_save_path("df_exe_translation_file", text)
+    def update_combo_encoding(self, translation_file: Path):
+        self.update_combo_encoding_list(translation_file)
 
-        # Update codepage combobox
-        translation_file = self.fileentry_translation_file.path
-        codepages, language = get_suitable_codepages_for_file(translation_file)
-        self.combo_encoding.values = natsorted(codepages)
-        self.translation_file_language = language
+        if (self.translation_file_language
+                and self.translation_file_language in self.config_section["language_codepages"]):
 
-        if self.translation_file_language not in self.config_section["language_codepages"]:
-            if self.combo_encoding.values:
-                self.combo_encoding.current(0)
-            else:
-                self.combo_encoding.text = "cp437"
-        else:
             self.combo_encoding.text = self.config_section["language_codepages"][self.translation_file_language]
+        elif self.combo_encoding.values:
+            self.combo_encoding.current(0)
+        else:
+            self.combo_encoding.text = "cp437"
 
     def __init__(self, *args, config: Config, debug=False, **kwargs):
         super().__init__(*args, **kwargs)
@@ -202,8 +208,9 @@ class PatchExecutableFrame(tk.Frame):
             )
             grid.add_row("DF executable file:", self.file_entry_executable_file, ...)
 
-            def on_translation_file_change(text):
-                self.update_combo_encoding(text)
+            def on_translation_file_change(file_path):
+                self.config_section.check_and_save_path("df_exe_translation_file", file_path)
+                self.update_combo_encoding(Path(file_path))
                 if self.debug_frame:
                     self.debug_frame.set_dictionary(self.load_dictionary())
 
@@ -221,8 +228,7 @@ class PatchExecutableFrame(tk.Frame):
             grid.add_row("DF executable translation file:", self.fileentry_translation_file, ...)
 
             self.combo_encoding = Combobox()
-            self.translation_file_language = None
-            self.config_combo_encoding()
+            self.config_combo_encoding(self.fileentry_translation_file.path)
             grid.add_row("Encoding:", self.combo_encoding)
 
             # FIXME: chk_do_not_patch_charmap does nothing
