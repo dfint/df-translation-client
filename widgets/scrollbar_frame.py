@@ -24,9 +24,8 @@ class ScrollbarFrame(tk.Frame, Generic[TWidget]):
         if widget_args is None:
             widget_args = dict()
 
-        if widget_factory:
-            self.__widget = widget_factory(self, **widget_args)
-            self.__widget.grid(row=0, column=0, sticky=tk.NSEW)
+        self.__widget = widget_factory(self, **widget_args)
+        self.__widget.grid(row=0, column=0, sticky=tk.NSEW)
         
         if show_scrollbars in (tk.HORIZONTAL, tk.BOTH):
             x_scrollbar = scrollbar(self, orient=tk.HORIZONTAL, command=self.__widget.xview)
