@@ -108,8 +108,8 @@ class TranslateExternalFiles(tk.Frame):
         self.config_section.check_and_save_path(key, directory)
         self.update_combo_languages(directory)
 
-    def __init__(self, master, config: Config, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+    def __init__(self, *args, config: Config, **kwargs):
+        super().__init__(*args, **kwargs)
         self.config_section = config.init_section(section_name="translate_external_files")
         config_section = self.config_section
 

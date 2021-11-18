@@ -150,7 +150,8 @@ class PatchExecutableFrame(tk.Frame):
 
     def config_combo_encoding(self):
         translation_file = self.fileentry_translation_file.path
-        self.combo_encoding.values, _ = natsorted(get_suitable_codepages_for_file(translation_file))
+        codepages, _ = get_suitable_codepages_for_file(translation_file)
+        self.combo_encoding.values = natsorted(codepages)
         if "last_encoding" in self.config_section:
             self.combo_encoding.text = self.config_section["last_encoding"]
         elif self.combo_encoding.values:
@@ -175,8 +176,8 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = self.config_section["language_codepages"][self.translation_file_language]
 
-    def __init__(self, master, config: Config, debug=False):
-        super().__init__(master)
+    def __init__(self, *args, config: Config, debug=False, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.config_section = config.init_section(
             section_name="patch_executable",

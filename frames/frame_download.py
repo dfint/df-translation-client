@@ -175,8 +175,8 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.download_process and self.download_process.is_alive():
             self.download_process.terminate()
 
-    def __init__(self, master, config: Config):
-        super().__init__(master)
+    def __init__(self, *args, config: Config, **kwargs):
+        super().__init__(*args, **kwargs)
         
         self.config_section = config.init_section(
             section_name="download_translations",
