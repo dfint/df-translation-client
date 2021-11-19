@@ -2,23 +2,72 @@ import tkinter as tk
 from itertools import islice
 from operator import itemgetter
 from tkinter import ttk
+from typing import List, Optional, Tuple, Iterable, Hashable
 
-from df_translation_client.tkinter_helpers import Grid, Packer
+from bidict import bidict, MutableBidict
+
 from .scrollbar_frame import ScrollbarFrame
+from ..tkinter_helpers import Grid, Packer
+
+
+class Node:
+    def __init__(self, strings: List[Tuple[str, str]], start=0, end=-1):
+        self._strings = strings
+        self.start = start
+        self.end = end if end >= 0 else len(strings) - 1
+
+    def split(self) -> Tuple["Node", "Node"]:
+        assert self.start != self.end
+        mid = (self.start + self.end) // 2
+        return Node(self._strings, self.start, mid), Node(self._strings, mid + 1, self.end)
+
+    @property
+    def tree_text(self):
+        if self.start == self.end:
+            return "[{} : {}] ({} string)".format(self.start, self.end, self.end - self.start + 1)
+        else:
+            return "[{} : {}] ({} strings)".format(self.start, self.end, self.end - self.start + 1)
+
+    @property
+    def strings(self) -> Iterable[Tuple[str, str]]:
+        return islice(self._strings, self.start, self.end + 1)
+
+    @property
+    def column_text(self) -> str:
+        if self.start == self.end:
+            return repr(self._strings[self.start])
+        else:
+            if self.end - self.start + 1 <= 2:  # One or two strings in the slice: show all strings
+                text = ",".join(map(repr, self.strings))
+            else:  # More strings: show the first and the last
+                text = "{!r} ... {!r}".format(self._strings[self.start], self._strings[self.end])
+            return text
+
+    def __hash__(self):
+        return hash((self.start, self.end))
+
+    def __eq__(self, other: "Node"):
+        return self.start == other.start and self.end == other.end
 
 
 class BisectTool(tk.Frame):
-    def __init__(self, *args, strings=None, **kwargs):
+    _strings: Optional[List[Tuple[str, str]]]
+    _nodes_by_item_ids: MutableBidict[Hashable, Node]
+
+    def __init__(self, *args, strings: Optional[List[Tuple[str, str]]] = None, **kwargs):
         super().__init__(*args, **kwargs)
         with Grid(self, sticky=tk.NSEW, pady=2) as grid:
-            scrollbar_frame = ScrollbarFrame(widget_factory=ttk.Treeview,
-                                             show_scrollbars=tk.VERTICAL)
-            self.tree = tree = scrollbar_frame.widget
-            tree["columns"] = ("start", "end", "strings")
-            tree["displaycolumns"] = tree["columns"][-1]
-            tree.heading('#0', text='Tree')
-            tree.heading('#1', text='Strings')
+            scrollbar_frame = ScrollbarFrame(
+                widget_factory=ttk.Treeview,
+                show_scrollbars=tk.VERTICAL
+            )
 
+            self.tree = tree = scrollbar_frame.widget
+            tree["columns"] = ("strings",)
+            tree.heading("#0", text="Tree")
+            tree.heading("#1", text="Strings")
+
+            self._nodes_by_item_ids = bidict()
             self.strings = strings
 
             grid.add_row(scrollbar_frame).configure(weight=1)
@@ -26,9 +75,9 @@ class BisectTool(tk.Frame):
             with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
                 toolbar.pack_all(
                     ttk.Button(text="Split", command=self.split_selected_node),
-                    ttk.Button(text="Mark as bad", command=lambda: self.mark_selected_node(background='orange')),
-                    ttk.Button(text="Mark as good", command=lambda: self.mark_selected_node(background='lightgreen')),
-                    ttk.Button(text="Clear mark", command=lambda: self.mark_selected_node(background='white')),
+                    ttk.Button(text="Mark as bad", command=lambda: self.mark_selected_node(background="orange")),
+                    ttk.Button(text="Mark as good", command=lambda: self.mark_selected_node(background="lightgreen")),
+                    ttk.Button(text="Clear mark", command=lambda: self.mark_selected_node(background="white")),
                 )
 
                 grid.add_row(toolbar.parent)
@@ -36,7 +85,7 @@ class BisectTool(tk.Frame):
             grid.columnconfigure(0, weight=1)
 
     @property
-    def strings(self):
+    def strings(self) -> Optional[List[Tuple[str, str]]]:
         return self._strings
 
     @strings.setter
@@ -44,35 +93,47 @@ class BisectTool(tk.Frame):
         self._strings = value
         self.tree.delete(*self.tree.get_children())
         if value:
-            self.insert_node(start=0, end=len(value) - 1)
+            self.insert_node(Node(value))
 
-    def insert_node(self, parent_node='', index='end', start=0, end=0):
-        if start == end:
-            text = '[{} : {}] ({} string)'.format(start, end, end-start+1)
-            values = (start, end, repr(self._strings[start]))
+    def insert_node(self, node: Node, parent_node: Optional[Node] = None):
+        if not parent_node:
+            parent_item_id = ""
         else:
-            text = '[{} : {}] ({} strings)'.format(start, end, end-start+1)
-            if end - start + 1 <= 2:
-                strings = ','.join(map(repr, islice(self._strings, start, end+1)))
-            else:
-                strings = '{!r} ... {!r}'.format(self._strings[start], self._strings[end])
-            values = (start, end, strings)
-        
+            parent_item_id = self._nodes_by_item_ids.inverse[parent_node]
+
+        item_id = self.tree.insert(
+            parent_item_id,
+            tk.END,
+            text=node.tree_text,
+            values=(node.column_text,),
+            open=True,
+        )
+
+        self._nodes_by_item_ids[item_id] = node
+
+        # Add an item id as a tag to color the row by that tag
+        self.tree.item(item_id, tags=(item_id,))
+
+    def get_item_id_of_node(self, node: Node):
+        return self._nodes_by_item_ids.inverse[node]
+
+    def get_selected_node(self) -> Optional[Node]:
         tree = self.tree
-        item_id = tree.insert(parent_node, index, text=text, open=True, values=values)
-        tree.item(item_id, tags=(item_id,))
-        return item_id
+        selected_ids = tree.selection()
+        if selected_ids and not tree.get_children(selected_ids[0]):
+            return self._nodes_by_item_ids[selected_ids[0]]
 
     def split_selected_node(self):
-        tree = self.tree
-        item = tree.selection()
-        if item and not tree.get_children(item[0]):
-            start, end = map(int, tree.item(item[0], option="values")[:2])
-            if start != end:
-                mid = (start + end) // 2
-                new_item = self.insert_node(item, start=start, end=mid)
-                tree.selection_set(new_item)  # move selection to the first child
-                self.insert_node(item, start=mid+1, end=end)
+        parent = self.get_selected_node()
+        if parent and parent.start != parent.end:
+            new_nodes = parent.split()
+
+            for node in new_nodes:
+                self.insert_node(parent_node=parent, node=node)
+
+            # move selection to the first child
+            item_id = self._nodes_by_item_ids.inverse[new_nodes[0]]
+            self.tree.selection_set(item_id)
 
     def mark_selected_node(self, **kwargs):
         tree = self.tree
@@ -80,25 +141,25 @@ class BisectTool(tk.Frame):
             tree.tag_configure(item, **kwargs)
 
     @property
-    def selected_ranges(self):
-        return (map(int, self.tree.item(item, option="values")[:2]) for item in self.tree.selection())
+    def selected_nodes(self) -> Iterable[Node]:
+        return (self._nodes_by_item_ids[item_id] for item_id in self.tree.selection())
 
     @property
     def filtered_strings(self):
-        ranges = list(self.selected_ranges)
-        if not ranges:
+        nodes: List[Node] = list(self.selected_nodes)
+        if not nodes:
             return self._strings
         else:
-            if len(ranges) == 1:
+            if len(nodes) == 1:
                 # Only one row selected (optimized case)
-                start, end = ranges[0]
-                return islice(self._strings, start, end+1)
+                return islice(self._strings, nodes[0].start, nodes[0].end + 1)
             else:
                 # Merge ranges when multiple rows selected
                 enumerated_strings = list(enumerate(self._strings))
                 strings = set()
-                for start, end in ranges:
-                    strings |= set(islice(enumerated_strings, start, end+1))
+                for node in nodes:
+                    strings |= set(islice(enumerated_strings, node.start, node.end + 1))
 
+                # Restore original order of the strings
                 strings = map(itemgetter(1), sorted(strings, key=itemgetter(0)))
                 return strings
