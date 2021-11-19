@@ -52,7 +52,7 @@ class DownloadTranslationsFrame(tk.Frame):
             messagebox.showerror("Unexpected error", traceback.format_exc())
         else:
             self.combo_languages.values = sorted(languages)
-            last_language = self.config_section.get("default_language", None)
+            last_language = self.config_section.get("language", None)
             if last_language and last_language in languages:
                 self.combo_languages.text = last_language
             else:
@@ -105,7 +105,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.button_download.reset_state()
                 self.download_started = False
 
-                self.config_section["default_language"] = language
+                self.config_section["language"] = language
 
                 if sys.platform == "win32":
                     subprocess.Popen(f'explorer "{download_dir}"')
@@ -200,7 +200,7 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
 
             self.combo_languages = Combobox()
-            grid.add_row("Choose default_language:", self.combo_languages)
+            grid.add_row("Choose language:", self.combo_languages)
 
             grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
 
