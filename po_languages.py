@@ -1,11 +1,10 @@
-import codecs
 from collections import OrderedDict
 from pathlib import Path
-from typing import List, Mapping, Set
+from typing import List, Mapping, Set, Iterable
 
 from df_gettext_toolkit import parse_po
 from df_gettext_toolkit.fix_translated_strings import cleanup_string, fix_spaces
-from dfrus.patch_charmap import get_codepages, get_encoder
+from dfrus.patch_charmap import get_supported_codepages, get_encoder
 
 
 def get_languages(directory: Path):
@@ -24,12 +23,9 @@ def filter_files_by_language(directory: Path, language):
                 yield filename.name
 
 
-def filter_codepages(encodings: List[str], strings: List[str]):
+def filter_codepages(encodings: Iterable[str], strings: List[str]):
     for encoding in encodings:
-        try:
-            encoder_function = codecs.getencoder(encoding)
-        except LookupError:
-            encoder_function = get_encoder(encoding)
+        encoder_function = get_encoder(encoding)
 
         try:
             for text in strings:
@@ -44,7 +40,7 @@ def filter_codepages(encodings: List[str], strings: List[str]):
 
 def get_suitable_codepages_for_directory(directory: Path, language: str):
     files = filter_files_by_language(directory, language)
-    codepages = get_codepages().keys()
+    codepages = get_supported_codepages().keys()
 
     for file in files:
         with open(directory / file, "r", encoding="utf-8") as fn:
@@ -56,7 +52,7 @@ def get_suitable_codepages_for_directory(directory: Path, language: str):
 
 
 def get_suitable_codepages_for_file(translation_file: Path):
-    codepages = get_codepages().keys()
+    codepages = get_supported_codepages().keys()
 
     with open(translation_file, "r", encoding="utf-8") as fn:
         po_file = parse_po.PoReader(fn)
