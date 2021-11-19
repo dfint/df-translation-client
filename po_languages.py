@@ -77,3 +77,11 @@ def load_dictionary_with_cleanup(translation_file: Path, exclusions_by_language:
             for entry in po_file
         )
     return dictionary
+
+
+def load_dictionary_raw(translation_file):
+    with open(translation_file, "r", encoding="utf-8") as fn:
+        po_file = parse_po.PoReader(fn)
+        language = po_file.meta["Language"]
+        dictionary = {entry["msgid"]: entry["msgstr"] for entry in po_file}
+    return dictionary, language

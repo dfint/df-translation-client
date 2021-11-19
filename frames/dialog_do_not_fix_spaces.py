@@ -64,12 +64,12 @@ class DialogDoNotFixSpaces(tk.Toplevel):
             self.exclusions[self.combo_language.text] = list(exclusions)
             self.update_listbox_exclusions()
 
-    def __init__(self, parent, exclusions: Mapping[str, List[str]],
-                 dictionary: Mapping[str, str],
-                 *args,
-                 default_language: str = None,
+    def __init__(self, *args,
+                 exclusions: Mapping[str, List[str]],
+                 dictionary: Optional[Mapping[str, str]],
+                 default_language: Optional[str] = None,
                  **kwargs):
-        super().__init__(parent, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.grab_set()
 
         self.exclusions = dict(deepcopy(exclusions))

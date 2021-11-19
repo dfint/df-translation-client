@@ -5,12 +5,11 @@ from pathlib import Path
 from tkinter import messagebox, ttk
 from typing import Optional
 
-from df_gettext_toolkit import parse_po
 from dfrus import dfrus
 from natsort import natsorted
 
 from config import Config
-from po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup
+from po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup, load_dictionary_raw
 from tkinter_helpers import Grid, GridCell
 from widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from widgets.custom_widgets import Checkbutton, Combobox, Text
@@ -103,21 +102,22 @@ class PatchExecutableFrame(tk.Frame):
 
     def bt_exclusions(self):
         translation_file = self.fileentry_translation_file.path
-        language = None
-        dictionary = None
+
         if translation_file.exists():
-            with open(translation_file, "r", encoding="utf-8") as fn:
-                pofile = parse_po.PoReader(fn)
-                meta = pofile.meta
-                language = meta["Language"]
-                dictionary = {entry["msgid"]: entry["msgstr"] for entry in pofile}
+            dictionary, language = load_dictionary_raw(translation_file)
+        else:
+            dictionary = None
+            language = None
 
-        dialog = DialogDoNotFixSpaces(self, self.config_section["fix_space_exclusions"], dictionary,
-                                      default_language=language)
+        exclusions = DialogDoNotFixSpaces(
+            exclusions=self.config_section["fix_space_exclusions"],
+            dictionary=dictionary,
+            default_language=language,
+        ).wait_result()
 
-        exclusions = dialog.wait_result()
-        self.exclusions = exclusions or self.config_section["fix_space_exclusions"]
-        self.config_section["fix_space_exclusions"] = self.exclusions
+        if exclusions:
+            self.exclusions = exclusions
+            self.config_section["fix_space_exclusions"] = exclusions
 
     def setup_checkbutton(self, text, config_key, default_state):
         config = self.config_section
