@@ -1,40 +1,20 @@
-import codecs
-import importlib
 import multiprocessing as mp
 import tkinter as tk
 from collections import OrderedDict
 from pathlib import Path
 from tkinter import messagebox, ttk
+from typing import Optional
 
-from df_gettext_toolkit import parse_po
-from df_gettext_toolkit.fix_translated_strings import fix_spaces, cleanup_string
 from dfrus import dfrus
-from dfrus.patch_charmap import get_codepages, get_encoder
 from natsort import natsorted
 
 from config import Config
+from po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup, load_dictionary_raw
 from tkinter_helpers import Grid, GridCell
-from widgets import FileEntry, BisectTool, TwoStateButton, ScrollbarFrame
+from widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from widgets.custom_widgets import Checkbutton, Combobox, Text
 from .dialog_do_not_fix_spaces import DialogDoNotFixSpaces
-
-
-def filter_codepages(encodings, strings):
-    for encoding in encodings:
-        try:
-            encoder_function = codecs.getencoder(encoding)
-        except LookupError:
-            encoder_function = get_encoder(encoding)
-        
-        try:
-            for text in strings:
-                encoded_text = encoder_function(text)[0]
-                # Only one-byte encodings are supported (but shorter result is allowed)
-                if len(encoded_text) > len(text): 
-                    raise ValueError
-            yield encoding
-        except (UnicodeEncodeError, ValueError, LookupError):
-            pass
+from .frame_debug import DebugFrame
 
 
 class ProcessMessageWrapper:
@@ -46,32 +26,20 @@ class ProcessMessageWrapper:
 
     def write(self, s):
         for i in range(0, len(s), self._chunk_size):
-            self._message_receiver.send(s[i:i+self._chunk_size])
+            self._message_receiver.send(s[i:i + self._chunk_size])
 
     def flush(self):
         pass  # stub method
-
-
-class DebugFrame(tk.Frame):
-    @staticmethod
-    def reload():
-        importlib.reload(dfrus)
-
-    def __init__(self, *args, dictionary=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        ttk.Button(self, text="Reload dfrus", command=self.reload).pack()
-        self.bisect = BisectTool(self, strings=list(dictionary.items()))
-        self.bisect.pack(fill=tk.BOTH, expand=1)
 
 
 class PatchExecutableFrame(tk.Frame):
     def update_log(self, message_queue):
         try:
             message = []
-            
+
             while message_queue.poll():
                 message.append(message_queue.recv())
-            
+
             self.log_field.write("".join(message))
 
             if not self.dfrus_process.is_alive():
@@ -83,39 +51,17 @@ class PatchExecutableFrame(tk.Frame):
             self.log_field.write("\n[MESSAGE QUEUE/PIPE BROKEN]")
             self.button_patch.reset_state()
 
-    def load_dictionary(self, translation_file):
-        with open(translation_file, "r", encoding="utf-8") as fn:
-            pofile = parse_po.PoReader(fn)
-            meta = pofile.meta
-            exclusions = self.exclusions.get(meta["Language"], self.exclusions)
-            dictionary = OrderedDict(
-                (entry["msgid"],
-                 fix_spaces(entry["msgid"], cleanup_string(entry["msgstr"]), exclusions, exclusions))
-                for entry in pofile
-            )
-        return dictionary
-
-    @property
-    def dictionary(self):
-        if not self._dictionary:
-            translation_file = self.fileentry_translation_file.text
-            if self.fileentry_translation_file.path_is_valid():
-                self._dictionary = self.load_dictionary(translation_file)
-        return self._dictionary
-
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
             return False
 
-        executable_file = self.file_entry_executable_file.text
+        executable_file = self.file_entry_executable_file.path
 
-        if not executable_file or not Path(executable_file).exists():
+        if not Path(executable_file).exists():
             messagebox.showerror("Error", "Valid path to an executable file must be specified")
-        elif not self.dictionary:
-            messagebox.showerror("Error", "Dictionary wasn't loaded")
         else:
             if not self.debug_frame:
-                dictionary = self.dictionary
+                dictionary = load_dictionary_with_cleanup(self.fileentry_translation_file.path, self.exclusions)
             else:
                 dictionary = OrderedDict(self.debug_frame.bisect.filtered_strings)
 
@@ -155,22 +101,23 @@ class PatchExecutableFrame(tk.Frame):
             self.dfrus_process.terminate()
 
     def bt_exclusions(self):
-        translation_file = self.fileentry_translation_file.text
-        language = None
-        dictionary = None
-        if translation_file and Path(translation_file).exists():
-            with open(translation_file, "r", encoding="utf-8") as fn:
-                pofile = parse_po.PoReader(fn)
-                meta = pofile.meta
-                language = meta["Language"]
-                dictionary = {entry["msgid"]: entry["msgstr"] for entry in pofile}
+        translation_file = self.fileentry_translation_file.path
 
-        dialog = DialogDoNotFixSpaces(self, self.config_section["fix_space_exclusions"], dictionary,
-                                      default_language=language)
+        if translation_file.exists():
+            dictionary, language = load_dictionary_raw(translation_file)
+        else:
+            dictionary = None
+            language = None
 
-        exclusions = dialog.wait_result()
-        self.exclusions = exclusions or self.config_section["fix_space_exclusions"]
-        self.config_section["fix_space_exclusions"] = self.exclusions
+        exclusions = DialogDoNotFixSpaces(
+            exclusions=self.config_section["fix_space_exclusions"],
+            dictionary=dictionary,
+            default_language=language,
+        ).wait_result()
+
+        if exclusions:
+            self.exclusions = exclusions
+            self.config_section["fix_space_exclusions"] = exclusions
 
     def setup_checkbutton(self, text, config_key, default_state):
         config = self.config_section
@@ -178,57 +125,51 @@ class PatchExecutableFrame(tk.Frame):
         def save_checkbox_state(event, option_name):
             config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
 
-        check = Checkbutton(self, text=text)
+        check = Checkbutton(text=text)
         check.bind("<1>", lambda event: save_checkbox_state(event, config_key))
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
 
-    def config_combo_encoding(self):
-        codepages = get_codepages().keys()
-        if self.fileentry_translation_file.path_is_valid():
-            translation_file = self.fileentry_translation_file.text
-            with open(translation_file, "r", encoding="utf-8") as fn:
-                pofile = parse_po.PoReader(fn)
-                self.translation_file_language = pofile.meta["Language"]
-                strings = [cleanup_string(entry["msgstr"]) for entry in pofile]
-            codepages = filter_codepages(codepages, strings)
-        self.combo_encoding.values = natsorted(codepages)
+    translation_file_language: Optional[str]
+
+    def save_encoding_into_config(self, event):
+        self.config_section["last_encoding"] = event.widget.text
+        if self.translation_file_language:
+            self.config_section["language_codepages"][self.translation_file_language] = event.widget.text
+
+    def update_combo_encoding_list(self, translation_file):
+        if translation_file.exists() and translation_file.is_file():
+            codepages, language = get_suitable_codepages_for_file(translation_file)
+            self.combo_encoding.values = natsorted(codepages)
+            self.translation_file_language = language
+        else:
+            self.translation_file_language = None
+            self.combo_encoding.values = tuple()
+
+    def config_combo_encoding(self, translation_file: Path):
+        self.update_combo_encoding_list(translation_file)
+
         if "last_encoding" in self.config_section:
             self.combo_encoding.text = self.config_section["last_encoding"]
         elif self.combo_encoding.values:
             self.combo_encoding.current(0)
 
-        def save_encoding_into_config(event):
-            self.config_section["last_encoding"] = event.widget.text
-            if self.translation_file_language:
-                self.config_section["language_codepages"][self.translation_file_language] = event.widget.text
+        self.combo_encoding.bind("<<ComboboxSelected>>", func=self.save_encoding_into_config)
 
-        self.combo_encoding.bind("<<ComboboxSelected>>", func=save_encoding_into_config)
+    def update_combo_encoding(self, translation_file: Path):
+        self.update_combo_encoding_list(translation_file)
 
-    def update_combo_encoding(self, text):
-        self.config_section.check_and_save_path("df_exe_translation_file", text)
+        if (self.translation_file_language
+                and self.translation_file_language in self.config_section["language_codepages"]):
 
-        # Update codepage combobox
-        codepages = get_codepages().keys()
-        if self.fileentry_translation_file.path_is_valid():
-            translation_file = self.fileentry_translation_file.text
-            with open(translation_file, "r", encoding="utf-8") as fn:
-                pofile = parse_po.PoReader(fn)
-                self.translation_file_language = pofile.meta["Language"]
-                strings = [cleanup_string(entry["msgstr"]) for entry in pofile]
-            codepages = filter_codepages(codepages, strings)
-        self.combo_encoding.values = natsorted(codepages)
-
-        if self.translation_file_language not in self.config_section["language_codepages"]:
-            if self.combo_encoding.values:
-                self.combo_encoding.current(0)
-            else:
-                self.combo_encoding.text = "cp437"
-        else:
             self.combo_encoding.text = self.config_section["language_codepages"][self.translation_file_language]
+        elif self.combo_encoding.values:
+            self.combo_encoding.current(0)
+        else:
+            self.combo_encoding.text = "cp437"
 
-    def __init__(self, master, config: Config, debug=False):
-        super().__init__(master)
+    def __init__(self, *args, config: Config, debug=False, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.config_section = config.init_section(
             section_name="patch_executable",
@@ -244,7 +185,7 @@ class PatchExecutableFrame(tk.Frame):
 
         self._dictionary = None
 
-        with Grid(self, sticky=tk.EW, padx=3, pady=3) as grid:
+        with Grid(self, sticky=tk.EW, padx=2, pady=2) as grid:
             self.file_entry_executable_file = FileEntry(
                 dialog_type="askopenfilename",
                 filetypes=[("Executable files", "*.exe")],
@@ -253,9 +194,12 @@ class PatchExecutableFrame(tk.Frame):
             )
             grid.add_row("DF executable file:", self.file_entry_executable_file, ...)
 
-            def on_translation_file_change(text):
-                self.update_combo_encoding(text)
-                self._dictionary = None  # Clear cached dictionary
+            def on_translation_file_change(file_path):
+                self.config_section.check_and_save_path("df_exe_translation_file", file_path)
+                self.update_combo_encoding(Path(file_path))
+                if self.debug_frame:
+                    self.debug_frame.set_dictionary(load_dictionary_with_cleanup(self.fileentry_translation_file.path,
+                                                                                 self.exclusions))
 
             self.fileentry_translation_file = FileEntry(
                 dialog_type="askopenfilename",
@@ -271,8 +215,7 @@ class PatchExecutableFrame(tk.Frame):
             grid.add_row("DF executable translation file:", self.fileentry_translation_file, ...)
 
             self.combo_encoding = Combobox()
-            self.translation_file_language = None
-            self.config_combo_encoding()
+            self.config_combo_encoding(self.fileentry_translation_file.path)
             grid.add_row("Encoding:", self.combo_encoding)
 
             # FIXME: chk_do_not_patch_charmap does nothing
@@ -293,7 +236,11 @@ class PatchExecutableFrame(tk.Frame):
             grid.add_row(self.chk_add_leading_trailing_spaces, ..., button_exclusions)
 
             if debug:
-                self.debug_frame = DebugFrame(dictionary=self.dictionary)
+                self.debug_frame = DebugFrame(dictionary=load_dictionary_with_cleanup(
+                    self.fileentry_translation_file.path,
+                    self.exclusions
+                ))
+
                 grid.add_row(GridCell(self.debug_frame, sticky=tk.NSEW, columnspan=3)).configure(weight=1)
             else:
                 self.debug_frame = None
@@ -305,7 +252,6 @@ class PatchExecutableFrame(tk.Frame):
             )
 
             self.button_patch = TwoStateButton(
-                self,
                 text="Patch!", command=self.bt_patch,
                 text2="Stop!", command2=self.bt_stop
             )
@@ -323,5 +269,5 @@ class PatchExecutableFrame(tk.Frame):
             self.log_field: Text = scrollbar_frame.widget
 
             grid.columnconfigure(1, weight=1)
-        
+
         self.bind("<Destroy>", self.kill_processes)

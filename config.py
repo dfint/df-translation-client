@@ -1,13 +1,12 @@
 import json
-
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 
 class ConfigSection(dict):
     def check_and_save_path(self, key, file_path):
         if Path(file_path).exists():
-            self[key] = file_path
+            self[key] = str(file_path)
 
 
 class Config:

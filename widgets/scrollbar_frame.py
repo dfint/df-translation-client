@@ -1,5 +1,5 @@
 import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import ttk
 
 from typing import Any, Callable, Mapping, Union, TypeVar, Generic
 
@@ -11,7 +11,7 @@ class ScrollbarFrame(tk.Frame, Generic[TWidget]):
     A frame with scrollbars which can be added to any widget which supports scrolling (eg. Text, Listbox, Entry, etc.)
     """
     def __init__(self, *args,
-                 widget_factory: Callable[..., TWidget] = None,
+                 widget_factory: Callable[..., TWidget],
                  widget_args: Mapping[str, Any] = None,
                  show_scrollbars=tk.BOTH,
                  scrollbar: Callable[..., Union[tk.Scrollbar, ttk.Scrollbar]] = ttk.Scrollbar,
@@ -24,9 +24,8 @@ class ScrollbarFrame(tk.Frame, Generic[TWidget]):
         if widget_args is None:
             widget_args = dict()
 
-        if widget_factory:
-            self.__widget = widget_factory(self, **widget_args)
-            self.__widget.grid(row=0, column=0, sticky=tk.NSEW)
+        self.__widget = widget_factory(self, **widget_args)
+        self.__widget.grid(row=0, column=0, sticky=tk.NSEW)
         
         if show_scrollbars in (tk.HORIZONTAL, tk.BOTH):
             x_scrollbar = scrollbar(self, orient=tk.HORIZONTAL, command=self.__widget.xview)
@@ -46,10 +45,20 @@ class ScrollbarFrame(tk.Frame, Generic[TWidget]):
 if __name__ == '__main__':
     root = tk.Tk()
     
-    scrollable_text = ScrollbarFrame(root, tk.Text, widget_args=dict(wrap=tk.NONE), scrollbar=ttk.Scrollbar)
+    scrollable_text = ScrollbarFrame(
+        root,
+        widget_factory=tk.Text,
+        widget_args=dict(wrap=tk.NONE),
+        scrollbar=ttk.Scrollbar
+    )
     scrollable_text.pack()
     
-    scrollable_listbox = ScrollbarFrame(root, tk.Listbox, scrollbar=ttk.Scrollbar, show_scrollbars=tk.VERTICAL)
+    scrollable_listbox = ScrollbarFrame(
+        root,
+        widget_factory=tk.Listbox,
+        scrollbar=ttk.Scrollbar,
+        show_scrollbars=tk.VERTICAL
+    )
     scrollable_listbox.pack()
 
     root.mainloop()
