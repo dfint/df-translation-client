@@ -1,9 +1,10 @@
 import codecs
+from collections import OrderedDict
 from pathlib import Path
-from typing import List
+from typing import List, Mapping, Set
 
 from df_gettext_toolkit import parse_po
-from df_gettext_toolkit.fix_translated_strings import cleanup_string
+from df_gettext_toolkit.fix_translated_strings import cleanup_string, fix_spaces
 from dfrus.patch_charmap import get_codepages, get_encoder
 
 
@@ -47,8 +48,8 @@ def get_suitable_codepages_for_directory(directory: Path, language: str):
 
     for file in files:
         with open(directory / file, "r", encoding="utf-8") as fn:
-            pofile = parse_po.PoReader(fn)
-            strings = [cleanup_string(entry["msgstr"]) for entry in pofile]
+            po_file = parse_po.PoReader(fn)
+            strings = [cleanup_string(entry["msgstr"]) for entry in po_file]
         codepages = filter_codepages(codepages, strings)
 
     return codepages
@@ -58,8 +59,21 @@ def get_suitable_codepages_for_file(translation_file: Path):
     codepages = get_codepages().keys()
 
     with open(translation_file, "r", encoding="utf-8") as fn:
-        pofile = parse_po.PoReader(fn)
-        translation_file_language = pofile.meta["Language"]
-        strings = [cleanup_string(entry["msgstr"]) for entry in pofile]
+        po_file = parse_po.PoReader(fn)
+        translation_file_language = po_file.meta["Language"]
+        strings = [cleanup_string(entry["msgstr"]) for entry in po_file]
 
     return filter_codepages(codepages, strings), translation_file_language
+
+
+def load_dictionary_with_cleanup(translation_file: Path, exclusions_by_language: Mapping[str, Set[str]]):
+    with open(translation_file, "r", encoding="utf-8") as fn:
+        po_file = parse_po.PoReader(fn)
+        meta = po_file.meta
+        exclusions = exclusions_by_language.get(meta["Language"], None)
+        dictionary = OrderedDict(
+            (entry["msgid"],
+             fix_spaces(entry["msgid"], cleanup_string(entry["msgstr"]), exclusions, exclusions))
+            for entry in po_file
+        )
+    return dictionary

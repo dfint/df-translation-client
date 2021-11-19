@@ -6,12 +6,11 @@ from tkinter import messagebox, ttk
 from typing import Optional
 
 from df_gettext_toolkit import parse_po
-from df_gettext_toolkit.fix_translated_strings import fix_spaces, cleanup_string
 from dfrus import dfrus
 from natsort import natsorted
 
 from config import Config
-from po_languages import get_suitable_codepages_for_file
+from po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup
 from tkinter_helpers import Grid, GridCell
 from widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from widgets.custom_widgets import Checkbutton, Combobox, Text
@@ -28,7 +27,7 @@ class ProcessMessageWrapper:
 
     def write(self, s):
         for i in range(0, len(s), self._chunk_size):
-            self._message_receiver.send(s[i:i+self._chunk_size])
+            self._message_receiver.send(s[i:i + self._chunk_size])
 
     def flush(self):
         pass  # stub method
@@ -38,10 +37,10 @@ class PatchExecutableFrame(tk.Frame):
     def update_log(self, message_queue):
         try:
             message = []
-            
+
             while message_queue.poll():
                 message.append(message_queue.recv())
-            
+
             self.log_field.write("".join(message))
 
             if not self.dfrus_process.is_alive():
@@ -53,19 +52,6 @@ class PatchExecutableFrame(tk.Frame):
             self.log_field.write("\n[MESSAGE QUEUE/PIPE BROKEN]")
             self.button_patch.reset_state()
 
-    def load_dictionary(self):
-        translation_file = self.fileentry_translation_file.path
-        with open(translation_file, "r", encoding="utf-8") as fn:
-            pofile = parse_po.PoReader(fn)
-            meta = pofile.meta
-            exclusions = self.exclusions.get(meta["Language"], self.exclusions)
-            dictionary = OrderedDict(
-                (entry["msgid"],
-                 fix_spaces(entry["msgid"], cleanup_string(entry["msgstr"]), exclusions, exclusions))
-                for entry in pofile
-            )
-        return dictionary
-
     def bt_patch(self):
         if self.dfrus_process is not None and self.dfrus_process.is_alive():
             return False
@@ -76,7 +62,7 @@ class PatchExecutableFrame(tk.Frame):
             messagebox.showerror("Error", "Valid path to an executable file must be specified")
         else:
             if not self.debug_frame:
-                dictionary = self.load_dictionary()
+                dictionary = load_dictionary_with_cleanup(self.fileentry_translation_file.path, self.exclusions)
             else:
                 dictionary = OrderedDict(self.debug_frame.bisect.filtered_strings)
 
@@ -212,7 +198,8 @@ class PatchExecutableFrame(tk.Frame):
                 self.config_section.check_and_save_path("df_exe_translation_file", file_path)
                 self.update_combo_encoding(Path(file_path))
                 if self.debug_frame:
-                    self.debug_frame.set_dictionary(self.load_dictionary())
+                    self.debug_frame.set_dictionary(load_dictionary_with_cleanup(self.fileentry_translation_file.path,
+                                                                                 self.exclusions))
 
             self.fileentry_translation_file = FileEntry(
                 dialog_type="askopenfilename",
@@ -249,7 +236,11 @@ class PatchExecutableFrame(tk.Frame):
             grid.add_row(self.chk_add_leading_trailing_spaces, ..., button_exclusions)
 
             if debug:
-                self.debug_frame = DebugFrame(dictionary=self.load_dictionary())
+                self.debug_frame = DebugFrame(dictionary=load_dictionary_with_cleanup(
+                    self.fileentry_translation_file.path,
+                    self.exclusions
+                ))
+
                 grid.add_row(GridCell(self.debug_frame, sticky=tk.NSEW, columnspan=3)).configure(weight=1)
             else:
                 self.debug_frame = None
@@ -278,5 +269,5 @@ class PatchExecutableFrame(tk.Frame):
             self.log_field: Text = scrollbar_frame.widget
 
             grid.columnconfigure(1, weight=1)
-        
+
         self.bind("<Destroy>", self.kill_processes)
