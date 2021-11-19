@@ -1,5 +1,5 @@
 import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import ttk
 from typing import TypeVar, Generic, Iterable, List, Tuple
 
 

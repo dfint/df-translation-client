@@ -1,5 +1,5 @@
 from collections import namedtuple
-from tkinter import ttk as ttk
+from tkinter import ttk
 
 
 class TwoStateButton(ttk.Button):

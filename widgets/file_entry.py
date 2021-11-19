@@ -1,6 +1,6 @@
 import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog, ttk as ttk
+from tkinter import filedialog, ttk
 
 from tkinter_helpers import Packer
 from widgets.custom_widgets import Entry

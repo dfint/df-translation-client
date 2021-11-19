@@ -1,6 +1,6 @@
 import tkinter as tk
 import traceback
-from tkinter import ttk as ttk, messagebox
+from tkinter import ttk, messagebox
 
 from config import Config
 from frames.frame_download import DownloadTranslationsFrame

@@ -2,10 +2,9 @@ import multiprocessing as mp
 import subprocess
 import sys
 import tkinter as tk
-import tkinter.ttk as ttk
 import traceback
 from pathlib import Path
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 
 import requests
 from transifex.api import TransifexAPI, TransifexAPIException

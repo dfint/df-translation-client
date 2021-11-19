@@ -1,7 +1,7 @@
 import tkinter as tk
-import tkinter.ttk as ttk
 from itertools import islice
 from operator import itemgetter
+from tkinter import ttk
 
 from tkinter_helpers import Grid, Packer
 from .scrollbar_frame import ScrollbarFrame

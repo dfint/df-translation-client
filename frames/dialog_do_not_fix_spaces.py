@@ -1,7 +1,7 @@
 import re
 import tkinter as tk
 from copy import deepcopy
-from tkinter import ttk as ttk
+from tkinter import ttk
 from typing import MutableMapping, List, Mapping, Optional
 
 from tkinter_helpers import Grid, Packer
