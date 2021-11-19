@@ -7,11 +7,12 @@ from df_gettext_toolkit.translate_plain_text import translate_plain_text
 from df_gettext_toolkit.translate_raws import translate_raws
 from natsort import natsorted
 
-from config import Config
-from po_languages import get_languages, filter_files_by_language, get_suitable_codepages_for_directory
-from tkinter_helpers import Grid, Packer
-from widgets import FileEntry, ScrollbarFrame
-from widgets.custom_widgets import Combobox, Listbox
+from df_translation_client.config import Config
+from df_translation_client.po_languages import get_languages, filter_files_by_language, \
+    get_suitable_codepages_for_directory
+from df_translation_client.tkinter_helpers import Grid, Packer
+from df_translation_client.widgets import FileEntry, ScrollbarFrame
+from df_translation_client.widgets.custom_widgets import Combobox, Listbox
 
 
 class TranslateExternalFiles(tk.Frame):

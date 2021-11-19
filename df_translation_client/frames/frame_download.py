@@ -9,10 +9,10 @@ from tkinter import ttk, messagebox
 import requests
 from transifex.api import TransifexAPI, TransifexAPIException
 
-from config import Config
-from tkinter_helpers import Grid, GridCell
-from widgets import FileEntry, TwoStateButton, ScrollbarFrame
-from widgets.custom_widgets import Combobox, Entry, Listbox
+from df_translation_client.config import Config
+from df_translation_client.tkinter_helpers import Grid, GridCell
+from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
+from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox
 
 
 def downloader(conn, tx: TransifexAPI, project: str, language: str, resources, file_path_pattern: str):

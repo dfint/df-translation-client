@@ -1,4 +1,4 @@
-from config import Config
+from df_translation_client.config import Config
 
 
 def test_config():

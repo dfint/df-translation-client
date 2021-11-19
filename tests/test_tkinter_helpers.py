@@ -1,12 +1,12 @@
 import pytest
 
-from tkinter_helpers import Packer, set_parent, ParentSetter, Grid, GridCell, Row
+from df_translation_client.tkinter_helpers import Packer, set_parent, ParentSetter, Grid, GridCell, Row
 
 
 @pytest.mark.parametrize("context_manager", [set_parent, ParentSetter, Grid, Packer])
 def test_context_managers(context_manager, mocker):
     default_root_wrapper = mocker.Mock()
-    mocker.patch("tkinter_helpers.default_root_wrapper", default_root_wrapper)
+    mocker.patch("df_translation_client.tkinter_helpers.default_root_wrapper", default_root_wrapper)
 
     old_default_root = mocker.Mock(name="old default_root")
     default_root_wrapper.default_root = old_default_root
@@ -22,7 +22,7 @@ def test_context_managers(context_manager, mocker):
 
 def test_packer(mocker):
     default_root_wrapper = mocker.Mock()
-    mocker.patch("tkinter_helpers.default_root_wrapper", default_root_wrapper)
+    mocker.patch("df_translation_client.tkinter_helpers.default_root_wrapper", default_root_wrapper)
 
     old_default_root = mocker.Mock(name="old default_root")
     default_root_wrapper.default_root = old_default_root

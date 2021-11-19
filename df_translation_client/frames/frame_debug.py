@@ -4,8 +4,8 @@ from tkinter import ttk
 
 from dfrus import dfrus
 
-from tkinter_helpers import Packer
-from widgets import BisectTool
+from df_translation_client.tkinter_helpers import Packer
+from df_translation_client.widgets import BisectTool
 
 
 class DebugFrame(tk.Frame):
@@ -16,7 +16,9 @@ class DebugFrame(tk.Frame):
     def __init__(self, *args, dictionary=None, **kwargs):
         super().__init__(*args, **kwargs)
         with Packer(self) as packer:
-            self.bisect = BisectTool(self, strings=list(dictionary.items()))
+            if dictionary is not None:
+                dictionary = list(dictionary.items())
+            self.bisect = BisectTool(self, strings=dictionary)
 
             packer.pack(ttk.Button(text="Reload dfrus", command=self.reload)) \
                   .expand(self.bisect)

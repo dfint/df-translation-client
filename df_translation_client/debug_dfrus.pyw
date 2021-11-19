@@ -2,9 +2,9 @@ import importlib
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from tkinter_helpers import Packer
-from widgets import FileEntry, BisectTool, ScrollbarFrame
-from widgets.custom_widgets import Text
+from .tkinter_helpers import Packer
+from .widgets import FileEntry, BisectTool, ScrollbarFrame
+from .widgets.custom_widgets import Text
 
 
 class App(tk.Tk):

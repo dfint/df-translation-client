@@ -3,7 +3,7 @@ from itertools import islice
 from operator import itemgetter
 from tkinter import ttk
 
-from tkinter_helpers import Grid, Packer
+from df_translation_client.tkinter_helpers import Grid, Packer
 from .scrollbar_frame import ScrollbarFrame
 
 

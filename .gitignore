@@ -7,3 +7,4 @@ venv
 *.mo
 .df-translate.json
 .coverage
+*.egg-info

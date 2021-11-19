@@ -4,9 +4,9 @@ from copy import deepcopy
 from tkinter import ttk
 from typing import MutableMapping, List, Mapping, Optional
 
-from tkinter_helpers import Grid, Packer
-from widgets import ScrollbarFrame
-from widgets.custom_widgets import Listbox, Combobox, Entry
+from ..tkinter_helpers import Grid, Packer
+from ..widgets import ScrollbarFrame
+from ..widgets.custom_widgets import Listbox, Combobox, Entry
 
 
 class HighlightedSpacesItem:

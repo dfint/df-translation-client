@@ -2,8 +2,8 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, ttk
 
-from tkinter_helpers import Packer
-from widgets.custom_widgets import Entry
+from df_translation_client.tkinter_helpers import Packer
+from df_translation_client.widgets.custom_widgets import Entry
 
 
 class FileEntry(tk.Frame):

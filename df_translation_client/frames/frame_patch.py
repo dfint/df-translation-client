@@ -8,11 +8,12 @@ from typing import Optional
 from dfrus import dfrus
 from natsort import natsorted
 
-from config import Config
-from po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup, load_dictionary_raw
-from tkinter_helpers import Grid, GridCell
-from widgets import FileEntry, TwoStateButton, ScrollbarFrame
-from widgets.custom_widgets import Checkbutton, Combobox, Text
+from df_translation_client.config import Config
+from df_translation_client.po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup, \
+    load_dictionary_raw
+from df_translation_client.tkinter_helpers import Grid, GridCell
+from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
+from df_translation_client.widgets.custom_widgets import Checkbutton, Combobox, Text
 from .dialog_do_not_fix_spaces import DialogDoNotFixSpaces
 from .frame_debug import DebugFrame
 
@@ -236,10 +237,14 @@ class PatchExecutableFrame(tk.Frame):
             grid.add_row(self.chk_add_leading_trailing_spaces, ..., button_exclusions)
 
             if debug:
-                self.debug_frame = DebugFrame(dictionary=load_dictionary_with_cleanup(
-                    self.fileentry_translation_file.path,
-                    self.exclusions
-                ))
+                if self.fileentry_translation_file.path.is_file():
+                    dictionary = load_dictionary_with_cleanup(
+                        self.fileentry_translation_file.path,
+                        self.exclusions
+                    )
+                else:
+                    dictionary = None
+                self.debug_frame = DebugFrame(dictionary=dictionary)
 
                 grid.add_row(GridCell(self.debug_frame, sticky=tk.NSEW, columnspan=3)).configure(weight=1)
             else:
