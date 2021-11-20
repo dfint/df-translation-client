@@ -3,7 +3,7 @@ from functools import partial
 from itertools import islice
 from operator import itemgetter
 from tkinter import ttk
-from typing import List, Optional, Tuple, Iterable, Hashable
+from typing import List, Optional, Tuple, Iterable, Hashable, Any
 
 from bidict import bidict, MutableBidict
 
@@ -12,11 +12,15 @@ from ..tkinter_helpers import Grid, Packer
 
 
 class Node:
-    def __init__(self, strings: List, start=0, end=-1):
-        self._strings = strings
+    _all_items: List[Any]
+    start: int
+    end: int
+
+    def __init__(self, items: List, start: int = 0, end: int = -1):
+        self._all_items = items
         self.start = start
-        self.end = end if end >= 0 else len(strings) - 1
-        assert 0 <= self.start <= self.end < len(strings)
+        self.end = end if end >= 0 else len(items) - 1
+        assert 0 <= self.start <= self.end < len(items)
 
     @property
     def size(self):
@@ -25,7 +29,7 @@ class Node:
     def split(self) -> Tuple["Node", "Node"]:
         assert self.size >= 2
         mid = (self.start + self.end) // 2
-        return Node(self._strings, self.start, mid), Node(self._strings, mid + 1, self.end)
+        return Node(self._all_items, self.start, mid), Node(self._all_items, mid + 1, self.end)
 
     @property
     def tree_text(self):
@@ -36,17 +40,17 @@ class Node:
 
     @property
     def items(self) -> Iterable[Tuple[str, str]]:
-        return islice(self._strings, self.start, self.end + 1)
+        return islice(self._all_items, self.start, self.end + 1)
 
     @property
     def column_text(self) -> str:
         if self.start == self.end:
-            return repr(self._strings[self.start])
+            return repr(self._all_items[self.start])
         else:
             if self.end - self.start + 1 <= 2:  # One or two strings in the slice: show all strings
                 return ",".join(map(repr, self.items))
             else:  # More strings: show the first and the last
-                return f"{self._strings[self.start]!r} ... {self._strings[self.end]!r}"
+                return f"{self._all_items[self.start]!r} ... {self._all_items[self.end]!r}"
 
     def __hash__(self):
         return hash((self.start, self.end))
