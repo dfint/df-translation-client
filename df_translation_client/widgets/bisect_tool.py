@@ -49,6 +49,9 @@ class Node:
     def __eq__(self, other: "Node"):
         return self.start == other.start and self.end == other.end
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(..., {self.start}, {self.end})"
+
 
 class BisectTool(tk.Frame):
     _strings: Optional[List[Tuple[str, str]]]
@@ -92,6 +95,7 @@ class BisectTool(tk.Frame):
     def strings(self, value):
         self._strings = value
         self.tree.delete(*self.tree.get_children())
+        self._nodes_by_item_ids = bidict()  # Create new empty bidict to avoid ValueDuplicationError
         if value:
             self.insert_node(Node(value))
 
