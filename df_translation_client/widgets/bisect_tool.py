@@ -12,7 +12,7 @@ from ..tkinter_helpers import Grid, Packer
 
 
 class Node:
-    def __init__(self, strings: List[Tuple[str, str]], start=0, end=-1):
+    def __init__(self, strings: List, start=0, end=-1):
         self._strings = strings
         self.start = start
         self.end = end if end >= 0 else len(strings) - 1
@@ -23,14 +23,18 @@ class Node:
         return Node(self._strings, self.start, mid), Node(self._strings, mid + 1, self.end)
 
     @property
-    def tree_text(self):
-        if self.start == self.end:
-            return f"[{self.start} : {self.end}] (1 string)"
-        else:
-            return f"[{self.start} : {self.end}] ({self.end - self.start + 1} strings)"
+    def size(self):
+        return self.end - self.start + 1
 
     @property
-    def strings(self) -> Iterable[Tuple[str, str]]:
+    def tree_text(self):
+        if self.size == 1:
+            return f"[{self.start} : {self.end}] (1 string)"
+        else:
+            return f"[{self.start} : {self.end}] ({self.size} strings)"
+
+    @property
+    def items(self) -> Iterable[Tuple[str, str]]:
         return islice(self._strings, self.start, self.end + 1)
 
     @property
@@ -39,7 +43,7 @@ class Node:
             return repr(self._strings[self.start])
         else:
             if self.end - self.start + 1 <= 2:  # One or two strings in the slice: show all strings
-                return ",".join(map(repr, self.strings))
+                return ",".join(map(repr, self.items))
             else:  # More strings: show the first and the last
                 return f"{self._strings[self.start]!r} ... {self._strings[self.end]!r}"
 
