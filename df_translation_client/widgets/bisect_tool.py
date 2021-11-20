@@ -16,15 +16,16 @@ class Node:
         self._strings = strings
         self.start = start
         self.end = end if end >= 0 else len(strings) - 1
-
-    def split(self) -> Tuple["Node", "Node"]:
-        assert self.start != self.end
-        mid = (self.start + self.end) // 2
-        return Node(self._strings, self.start, mid), Node(self._strings, mid + 1, self.end)
+        assert 0 <= self.start <= self.end < len(strings)
 
     @property
     def size(self):
         return self.end - self.start + 1
+
+    def split(self) -> Tuple["Node", "Node"]:
+        assert self.size >= 2
+        mid = (self.start + self.end) // 2
+        return Node(self._strings, self.start, mid), Node(self._strings, mid + 1, self.end)
 
     @property
     def tree_text(self):
