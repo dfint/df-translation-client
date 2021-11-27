@@ -1,6 +1,5 @@
-from collections import OrderedDict
 from pathlib import Path
-from typing import List, Mapping, Set, Iterable
+from typing import List, Mapping, Set, Iterable, Optional, Tuple, TextIO
 
 from df_gettext_toolkit import parse_po
 from df_gettext_toolkit.fix_translated_strings import cleanup_string, fix_spaces
@@ -62,22 +61,29 @@ def get_suitable_codepages_for_file(translation_file: Path):
     return filter_codepages(codepages, strings), translation_file_language
 
 
-def load_dictionary_with_cleanup(translation_file: Path, exclusions_by_language: Mapping[str, Set[str]]):
-    with open(translation_file, "r", encoding="utf-8") as fn:
-        po_file = parse_po.PoReader(fn)
-        meta = po_file.meta
-        exclusions = exclusions_by_language.get(meta["Language"], None)
-        dictionary = OrderedDict(
-            (entry["msgid"],
-             fix_spaces(entry["msgid"], cleanup_string(entry["msgstr"]), exclusions, exclusions))
-            for entry in po_file
-        )
-    return dictionary
+def cleanup_translations_string(original: str, translation: str,
+                                exclusions_leading: Optional[Set[str]],
+                                exclusions_trailing: Optional[Set[str]]) -> str:
+    return fix_spaces(original, cleanup_string(translation), exclusions_leading, exclusions_trailing)
 
 
-def load_dictionary_raw(translation_file):
-    with open(translation_file, "r", encoding="utf-8") as fn:
-        po_file = parse_po.PoReader(fn)
-        language = po_file.meta["Language"]
-        dictionary = {entry["msgid"]: entry["msgstr"] for entry in po_file}
+def cleanup_dictionary(raw_dict: Iterable[Tuple[str, str]],
+                       exclusions_leading: Optional[Set[str]],
+                       exclusions_trailing: Optional[Set[str]]) -> Iterable[Tuple[str, str]]:
+    return {
+        (original, cleanup_translations_string(original, translation, exclusions_leading, exclusions_trailing))
+        for original, translation in raw_dict
+    }
+
+
+def load_dictionary_raw(translation_file: TextIO) -> Tuple[Iterable[Tuple[str, str]], str]:
+    po_file = parse_po.PoReader(translation_file)
+    language = po_file.meta["Language"]
+    dictionary = ((entry["msgid"], entry["msgstr"]) for entry in po_file)
     return dictionary, language
+
+
+def load_dictionary_with_cleanup(translation_file: TextIO, exclusions_by_language: Mapping[str, Set[str]]):
+    dictionary, language = load_dictionary_raw(translation_file)
+    exclusions = exclusions_by_language.get(language, None)
+    return cleanup_dictionary(dictionary, exclusions, exclusions)

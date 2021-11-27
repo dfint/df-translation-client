@@ -1,6 +1,5 @@
 import multiprocessing as mp
 import tkinter as tk
-from collections import OrderedDict
 from pathlib import Path
 from tkinter import messagebox, ttk
 from typing import Optional
@@ -62,9 +61,10 @@ class PatchExecutableFrame(tk.Frame):
             messagebox.showerror("Error", "Valid path to an executable file must be specified")
         else:
             if not self.debug_frame:
-                dictionary = load_dictionary_with_cleanup(self.fileentry_translation_file.path, self.exclusions)
+                with open(self.fileentry_translation_file.path, "r", encoding="utf-8") as translation_file:
+                    dictionary = dict(load_dictionary_with_cleanup(translation_file, self.exclusions))
             else:
-                dictionary = OrderedDict(self.debug_frame.bisect.filtered_strings)
+                dictionary = dict(self.debug_frame.bisect.filtered_strings)
 
             self.config_section["last_encoding"] = self.combo_encoding.text
 
@@ -102,10 +102,11 @@ class PatchExecutableFrame(tk.Frame):
             self.dfrus_process.terminate()
 
     def bt_exclusions(self):
-        translation_file = self.fileentry_translation_file.path
+        translation_file_path = self.fileentry_translation_file.path
 
-        if translation_file.exists():
-            dictionary, language = load_dictionary_raw(translation_file)
+        if translation_file_path.exists():
+            with open(translation_file_path, "r", encoding="utf-8") as translation_file:
+                dictionary, language = load_dictionary_raw(translation_file)
         else:
             dictionary = None
             language = None
@@ -169,6 +170,13 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = "cp437"
 
+    def on_translation_file_change(self, file_path):
+        self.config_section.check_and_save_path("df_exe_translation_file", file_path)
+        self.update_combo_encoding(self.fileentry_translation_file.path)
+        if self.debug_frame:
+            with open(self.fileentry_translation_file.path, "r", encoding="utf-8") as translation_file:
+                self.debug_frame.set_dictionary(load_dictionary_with_cleanup(translation_file, self.exclusions))
+
     def __init__(self, *args, config: Config, debug=False, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -195,13 +203,6 @@ class PatchExecutableFrame(tk.Frame):
             )
             grid.add_row("DF executable file:", self.file_entry_executable_file, ...)
 
-            def on_translation_file_change(file_path):
-                self.config_section.check_and_save_path("df_exe_translation_file", file_path)
-                self.update_combo_encoding(Path(file_path))
-                if self.debug_frame:
-                    self.debug_frame.set_dictionary(load_dictionary_with_cleanup(self.fileentry_translation_file.path,
-                                                                                 self.exclusions))
-
             self.fileentry_translation_file = FileEntry(
                 dialog_type="askopenfilename",
                 filetypes=[
@@ -210,7 +211,7 @@ class PatchExecutableFrame(tk.Frame):
                     # ("csv file", "*.csv"), # @TODO: Currently not supported
                 ],
                 default_path=self.config_section.get("df_exe_translation_file", ""),
-                on_change=on_translation_file_change,
+                on_change=self.on_translation_file_change,
                 change_color=True
             )
             grid.add_row("DF executable translation file:", self.fileentry_translation_file, ...)
@@ -238,10 +239,8 @@ class PatchExecutableFrame(tk.Frame):
 
             if debug:
                 if self.fileentry_translation_file.path.is_file():
-                    dictionary = load_dictionary_with_cleanup(
-                        self.fileentry_translation_file.path,
-                        self.exclusions
-                    )
+                    with open(self.fileentry_translation_file.path, "r", encoding="utf-8") as translation_file:
+                        dictionary = load_dictionary_with_cleanup(translation_file, self.exclusions)
                 else:
                     dictionary = None
                 self.debug_frame = DebugFrame(dictionary=dictionary)
