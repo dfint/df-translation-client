@@ -8,3 +8,5 @@ venv
 .df-translate.json
 .coverage
 *.egg-info
+*.log
+*.log.*
