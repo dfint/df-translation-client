@@ -214,11 +214,11 @@ class PatchExecutableFrame(tk.Frame):
                 on_change=self.on_translation_file_change,
                 change_color=True
             )
-            grid.add_row("DF executable translation file:", self.fileentry_translation_file, ...)
+            grid.add_row("Translation file:", self.fileentry_translation_file, ...)
 
             self.combo_encoding = Combobox()
             self.config_combo_encoding(self.fileentry_translation_file.path)
-            grid.add_row("Encoding:", self.combo_encoding)
+            grid.add_row("Encoding:", self.combo_encoding, ...)
 
             # FIXME: chk_do_not_patch_charmap does nothing
             self.chk_do_not_patch_charmap = self.setup_checkbutton(

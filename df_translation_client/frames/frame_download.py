@@ -48,8 +48,6 @@ class DownloadTranslationsFrame(tk.Frame):
             languages = self.tx.list_languages(project, resource_slug=self.resources[0]["slug"])
         except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
             messagebox.showerror("Error", err)
-        except Exception:
-            messagebox.showerror("Unexpected error", traceback.format_exc())
         else:
             self.combo_languages.values = sorted(languages)
             last_language = self.config_section.get("language", None)
@@ -200,7 +198,7 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
 
             self.combo_languages = Combobox()
-            grid.add_row("Choose language:", self.combo_languages)
+            grid.add_row("Choose language:", self.combo_languages, ...)
 
             grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
 
