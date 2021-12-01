@@ -1,6 +1,6 @@
-def main():
-    import df_translation_client.__main__
+import sys
+from subprocess import Popen
 
 
 if __name__ == '__main__':
-    main()
+    Popen("poetry run df-translate".split() + sys.argv[1:])
