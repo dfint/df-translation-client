@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "df-translation-client"
+version = "0.1.0"
+description = "A GUI client intended to simplify usage of dfrus and other utilities"
+authors = ["insolor <insolor@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+bidict = "^0.21.4"
+natsort = "8.0.0"
+requests = "^2.26.0"
+python-transifex = { url = "https://github.com/insolor/python-transifex/archive/master.zip" }
+dfrus = { url = "https://github.com/dfint/dfrus/releases/download/0.0.9/dfrus-0.0.9-py3-none-any.whl" }
+df-gettext-toolkit = { url = "https://github.com/dfint/df-gettext-toolkit/releases/download/0.2.4/df_gettext_toolkit-0.2.4-py3-none-any.whl" }
+df-raw-decoder = { url = "https://github.com/dfint/df_raw_decoder/releases/download/1.0.0/df_raw_decoder-1.0.0-py3-none-any.whl" }
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+pytest-mock = "^3.6.1"
+pytest-timeout = "^2.0.1"
+flake8 = "^4.0.1"
+# tkinter-stubs = { url = "https://github.com/insolor/tkinter-stubs/releases/download/0.1.0/tkinter_stubs-0.1.0-py3-none-any.whl" }
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
