@@ -16,10 +16,8 @@ A GUI client intended to simplify usage of all the utils of the localization pro
     ```
     (use `pip3` instead of `pip` on Linux)
 
-* Double click `df-translate.pyw` file or run it from a command line:
-    
-    `python df-translate.pyw`
- 
-    (use `python3` instead of `python` on Linux)
+* Double click `df-translate.pyw` file or run the application from the command line:
+
+    `poetry run df-translate`
 
 ![screenshot](screenshot.png)
