@@ -1,7 +1,9 @@
 *.pyc
-.idea
-venv
-.pytest_cache
+.idea/
+venv/
+.venv/
+.pytest_cache/
+htmlcov/
 *.po
 *.pot
 *.mo
