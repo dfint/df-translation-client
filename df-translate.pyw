@@ -1,6 +1,7 @@
 import sys
-from subprocess import Popen
+from subprocess import run, CREATE_NO_WINDOW
 
 
 if __name__ == '__main__':
-    Popen("poetry run df-translate".split() + sys.argv[1:])
+    run("poetry install --no-dev".split())
+    run("poetry run df-translate".split() + sys.argv[1:], creationflags=CREATE_NO_WINDOW)
