@@ -6,7 +6,7 @@ authors = ["insolor <insolor@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 bidict = "^0.21.4"
 natsort = "8.0.0"
 requests = "^2.26.0"
