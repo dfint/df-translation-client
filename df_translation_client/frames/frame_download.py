@@ -187,25 +187,27 @@ class DownloadTranslationsFrame(tk.Frame):
 
             self.button_connect = ttk.Button(text="Connect...", command=self.bt_connect)
             grid.new_row() \
-                .add(tk.Label(text="Download from:")) \
+                .add(tk.Label(text="Download from:"), sticky=tk.W) \
                 .add(self.combo_download_from) \
                 .add(self.button_connect, sticky=tk.NSEW).row_span(3)
 
             self.combo_projects = Combobox(values=self.config_section["recent_projects"])
             self.combo_projects.current(0)
-            grid.new_row().add(tk.Label(text="Transifex project:")).add(self.combo_projects)
+            grid.new_row().add(tk.Label(text="Transifex project:"), sticky=tk.W).add(self.combo_projects)
 
             self.entry_username = Entry()
             self.entry_username.text = self.config_section.get("username", "")
-            grid.new_row().add(tk.Label(text="Username:")).add(self.entry_username)
+            grid.new_row().add(tk.Label(text="Username:"), sticky=tk.W).add(self.entry_username)
 
             self.entry_password = Entry(show="•")
-            grid.new_row().add(tk.Label(text="Password:")).add(self.entry_password)
+            grid.new_row().add(tk.Label(text="Password:"), sticky=tk.W).add(self.entry_password)
 
             grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
             self.combo_languages = Combobox()
-            grid.new_row().add(tk.Label(text="Choose language:")).add(self.combo_languages).column_span(2)
+            grid.new_row() \
+                .add(tk.Label(text="Choose language:"), sticky=tk.W) \
+                .add(self.combo_languages).column_span(2)
 
             grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
@@ -214,7 +216,9 @@ class DownloadTranslationsFrame(tk.Frame):
                 default_path=self.config_section.get("download_to", ""),
                 on_change=lambda text: self.config_section.check_and_save_path("download_to", text),
             )
-            grid.new_row().add(tk.Label(text="Download to:")).add(self.fileentry_download_to).column_span(2)
+            grid.new_row()\
+                .add(tk.Label(text="Download to:"), sticky=tk.W)\
+                .add(self.fileentry_download_to).column_span(2)
 
             self.button_download = TwoStateButton(text="Download translations", command=self.bt_download,
                                                   text2="Stop", command2=self.bt_stop_downloading)
