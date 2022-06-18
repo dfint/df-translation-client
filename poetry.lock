@@ -431,7 +431,7 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 
 [[package]]
 name = "tk-grid-helper"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 category = "main"
 optional = false
@@ -439,7 +439,7 @@ python-versions = ">=3.6,<4.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/insolor/tk_grid_helper/releases/download/0.1.1/tk_grid_helper-0.1.1-py3-none-any.whl"
+url = "https://github.com/insolor/tk_grid_helper/releases/download/0.1.2/tk_grid_helper-0.1.2-py3-none-any.whl"
 [[package]]
 name = "toml"
 version = "0.10.2"
@@ -530,7 +530,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "fbb75559867eb75e66dc711ce393a500d4143c839cadb765cfdb4d74091eff06"
+content-hash = "b2fe892cf04f5bd9ceedf9e77c013496fce26ef7ea2fff41ac12919f7bdb39af"
 
 [metadata.files]
 aiohttp = [
