@@ -5,8 +5,8 @@ from pathlib import Path
 
 from async_tkinter_loop import async_mainloop
 
+from df_translation_client.main_window import MainWindow
 from df_translation_client.utils.config import Config
-from .main_window import MainWindow
 
 
 class App:
