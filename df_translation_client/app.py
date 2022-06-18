@@ -40,7 +40,6 @@ class App:
 
     def run(self):
         async_mainloop(self.main_window)
-        # self.main_window.mainloop()
 
 
 def main():
