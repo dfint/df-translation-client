@@ -1,5 +1,5 @@
-import asyncio
 import io
+import json
 import traceback
 from pathlib import PurePosixPath
 from typing import AsyncIterable, List, Mapping
@@ -14,16 +14,16 @@ class GithubDownloader(AbstractDownloader):
     metadata: Mapping[str, Mapping[str, str]]
     resources: List[str]
 
-    BASE_URL = PurePosixPath("https://raw.githubusercontent.com/dfint/translations-backup/main/")
+    BASE_URL = PurePosixPath("raw.githubusercontent.com/dfint/translations-backup/main/")
 
     def __init__(self):
         pass
 
     async def connect(self) -> None:
-        url = str(GithubDownloader.BASE_URL / "files_by_resource.json")
+        url = "https://" + str(GithubDownloader.BASE_URL / "files_by_resource.json")
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                self.metadata = await response.json()
+                self.metadata = json.loads(await response.text())
                 self.resources = list(self.metadata)
 
     async def async_downloader(self, language: str, resources: List[str], file_path_pattern: str) \
@@ -31,7 +31,7 @@ class GithubDownloader(AbstractDownloader):
         async with aiohttp.ClientSession() as session:
             for resource in resources:
                 yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
-                url = str(GithubDownloader.BASE_URL / "translation" / self.metadata[resource][language])
+                url = "https://" + str(GithubDownloader.BASE_URL / "translations" / self.metadata[resource][language])
                 try:
                     async with session.get(url) as response:
                         file_name = file_path_pattern.format(resource=resource, language=language)
@@ -41,7 +41,6 @@ class GithubDownloader(AbstractDownloader):
                                 if not block:
                                     break
                                 file.write(block)
-                                await asyncio.sleep(.05)  # let other parts of the program work
                 except Exception:
                     yield DownloadStage(resource, StatusEnum.FAILED, traceback.format_exc())
                 else:

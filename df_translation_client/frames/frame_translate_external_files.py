@@ -20,7 +20,7 @@ from df_translation_client.widgets.custom_widgets import Combobox, Listbox
 
 class TranslateExternalFiles(tk.Frame):
     def update_combo_languages(self, directory: Path):
-        if directory.exists():
+        try:
             languages = get_languages(directory)
             self.combo_language.values = languages
 
@@ -31,7 +31,7 @@ class TranslateExternalFiles(tk.Frame):
 
             self.update_listbox_translation_files()
             self.update_combo_encoding()
-        else:
+        except Exception:
             self.combo_language.values = tuple()
             self.combo_language.text = ''
 
