@@ -2,6 +2,7 @@ import asyncio
 import platform
 import subprocess
 import tkinter as tk
+import traceback
 from asyncio import Task
 from pathlib import Path
 from tkinter import ttk, messagebox
@@ -39,6 +40,7 @@ class DownloadTranslationsFrame(tk.Frame):
             languages = await self.downloader_api.list_languages(self.resources[0]["slug"])
         except Exception as err:
             messagebox.showerror("Error", str(err))
+            traceback.print_exc()
         else:
             self.combo_languages.values = sorted(languages)
             last_language = self.config_section.get("language", None)

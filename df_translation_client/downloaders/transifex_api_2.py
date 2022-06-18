@@ -3,14 +3,16 @@ import traceback
 
 from transifex.api import TransifexAPI
 
+from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
+
 try:
-    from asyncio import to_thread
+    from asyncio import to_thread  # added in Python 3.9
 except ImportError:
     async def to_thread(func, *args):
         return await asyncio.get_running_loop().run_in_executor(None, func, *args)
 
 
-class TransifexApiDownloader:
+class TransifexApiDownloader(AbstractDownloader):
     transifex_api: TransifexAPI
     project_slug: str
 
