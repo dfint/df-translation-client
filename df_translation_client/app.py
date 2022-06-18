@@ -3,8 +3,10 @@ import os
 import sys
 from pathlib import Path
 
-from .config import Config
-from .main_window import MainWindow
+from async_tkinter_loop import async_mainloop
+
+from df_translation_client.main_window import MainWindow
+from df_translation_client.utils.config import Config
 
 
 class App:
@@ -37,7 +39,7 @@ class App:
             self.setup_config_autosave(self.main_window, self.config)
 
     def run(self):
-        self.main_window.mainloop()
+        async_mainloop(self.main_window)
 
 
 def main():

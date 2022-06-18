@@ -3,12 +3,12 @@ from functools import partial
 from itertools import islice
 from operator import itemgetter
 from tkinter import ttk
-from typing import List, Optional, Tuple, Iterable, Hashable, Any
+from typing import List, Optional, Tuple, Iterable, Any
 
 from bidict import bidict, MutableBidict
 
-from .scrollbar_frame import ScrollbarFrame
-from ..tkinter_helpers import Grid, Packer
+from df_translation_client.utils.tkinter_helpers import Grid, Packer
+from df_translation_client.widgets.scrollbar_frame import ScrollbarFrame
 
 
 class Node:
@@ -64,7 +64,7 @@ class Node:
 
 class BisectTool(tk.Frame):
     _strings: Optional[List[Tuple[str, str]]]
-    _nodes_by_item_ids: MutableBidict[Hashable, Node]
+    _nodes_by_item_ids: MutableBidict[str, Node]
 
     def __init__(self, *args, strings: Optional[List[Tuple[str, str]]] = None, **kwargs):
         super().__init__(*args, **kwargs)

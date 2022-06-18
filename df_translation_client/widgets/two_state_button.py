@@ -4,8 +4,8 @@ from tkinter import ttk
 
 class TwoStateButton(ttk.Button):
     def _action(self):
-        command = self._state[0].command
-        if command():
+        command_result = self._state[0].command()
+        if command_result:
             self.swap_state()
 
     def swap_state(self):
