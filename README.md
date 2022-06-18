@@ -10,15 +10,32 @@ A GUI client intended to simplify usage of all the utils of the localization pro
 * [Python 3](https://www.python.org) must be installed (version 3.7 or higher).  
     Also, on Linux tkinter library must be installed (e.g. run `sudo apt install python3-tk` on Ubuntu).
 * Download project as zip archive and unpack it (or just clone with git if you know how to use it)
+
+
+### For usage
+
+* Double click `df-translate.pyw` file. It will take a moment before the main window appears when you run it for the first time, because it downloads required modules.
+
+### For development
+
 * Install `poetry`, then install the package with the following commands from the command line:
     ```bash
     pip install poetry
-    poetry install
     ```
     (use `pip3` instead of `pip` on Linux)
+    
+    Other possible ways of installation of poetry see [here](https://python-poetry.org/docs/#installation).
 
-* Double click `df-translate.pyw` file or run the application from the command line:
-
-    `poetry run df-translate`
+* Install the application with poetry and run it from the command line:
+    ```
+    poetry install
+    poetry run df-translate
+    ```
+    If you need to run the application from an activated virtual environment (eg. when you are using PyCharm), then use the following command:
+    ```
+    # poetry install
+    python -m df_translation_client
+    ```
+    I don't recommend running with `df-translate.pyw`, cause it will remove development requirements (like `pytest`, `flake8`, etc.) from the virtual environment.
 
 ![screenshot](screenshot.png)
