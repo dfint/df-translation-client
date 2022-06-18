@@ -10,13 +10,13 @@ from tkinter import ttk, messagebox
 from typing import List, Optional
 
 from async_tkinter_loop import async_handler
+from tk_grid_helper import grid_manager
 
 from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
 from df_translation_client.downloaders.common import StatusEnum, DownloadStage
 from df_translation_client.downloaders.github import GithubDownloader
 from df_translation_client.downloaders.transifex_api_2 import TransifexApiDownloader
 from df_translation_client.utils.config import Config
-from df_translation_client.utils.tkinter_helpers import Grid, GridCell
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox, TypedCombobox
 
@@ -179,51 +179,54 @@ class DownloadTranslationsFrame(tk.Frame):
             defaults=dict(recent_projects=["dwarf-fortress"])
         )
 
-        with Grid(self, sticky=tk.EW, padx=2, pady=2) as grid:
+        with grid_manager(self, sticky=tk.EW, padx=2, pady=2) as grid:
             self.combo_download_from = TypedCombobox[DownloadFromEnum](values=list(DownloadFromEnum))
             self.combo_download_from.select(DownloadFromEnum.GITHUB)
-            grid.add_row("Download from:", self.combo_download_from)
+
             self.combo_download_from.bind("<<ComboboxSelected>>", self.on_combo_download_from_change)
+
+            self.button_connect = ttk.Button(text="Connect...", command=self.bt_connect)
+            grid.new_row() \
+                .add(tk.Label(text="Download from:")) \
+                .add(self.combo_download_from) \
+                .add(self.button_connect, sticky=tk.NSEW).row_span(3)
 
             self.combo_projects = Combobox(values=self.config_section["recent_projects"])
             self.combo_projects.current(0)
-            grid.add_row("Transifex project:", self.combo_projects)
+            grid.new_row().add(tk.Label(text="Transifex project:")).add(self.combo_projects)
 
             self.entry_username = Entry()
             self.entry_username.text = self.config_section.get("username", "")
-            grid.add_row("Username:", self.entry_username)
+            grid.new_row().add(tk.Label(text="Username:")).add(self.entry_username)
 
             self.entry_password = Entry(show="•")
-            grid.add_row("Password:", self.entry_password)
+            grid.new_row().add(tk.Label(text="Password:")).add(self.entry_password)
 
-            self.button_connect = ttk.Button(text="Connect...", command=self.bt_connect)
-            grid.add(self.button_connect, row=0, column=2, rowspan=3, sticky=tk.NSEW)
-
-            grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
+            grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
             self.combo_languages = Combobox()
-            grid.add_row("Choose language:", self.combo_languages, ...)
+            grid.new_row().add(tk.Label(text="Choose language:")).add(self.combo_languages).column_span(2)
 
-            grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
+            grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
             self.fileentry_download_to = FileEntry(
                 dialog_type="askdirectory",
                 default_path=self.config_section.get("download_to", ""),
                 on_change=lambda text: self.config_section.check_and_save_path("download_to", text),
             )
-            grid.add_row("Download to:", self.fileentry_download_to, ...)
+            grid.new_row().add(tk.Label(text="Download to:")).add(self.fileentry_download_to).column_span(2)
 
             self.button_download = TwoStateButton(text="Download translations", command=self.bt_download,
                                                   text2="Stop", command2=self.bt_stop_downloading)
 
             self.progressbar = ttk.Progressbar()
 
-            grid.add_row(self.button_download, self.progressbar, ...)
+            grid.new_row().add(self.button_download).add(self.progressbar).column_span(2)
 
-            grid.add_row(tk.Label(text="Resources:"), ..., ...)
+            grid.new_row().add(tk.Label(text="Resources:")).column_span(3)
 
             scrollbar_frame = ScrollbarFrame(widget_factory=Listbox, show_scrollbars=tk.VERTICAL)
-            grid.add_row(GridCell(scrollbar_frame, columnspan=3, sticky=tk.NSEW)).configure(weight=1)
+            grid.new_row().add(scrollbar_frame, sticky=tk.NSEW).column_span(3).configure(weight=1)
 
             self.listbox_resources: Listbox = scrollbar_frame.widget
 
