@@ -1,3 +1,4 @@
+import asyncio
 import multiprocessing as mp
 import subprocess
 import sys
@@ -5,6 +6,7 @@ import tkinter as tk
 import traceback
 from pathlib import Path
 from tkinter import ttk, messagebox
+from typing import List, Optional
 
 import requests
 from async_tkinter_loop import async_handler
@@ -35,19 +37,36 @@ def downloader(conn, tx: TransifexAPI, project: str, language: str, resources, f
     conn.send((None, "completed"))
 
 
+def get_transifex_connection(username, password, project):
+    tx = TransifexAPI(username, password, "https://www.transifex.com")
+    assert tx.ping(), "No connection to the server"
+    assert tx.project_exists(project), "Project %r does not exist" % project
+    return tx
+
+
+def get_translations_info(transifex, project):
+    resources = transifex.list_resources(project)
+    languages = transifex.list_languages(project, resource_slug=resources[0]["slug"])
+    return resources, languages
+
+
+async def run_in_executor(func, *args):
+    return await asyncio.get_running_loop().run_in_executor(None, func, *args)
+
+
 class DownloadTranslationsFrame(tk.Frame):
+    transifex_api: Optional[TransifexAPI]
+    resources: Optional[List[dict]]
+
     @async_handler
     async def bt_connect(self):
+        self.button_connect.config(state=tk.DISABLED)
         username = self.entry_username.text
         password = self.entry_password.text  # DO NOT remember password (not safe)
         project = self.combo_projects.text
         try:
-            # Todo: make connection in separate thread
-            self.tx = TransifexAPI(username, password, "https://www.transifex.com")
-            assert self.tx.ping(), "No connection to the server"
-            assert self.tx.project_exists(project), "Project %r does not exist" % project
-            self.resources = self.tx.list_resources(project)
-            languages = self.tx.list_languages(project, resource_slug=self.resources[0]["slug"])
+            self.transifex_api = await run_in_executor(get_transifex_connection, username, password, project)
+            self.resources, languages = await run_in_executor(get_translations_info, self.transifex_api, project)
         except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
             messagebox.showerror("Error", err)
         else:
@@ -69,6 +88,8 @@ class DownloadTranslationsFrame(tk.Frame):
                     recent_projects.remove(project)
                 recent_projects.insert(0, project)
             self.combo_projects.values = recent_projects
+        finally:
+            self.button_connect.config(state=tk.ACTIVE)
 
     def download_waiter(self, resources, language: str, project: str, download_dir: Path, parent_conn=None,
                         initial_names=None, resource_names=None, i=0):
@@ -83,7 +104,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 target=downloader,
                 kwargs=dict(
                     conn=child_conn,
-                    tx=self.tx,
+                    tx=self.transifex_api,
                     project=project,
                     language=language,
                     resources=resources,
@@ -140,7 +161,7 @@ class DownloadTranslationsFrame(tk.Frame):
                    parent_conn, initial_names, resource_names, i)
     
     def bt_download(self):
-        if self.tx and self.resources and not self.download_started:
+        if self.transifex_api and self.resources and not self.download_started:
             self.progressbar["maximum"] = len(self.resources) * 1.001
             self.progressbar["value"] = 0
 
@@ -194,8 +215,8 @@ class DownloadTranslationsFrame(tk.Frame):
             self.entry_password = Entry(show="•")
             grid.add_row("Password:", self.entry_password)
 
-            button_connect = ttk.Button(text="Connect...", command=self.bt_connect)
-            grid.add(button_connect, row=0, column=2, rowspan=3, sticky=tk.NSEW)
+            self.button_connect = ttk.Button(text="Connect...", command=self.bt_connect)
+            grid.add(self.button_connect, row=0, column=2, rowspan=3, sticky=tk.NSEW)
 
             grid.add_row(ttk.Separator(orient=tk.HORIZONTAL), ..., ...)
 
@@ -228,7 +249,7 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.columnconfigure(1, weight=1)
 
         self.resources = None
-        self.tx = None
+        self.transifex_api = None
         self.download_started = False
         self.download_process = None
 
