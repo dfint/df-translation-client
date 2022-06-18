@@ -2,68 +2,22 @@ import asyncio
 import subprocess
 import sys
 import tkinter as tk
-import traceback
 from asyncio import Task
 from pathlib import Path
 from tkinter import ttk, messagebox
 from typing import List, Optional
 
-import requests
 from async_tkinter_loop import async_handler
-from transifex.api import TransifexAPI, TransifexAPIException
 
+from df_translation_client.downloaders.transifex_api_2 import TransifexApiDownloader
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.tkinter_helpers import Grid, GridCell
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox
 
 
-async def async_downloader(transifex_api: TransifexAPI, project: str, language: str, resources, file_path_pattern: str):
-    for i, res in enumerate(resources):
-        yield i, "downloading...", None
-        exception_info = None
-        for j in range(10, 0, -1):
-            try:
-                await run_in_executor(
-                    transifex_api.get_translation,
-                    project,
-                    res["slug"],
-                    language,
-                    file_path_pattern.format(res["slug"])
-                )
-                break
-            except Exception:
-                yield i, f"retry... ({j})", None
-                exception_info = traceback.format_exc()
-        else:
-            yield i, "failed", exception_info
-            return
-        yield i, "ok!", None
-
-    yield None, "completed", None
-
-
-async def get_transifex_connection(username, password, project):
-    tx = TransifexAPI(username, password, "https://www.transifex.com")
-    assert await run_in_executor(tx.ping), "No connection to the server"
-    assert await run_in_executor(tx.project_exists, project), "Project %r does not exist" % project
-    return tx
-
-
-async def list_resources(transifex_api: TransifexAPI, project_slug: str):
-    return await run_in_executor(transifex_api.list_resources, project_slug)
-
-
-async def list_languages(transifex_api: TransifexAPI, project_slug: str, resource_slug: str):
-    return await run_in_executor(transifex_api.list_languages, project_slug, resource_slug)
-
-
-async def run_in_executor(func, *args):
-    return await asyncio.get_running_loop().run_in_executor(None, func, *args)
-
-
 class DownloadTranslationsFrame(tk.Frame):
-    transifex_api: Optional[TransifexAPI] = None
+    downloader_api: Optional[TransifexApiDownloader] = None
     resources: Optional[List[dict]] = None
     downloader_task: Optional[Task] = None
 
@@ -79,11 +33,12 @@ class DownloadTranslationsFrame(tk.Frame):
         self.button_connect.config(state=tk.DISABLED)
 
         try:
-            self.transifex_api = await get_transifex_connection(username, password, project)
-            self.resources = await list_resources(self.transifex_api, project)
-            languages = await list_languages(self.transifex_api, project, self.resources[0]["slug"])
-        except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
-            messagebox.showerror("Error", err)
+            self.downloader_api = TransifexApiDownloader(username, password, project)
+            await self.downloader_api.check_connection()
+            self.resources = await self.downloader_api.list_resources()
+            languages = await self.downloader_api.list_languages(self.resources[0]["slug"])
+        except Exception as err:
+            messagebox.showerror("Error", str(err))
         else:
             self.combo_languages.values = sorted(languages)
             last_language = self.config_section.get("language", None)
@@ -106,15 +61,14 @@ class DownloadTranslationsFrame(tk.Frame):
         finally:
             self.button_connect.config(state=tk.ACTIVE)
 
-    async def downloader(self, resources, language: str, project: str, download_dir: Path,
-                         initial_names=None, resource_names=None):
-        if initial_names is None:
-            initial_names = [res["name"] for res in self.resources]
-            resource_names = initial_names.copy()
+    async def downloader(self, language: str, download_dir: Path):
+        initial_names = [res["name"] for res in self.resources]
+        resource_names = initial_names.copy()
 
         file_path_pattern = str(download_dir / f"{{}}_{language}.po")
-        async for i, message, error_text in async_downloader(self.transifex_api, project, language, resources,
-                                                             file_path_pattern):
+        async for i, message, error_text in self.downloader_api.async_downloader(
+                language, self.resources, file_path_pattern
+        ):
             if message == "completed":
                 # Everything is downloaded
                 self.button_download.reset_state()
@@ -145,10 +99,10 @@ class DownloadTranslationsFrame(tk.Frame):
         return self.downloader_task is not None and not self.downloader_task.done()
 
     def bt_download(self) -> bool:
-        if not self.transifex_api:
+        if not self.downloader_api:
             messagebox.showerror("Not connected", "Make connection first")
             return False  # Don't change the two-state button state
-        elif not self.resources:
+        elif self.resources is None:
             messagebox.showerror("No resources", "No resources to download")
             return False
         elif self.download_started:
@@ -165,7 +119,6 @@ class DownloadTranslationsFrame(tk.Frame):
             download_dir = self.fileentry_download_to.path
             self.config_section.check_and_save_path("download_to", download_dir)
 
-            project = self.combo_projects.get()
             language = self.combo_languages.get()
 
             initial_names = [res["name"] for res in self.resources]
@@ -174,7 +127,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources.values = resource_names
 
             self.downloader_task: Task = asyncio.get_running_loop().create_task(
-                self.downloader(self.resources, language, project, download_dir)
+                self.downloader(language, download_dir)
             )
             return True
 
