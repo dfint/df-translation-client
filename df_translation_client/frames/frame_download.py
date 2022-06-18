@@ -4,54 +4,78 @@ import subprocess
 import tkinter as tk
 import traceback
 from asyncio import Task
+from enum import Enum
 from pathlib import Path
 from tkinter import ttk, messagebox
 from typing import List, Optional
 
 from async_tkinter_loop import async_handler
 
+from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
+from df_translation_client.downloaders.common import StatusEnum, DownloadStage
+from df_translation_client.downloaders.github import GithubDownloader
 from df_translation_client.downloaders.transifex_api_2 import TransifexApiDownloader
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.tkinter_helpers import Grid, GridCell
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
-from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox
+from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox, TypedCombobox
+
+
+class DownloadFromEnum(Enum):
+    GITHUB = "Github (faster, no registration, data updates at midnight GMT+00)"
+    TRANSIFEX = "Transifex (slower, needs registration, up-to-date)"
+
+    def __str__(self):
+        return self.value
 
 
 class DownloadTranslationsFrame(tk.Frame):
-    downloader_api: Optional[TransifexApiDownloader] = None
-    resources: Optional[List[dict]] = None
+    downloader_api: Optional[AbstractDownloader] = None
+    resources: Optional[List[str]] = None
     downloader_task: Optional[Task] = None
 
     @async_handler
     async def bt_connect(self):
         username = self.entry_username.text
-        password = self.entry_password.text  # DO NOT remember password (not safe)
+        password = self.entry_password.text
         project = self.combo_projects.text
-        if not username or not password or not project:
-            messagebox.showerror("Required fields", "Fields Username, Password and Project are required")
-            return
+
+        download_from = self.combo_download_from.get()
+        if download_from is DownloadFromEnum.GITHUB:
+            self.downloader_api = GithubDownloader()
+        else:  # DownloadFromEnum.TRANSIFEX
+            if not username or not password or not project:
+                messagebox.showerror("Required fields", "Fields Username, Password and Project are required")
+                return
+
+            self.downloader_api = TransifexApiDownloader(username, password, project)
 
         self.button_connect.config(state=tk.DISABLED)
 
         try:
-            self.downloader_api = TransifexApiDownloader(username, password, project)
-            await self.downloader_api.check_connection()
+            await self.downloader_api.connect()
             self.resources = await self.downloader_api.list_resources()
-            languages = await self.downloader_api.list_languages(self.resources[0]["slug"])
+            languages = await self.downloader_api.list_languages(self.resources[0])
         except Exception as err:
             traceback.print_exc()
             messagebox.showerror("Error", str(err))
+            return
         else:
             self.combo_languages.values = sorted(languages)
             last_language = self.config_section.get("language", None)
+
             if last_language and last_language in languages:
                 self.combo_languages.text = last_language
             else:
                 self.combo_languages.current(0)
-            
+
             self.listbox_resources.clear()
-            self.listbox_resources.values = tuple(res["name"] for res in self.resources)
-            
+            self.listbox_resources.values = tuple(res for res in self.resources)
+        finally:
+            self.button_connect.config(state=tk.ACTIVE)
+
+        if download_from is DownloadFromEnum.TRANSIFEX:
+            # Remember last successfully credentials
             self.config_section["username"] = username
 
             recent_projects = self.config_section["recent_projects"]
@@ -60,43 +84,38 @@ class DownloadTranslationsFrame(tk.Frame):
                     recent_projects.remove(project)
                 recent_projects.insert(0, project)
             self.combo_projects.values = recent_projects
-        finally:
-            self.button_connect.config(state=tk.ACTIVE)
 
     async def downloader(self, language: str, download_dir: Path):
-        initial_names = [res["name"] for res in self.resources]
-        resource_names = initial_names.copy()
+        lines = {res: res for res in self.resources}  # { "resource": "resource - status" }
 
-        file_path_pattern = str(download_dir / f"{{}}_{language}.po")
-        async for i, message, error_text in self.downloader_api.async_downloader(
+        file_path_pattern = str(download_dir / "{resource}_{language}.po")
+        async for stage in self.downloader_api.async_downloader(
                 language, self.resources, file_path_pattern
         ):
-            if message == "completed":
-                # Everything is downloaded
-                self.button_download.reset_state()
+            stage: DownloadStage
+            lines[stage.resource] = "{} - {}".format(stage.resource, stage.status.value)
+            self.listbox_resources.values = list(lines.values())
+            self.update()
 
-                self.config_section["language"] = language
-
-                if platform.system() == "Windows":
-                    subprocess.Popen(["explorer", download_dir])
-                elif platform.system() == "Darwin":
-                    subprocess.Popen(["open", download_dir])
-                else:
-                    subprocess.Popen(["xdg-open", download_dir])
-            else:
-                resource_names[i] = "{} - {}".format(initial_names[i], message)
-                self.listbox_resources.values = resource_names
-                self.update()
-
-                if message == "ok!":
-                    self.progressbar.step()
-                elif message == "failed":
-                    messagebox.showerror("Downloading error", error_text)
-                    break
-                elif message == "stopped":
-                    break
+            if stage.status == StatusEnum.OK:
+                self.progressbar.step()
+            elif stage.status == StatusEnum.FAILED:
+                messagebox.showerror("Downloading error", stage.error_text)
+                break
         else:
+            # Everything is downloaded
             self.button_download.reset_state()
+
+            self.config_section["language"] = language
+
+            if platform.system() == "Windows":
+                subprocess.Popen(["explorer", download_dir])
+            elif platform.system() == "Darwin":
+                subprocess.Popen(["open", download_dir])
+            else:
+                subprocess.Popen(["xdg-open", download_dir])
+
+        self.button_download.reset_state()
 
     @property
     def download_started(self) -> bool:
@@ -125,8 +144,8 @@ class DownloadTranslationsFrame(tk.Frame):
 
             language = self.combo_languages.get()
 
-            initial_names = [res["name"] for res in self.resources]
-            resource_names = list(initial_names)
+            initial_names = self.resources
+            resource_names = initial_names.copy()
 
             self.listbox_resources.values = resource_names
 
@@ -148,6 +167,14 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.downloader_task and not self.downloader_task.done():
             self.downloader_task.cancel()
 
+    def on_combo_download_from_change(self, _event=None):
+        state = tk.DISABLED if self.combo_download_from.get() is DownloadFromEnum.GITHUB else tk.NORMAL
+        self.combo_projects.config(state=state)
+        self.entry_username.config(state=state)
+        self.entry_password.config(state=state)
+        self.combo_languages.values = []
+        self.listbox_resources.values = []
+
     def __init__(self, *args, config: Config, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -157,6 +184,11 @@ class DownloadTranslationsFrame(tk.Frame):
         )
 
         with Grid(self, sticky=tk.EW, padx=2, pady=2) as grid:
+            self.combo_download_from = TypedCombobox[DownloadFromEnum](values=list(DownloadFromEnum))
+            self.combo_download_from.select(DownloadFromEnum.GITHUB)
+            grid.add_row("Download from:", self.combo_download_from)
+            self.combo_download_from.bind("<<ComboboxSelected>>", self.on_combo_download_from_change)
+
             self.combo_projects = Combobox(values=self.config_section["recent_projects"])
             self.combo_projects.current(0)
             grid.add_row("Transifex project:", self.combo_projects)
@@ -201,4 +233,5 @@ class DownloadTranslationsFrame(tk.Frame):
 
             grid.columnconfigure(1, weight=1)
 
+        self.on_combo_download_from_change()
         self.bind("<Destroy>", self.kill_background_tasks)

@@ -1,9 +1,11 @@
 import asyncio
 import traceback
+from typing import AsyncIterable, List
 
 from transifex.api import TransifexAPI
 
 from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
+from df_translation_client.downloaders.common import StatusEnum, DownloadStage
 
 try:
     from asyncio import to_thread  # added in Python 3.9
@@ -20,37 +22,39 @@ class TransifexApiDownloader(AbstractDownloader):
         self.transifex_api = TransifexAPI(username, password, "https://www.transifex.com")
         self.project_slug = project_slug
 
-    async def check_connection(self):
+    async def connect(self):
         assert await to_thread(self.transifex_api.ping), "No connection to the server"
-        assert await to_thread(self.transifex_api.project_exists, self.project_slug),\
+        assert await to_thread(self.transifex_api.project_exists, self.project_slug), \
             f"Project {self.project_slug} does not exist"
 
-    async def async_downloader(self, language: str, resources, file_path_pattern: str):
-        for i, res in enumerate(resources):
-            yield i, "downloading...", None
+    async def async_downloader(self, language: str, resources: List[str], file_path_pattern: str) \
+            -> AsyncIterable[DownloadStage]:
+        for resource in resources:
+            yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
             exception_info = None
             for j in range(10, 0, -1):
                 try:
+                    file_name = file_path_pattern.format(resource=resource, language=language)
                     await to_thread(
                         self.transifex_api.get_translation,
                         self.project_slug,
-                        res["slug"],
+                        resource,
                         language,
-                        file_path_pattern.format(res["slug"])
+                        file_name
                     )
                     break
                 except Exception:
-                    yield i, f"retry... ({j})", None
+                    yield DownloadStage(resource, StatusEnum.RETRY, None)
                     exception_info = traceback.format_exc()
             else:
-                yield i, "failed", exception_info
+                yield DownloadStage(resource, StatusEnum.FAILED, exception_info)
                 return
-            yield i, "ok!", None
+            yield DownloadStage(resource, StatusEnum.OK, None)
 
-        yield None, "completed", None
+    async def list_resources(self) -> List[str]:
+        resources = await to_thread(self.transifex_api.list_resources, self.project_slug)
+        resource_slugs = [res["slug"] for res in resources]
+        return resource_slugs
 
-    async def list_resources(self):
-        return await to_thread(self.transifex_api.list_resources, self.project_slug)
-
-    async def list_languages(self, resource_slug: str):
+    async def list_languages(self, resource_slug: str) -> List[str]:
         return await to_thread(self.transifex_api.list_languages, self.project_slug, resource_slug)

@@ -9,8 +9,11 @@ from dfrus.patch_charmap import get_supported_codepages, get_encoder
 def get_languages(directory: Path):
     languages = set()
     for filename in directory.glob("*.po"):
-        with open(directory / filename, encoding="utf-8") as file:
-            languages.add(parse_po.PoReader(file).meta["Language"])
+        try:
+            with open(directory / filename, encoding="utf-8") as file:
+                languages.add(parse_po.PoReader(file).meta["Language"])
+        except Exception:
+            pass
 
     return sorted(languages)
 
@@ -18,8 +21,11 @@ def get_languages(directory: Path):
 def filter_files_by_language(directory: Path, language):
     for filename in directory.glob("*.po"):
         with open(filename, encoding="utf-8") as file:
-            if parse_po.PoReader(file).meta["Language"] == language:
-                yield filename.name
+            try:
+                if parse_po.PoReader(file).meta["Language"] == language:
+                    yield filename.name
+            except:
+                pass
 
 
 def filter_codepages(encodings: Iterable[str], strings: List[str]):

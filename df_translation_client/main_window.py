@@ -57,6 +57,7 @@ class MainWindow(tk.Tk):
 
     def __init__(self, app):
         super().__init__()
+        self.geometry("800x600")
         self.app = app
         config = self.app.config
         self.config_section = config.init_section("application", dict(last_tab_opened=0))
