@@ -1,5 +1,5 @@
 # DF Translation Client
-[![Test](https://github.com/dfint/df-translation-client/workflows/Test/badge.svg)](https://github.com/dfint/df-translation-client/actions?query=workflow%3ATest)
+[![Test](https://github.com/dfint/df-translation-client/actions/workflows/test.yml/badge.svg)](https://github.com/dfint/df-translation-client/actions/workflows/test.yml)
 [![Coverage Status](https://coveralls.io/repos/github/dfint/df-translation-client/badge.svg?branch=develop)](https://coveralls.io/github/dfint/df-translation-client?branch=develop)
 [![Maintainability](https://api.codeclimate.com/v1/badges/0c3352a199ffdc026390/maintainability)](https://codeclimate.com/github/dfint/df-translation-client/maintainability)
 
