@@ -2,7 +2,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, ttk
 
-from df_translation_client.tkinter_helpers import Packer
+from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets.custom_widgets import Entry
 
 

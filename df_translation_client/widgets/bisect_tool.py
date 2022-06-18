@@ -7,8 +7,8 @@ from typing import List, Optional, Tuple, Iterable, Hashable, Any
 
 from bidict import bidict, MutableBidict
 
+from df_translation_client.utils.tkinter_helpers import Grid, Packer
 from .scrollbar_frame import ScrollbarFrame
-from ..tkinter_helpers import Grid, Packer
 
 
 class Node:

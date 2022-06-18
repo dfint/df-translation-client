@@ -7,10 +7,10 @@ from typing import Optional
 from dfrus import dfrus
 from natsort import natsorted
 
-from df_translation_client.config import Config
-from df_translation_client.po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup, \
+from df_translation_client.utils.config import Config
+from df_translation_client.utils.po_languages import get_suitable_codepages_for_file, load_dictionary_with_cleanup, \
     load_dictionary_raw
-from df_translation_client.tkinter_helpers import Grid, GridCell
+from df_translation_client.utils.tkinter_helpers import Grid, GridCell
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Checkbutton, Combobox, Text
 from .dialog_do_not_fix_spaces import DialogDoNotFixSpaces

@@ -5,14 +5,13 @@ import tkinter as tk
 import traceback
 from pathlib import Path
 from tkinter import ttk, messagebox
-from typing import List
 
 import requests
 from async_tkinter_loop import async_handler
 from transifex.api import TransifexAPI, TransifexAPIException
 
-from df_translation_client.config import Config
-from df_translation_client.tkinter_helpers import Grid, GridCell
+from df_translation_client.utils.config import Config
+from df_translation_client.utils.tkinter_helpers import Grid, GridCell
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox
 

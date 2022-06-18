@@ -5,7 +5,7 @@ from typing import Optional, Iterable, Tuple
 
 from dfrus import dfrus
 
-from df_translation_client.tkinter_helpers import Packer
+from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import BisectTool
 
 

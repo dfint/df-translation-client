@@ -5,7 +5,7 @@ from pathlib import Path
 
 from async_tkinter_loop import async_mainloop
 
-from .config import Config
+from df_translation_client.utils.config import Config
 from .main_window import MainWindow
 
 
@@ -40,6 +40,7 @@ class App:
 
     def run(self):
         async_mainloop(self.main_window)
+        # self.main_window.mainloop()
 
 
 def main():
