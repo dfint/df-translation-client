@@ -34,6 +34,7 @@ A GUI client intended to simplify usage of all the utils of the localization pro
     If you need to run the application from an activated virtual environment (eg. when you are using PyCharm), then use the following command:
     ```
     # poetry install
+    # poetry shell
     python -m df_translation_client
     ```
     I don't recommend running with `df-translate.pyw`, cause it will remove development requirements (like `pytest`, `flake8`, etc.) from the virtual environment.
