@@ -10,7 +10,7 @@ from typing import List, Optional
 
 from async_tkinter_loop import async_handler
 
-from df_translation_client.downloaders.abstract_downloader import AbstractDownloader, DownloadStage
+from df_translation_client.downloaders.abstract_downloader import AbstractDownloader, DownloadStage, StatusEnum
 from df_translation_client.downloaders.transifex_api_2 import TransifexApiDownloader
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.tkinter_helpers import Grid, GridCell
@@ -72,16 +72,14 @@ class DownloadTranslationsFrame(tk.Frame):
                 language, self.resources, file_path_pattern
         ):
             stage: DownloadStage
-            lines[stage.resource] = "{} - {}".format(stage.resource, stage.message)
+            lines[stage.resource] = "{} - {}".format(stage.resource, stage.status.value)
             self.listbox_resources.values = list(lines.values())
             self.update()
 
-            if stage.message == "ok!":
+            if stage.status == StatusEnum.OK:
                 self.progressbar.step()
-            elif stage.message == "failed":
+            elif stage.status == StatusEnum.FAILED:
                 messagebox.showerror("Downloading error", stage.error_text)
-                break
-            elif stage.message == "stopped":
                 break
         else:
             # Everything is downloaded

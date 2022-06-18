@@ -1,10 +1,19 @@
 from abc import abstractmethod, ABC
-from typing import List, AsyncIterable, Optional, NamedTuple
+from collections.abc import AsyncIterable
+from enum import Enum
+from typing import List, Optional, NamedTuple
+
+
+class StatusEnum(Enum):
+    DOWNLOADING = "downloading..."
+    RETRY = "retry..."
+    FAILED = "failed"
+    OK = "ok!"
 
 
 class DownloadStage(NamedTuple):
     resource: str
-    message: str
+    status: StatusEnum
     error_text: Optional[str]
 
 

@@ -1,10 +1,11 @@
 import asyncio
 import traceback
-from typing import List, AsyncIterable
+from collections.abc import AsyncIterable
+from typing import List
 
 from transifex.api import TransifexAPI
 
-from df_translation_client.downloaders.abstract_downloader import AbstractDownloader, DownloadStage
+from df_translation_client.downloaders.abstract_downloader import AbstractDownloader, DownloadStage, StatusEnum
 
 try:
     from asyncio import to_thread  # added in Python 3.9
@@ -29,7 +30,7 @@ class TransifexApiDownloader(AbstractDownloader):
     async def async_downloader(self, language: str, resources: List[str], file_path_pattern: str) \
             -> AsyncIterable[DownloadStage]:
         for resource in resources:
-            yield DownloadStage(resource, "downloading...", None)
+            yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
             exception_info = None
             for j in range(10, 0, -1):
                 try:
@@ -42,12 +43,12 @@ class TransifexApiDownloader(AbstractDownloader):
                     )
                     break
                 except Exception:
-                    yield DownloadStage(resource, f"retry... ({j})", None)
+                    yield DownloadStage(resource, StatusEnum.RETRY, None)
                     exception_info = traceback.format_exc()
             else:
-                yield DownloadStage(DownloadStage(resource, "failed", exception_info))
+                yield DownloadStage(resource, StatusEnum.FAILED, exception_info)
                 return
-            yield DownloadStage(resource, "ok!", None)
+            yield DownloadStage(resource, StatusEnum.OK, None)
 
     async def list_resources(self) -> List[str]:
         resources = await to_thread(self.transifex_api.list_resources, self.project_slug)
