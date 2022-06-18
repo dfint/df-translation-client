@@ -5,8 +5,10 @@ import tkinter as tk
 import traceback
 from pathlib import Path
 from tkinter import ttk, messagebox
+from typing import List
 
 import requests
+from async_tkinter_loop import async_handler
 from transifex.api import TransifexAPI, TransifexAPIException
 
 from df_translation_client.config import Config
@@ -35,7 +37,8 @@ def downloader(conn, tx: TransifexAPI, project: str, language: str, resources, f
 
 
 class DownloadTranslationsFrame(tk.Frame):
-    def bt_connect(self):
+    @async_handler
+    async def bt_connect(self):
         username = self.entry_username.text
         password = self.entry_password.text  # DO NOT remember password (not safe)
         project = self.combo_projects.text
