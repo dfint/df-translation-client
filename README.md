@@ -1,5 +1,5 @@
 # DF Translation Client
-[![Python application](https://github.com/dfint/df-translation-client/workflows/Python%20application/badge.svg)](https://github.com/dfint/df-translation-client/actions?query=workflow%3A"Python+application")
+[![Test](https://github.com/dfint/df-translation-client/workflows/Test/badge.svg)](https://github.com/dfint/df-translation-client/actions?query=workflow%3ATest)
 [![Coverage Status](https://coveralls.io/repos/github/dfint/df-translation-client/badge.svg?branch=develop)](https://coveralls.io/github/dfint/df-translation-client?branch=develop)
 [![Maintainability](https://api.codeclimate.com/v1/badges/0c3352a199ffdc026390/maintainability)](https://codeclimate.com/github/dfint/df-translation-client/maintainability)
 
