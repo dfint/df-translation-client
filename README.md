@@ -1,6 +1,6 @@
 # DF Translation Client
 [![Test](https://github.com/dfint/df-translation-client/actions/workflows/test.yml/badge.svg)](https://github.com/dfint/df-translation-client/actions/workflows/test.yml)
-[![Coverage Status](https://coveralls.io/repos/github/dfint/df-translation-client/badge.svg?branch=develop)](https://coveralls.io/github/dfint/df-translation-client?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/dfint/df-translation-client/badge.svg?branch=master)](https://coveralls.io/github/dfint/df-translation-client?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/0c3352a199ffdc026390/maintainability)](https://codeclimate.com/github/dfint/df-translation-client/maintainability)
 
 A GUI client intended to simplify usage of all the utils of the localization project (https://github.com/dfint/).
