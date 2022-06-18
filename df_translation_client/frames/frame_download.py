@@ -1,6 +1,6 @@
 import asyncio
+import platform
 import subprocess
-import sys
 import tkinter as tk
 from asyncio import Task
 from pathlib import Path
@@ -75,10 +75,12 @@ class DownloadTranslationsFrame(tk.Frame):
 
                 self.config_section["language"] = language
 
-                if sys.platform == "win32":
-                    subprocess.Popen(f'explorer "{download_dir}"')
+                if platform.system() == "Windows":
+                    subprocess.Popen(["explorer", download_dir])
+                elif platform.system() == "Darwin":
+                    subprocess.Popen(["open", download_dir])
                 else:
-                    pass  # Todo: open the directory in a file manager on linux
+                    subprocess.Popen(["xdg-open", download_dir])
             else:
                 resource_names[i] = "{} - {}".format(initial_names[i], message)
                 self.listbox_resources.values = resource_names
