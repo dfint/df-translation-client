@@ -36,11 +36,8 @@ class GithubDownloader(AbstractDownloader):
                     async with session.get(url) as response:
                         file_name = file_path_pattern.format(resource=resource, language=language)
                         with open(file_name, "wb") as file:
-                            while True:
-                                block = await response.content.read(io.DEFAULT_BUFFER_SIZE)
-                                if not block:
-                                    break
-                                file.write(block)
+                            async for chunk in response.content.iter_chunked(io.DEFAULT_BUFFER_SIZE):
+                                file.write(chunk)
                 except Exception:
                     yield DownloadStage(resource, StatusEnum.FAILED, traceback.format_exc())
                 else:
