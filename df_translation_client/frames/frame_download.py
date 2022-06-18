@@ -10,6 +10,7 @@ from typing import List, Optional
 
 from async_tkinter_loop import async_handler
 
+from df_translation_client.downloaders.abstract_downloader import AbstractDownloader, DownloadStage
 from df_translation_client.downloaders.transifex_api_2 import TransifexApiDownloader
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.tkinter_helpers import Grid, GridCell
@@ -18,8 +19,8 @@ from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbo
 
 
 class DownloadTranslationsFrame(tk.Frame):
-    downloader_api: Optional[TransifexApiDownloader] = None
-    resources: Optional[List[dict]] = None
+    downloader_api: Optional[AbstractDownloader] = None
+    resources: Optional[List[str]] = None
     downloader_task: Optional[Task] = None
 
     @async_handler
@@ -37,7 +38,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.downloader_api = TransifexApiDownloader(username, password, project)
             await self.downloader_api.check_connection()
             self.resources = await self.downloader_api.list_resources()
-            languages = await self.downloader_api.list_languages(self.resources[0]["slug"])
+            languages = await self.downloader_api.list_languages(self.resources[0])
         except Exception as err:
             traceback.print_exc()
             messagebox.showerror("Error", str(err))
@@ -50,7 +51,7 @@ class DownloadTranslationsFrame(tk.Frame):
                 self.combo_languages.current(0)
             
             self.listbox_resources.clear()
-            self.listbox_resources.values = tuple(res["name"] for res in self.resources)
+            self.listbox_resources.values = tuple(res for res in self.resources)
             
             self.config_section["username"] = username
 
@@ -64,39 +65,38 @@ class DownloadTranslationsFrame(tk.Frame):
             self.button_connect.config(state=tk.ACTIVE)
 
     async def downloader(self, language: str, download_dir: Path):
-        initial_names = [res["name"] for res in self.resources]
-        resource_names = initial_names.copy()
+        lines = {res: res for res in self.resources}  # { "resource": "resource - status" }
 
         file_path_pattern = str(download_dir / f"{{}}_{language}.po")
-        async for i, message, error_text in self.downloader_api.async_downloader(
+        async for stage in self.downloader_api.async_downloader(
                 language, self.resources, file_path_pattern
         ):
-            if message == "completed":
-                # Everything is downloaded
-                self.button_download.reset_state()
+            stage: DownloadStage
+            lines[stage.resource] = "{} - {}".format(stage.resource, stage.message)
+            self.listbox_resources.values = list(lines.values())
+            self.update()
 
-                self.config_section["language"] = language
-
-                if platform.system() == "Windows":
-                    subprocess.Popen(["explorer", download_dir])
-                elif platform.system() == "Darwin":
-                    subprocess.Popen(["open", download_dir])
-                else:
-                    subprocess.Popen(["xdg-open", download_dir])
-            else:
-                resource_names[i] = "{} - {}".format(initial_names[i], message)
-                self.listbox_resources.values = resource_names
-                self.update()
-
-                if message == "ok!":
-                    self.progressbar.step()
-                elif message == "failed":
-                    messagebox.showerror("Downloading error", error_text)
-                    break
-                elif message == "stopped":
-                    break
+            if stage.message == "ok!":
+                self.progressbar.step()
+            elif stage.message == "failed":
+                messagebox.showerror("Downloading error", stage.error_text)
+                break
+            elif stage.message == "stopped":
+                break
         else:
+            # Everything is downloaded
             self.button_download.reset_state()
+
+            self.config_section["language"] = language
+
+            if platform.system() == "Windows":
+                subprocess.Popen(["explorer", download_dir])
+            elif platform.system() == "Darwin":
+                subprocess.Popen(["open", download_dir])
+            else:
+                subprocess.Popen(["xdg-open", download_dir])
+
+        self.button_download.reset_state()
 
     @property
     def download_started(self) -> bool:
@@ -125,8 +125,8 @@ class DownloadTranslationsFrame(tk.Frame):
 
             language = self.combo_languages.get()
 
-            initial_names = [res["name"] for res in self.resources]
-            resource_names = list(initial_names)
+            initial_names = self.resources
+            resource_names = initial_names.copy()
 
             self.listbox_resources.values = resource_names
 
