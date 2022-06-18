@@ -37,17 +37,19 @@ def downloader(conn, tx: TransifexAPI, project: str, language: str, resources, f
     conn.send((None, "completed"))
 
 
-def get_transifex_connection(username, password, project):
+async def get_transifex_connection(username, password, project):
     tx = TransifexAPI(username, password, "https://www.transifex.com")
-    assert tx.ping(), "No connection to the server"
-    assert tx.project_exists(project), "Project %r does not exist" % project
+    assert await run_in_executor(tx.ping), "No connection to the server"
+    assert await run_in_executor(tx.project_exists, project), "Project %r does not exist" % project
     return tx
 
 
-def get_translations_info(transifex, project):
-    resources = transifex.list_resources(project)
-    languages = transifex.list_languages(project, resource_slug=resources[0]["slug"])
-    return resources, languages
+async def list_resources(transifex_api: TransifexAPI, project_slug: str):
+    return await run_in_executor(transifex_api.list_resources, project_slug)
+
+
+async def list_languages(transifex_api: TransifexAPI, project_slug: str, resource_slug: str):
+    return await run_in_executor(transifex_api.list_languages, project_slug, resource_slug)
 
 
 async def run_in_executor(func, *args):
@@ -65,8 +67,9 @@ class DownloadTranslationsFrame(tk.Frame):
         password = self.entry_password.text  # DO NOT remember password (not safe)
         project = self.combo_projects.text
         try:
-            self.transifex_api = await run_in_executor(get_transifex_connection, username, password, project)
-            self.resources, languages = await run_in_executor(get_translations_info, self.transifex_api, project)
+            self.transifex_api = await get_transifex_connection(username, password, project)
+            self.resources = await list_resources(self.transifex_api, project)
+            languages = await list_languages(self.transifex_api, project, self.resources[0]["slug"])
         except (TransifexAPIException, requests.exceptions.ConnectionError, AssertionError) as err:
             messagebox.showerror("Error", err)
         else:
