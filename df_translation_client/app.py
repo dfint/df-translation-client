@@ -3,6 +3,8 @@ import os
 import sys
 from pathlib import Path
 
+from async_tkinter_loop import async_mainloop
+
 from .config import Config
 from .main_window import MainWindow
 
@@ -37,7 +39,7 @@ class App:
             self.setup_config_autosave(self.main_window, self.config)
 
     def run(self):
-        self.main_window.mainloop()
+        async_mainloop(self.main_window)
 
 
 def main():
