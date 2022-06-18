@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import TypeVar, Generic, Iterable, List, Tuple
+from typing import TypeVar, Generic, Iterable, List, Tuple, Optional
 
 
 class Checkbutton(ttk.Checkbutton):
@@ -32,6 +32,40 @@ class Entry(tk.Entry):
     @text.setter
     def text(self, value: str):
         self._set(value)
+
+
+TComboboxValue = TypeVar("TComboboxValue")
+
+
+class TypedCombobox(ttk.Combobox, Generic[TComboboxValue]):
+    _values: List[TComboboxValue]
+
+    def __init__(self, *args, values: Optional[List[TComboboxValue]] = None, **kwargs):
+        super().__init__(*args, values=values, **kwargs)
+
+        if values is None:
+            values = []
+
+        self._values = values
+
+    @property
+    def values(self):
+        return self['values']
+
+    def select(self, value: TComboboxValue):
+        self.current(self._values.index(value))
+
+    @values.setter
+    def values(self, values: Optional[List[TComboboxValue]] = None):
+        if values is None:
+            values = []
+        self['values'] = tuple(values)
+
+    def get(self) -> Optional[TComboboxValue]:
+        if self.current() == -1:  # Если ничего не выбрано
+            return None
+        else:
+            return self._values[self.current()]
 
 
 class Combobox(ttk.Combobox):
@@ -86,7 +120,7 @@ class Listbox(tk.Listbox, Generic[TListboxValue]):
 
     def append(self, item: TListboxValue):
         self.insert(tk.END, str(item))
-        self.yview_moveto('1.0')
+        self.yview_moveto(1.0)
         self.update()
 
     def selected(self) -> List[TListboxValue]:
@@ -105,7 +139,7 @@ class Text(tk.Text):
         self.insert(tk.END, s)
         if not self.enabled:
             self.configure(state=tk.DISABLED)
-        self.yview_moveto('1.0')
+        self.yview_moveto(1.0)
         self.update()
 
     def clear(self):
