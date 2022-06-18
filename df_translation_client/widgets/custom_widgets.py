@@ -42,18 +42,19 @@ class TypedCombobox(ttk.Combobox, Generic[TComboboxValue]):
 
     def __init__(self, *args, values: Optional[List[TComboboxValue]] = None, **kwargs):
         super().__init__(*args, values=values, **kwargs)
+        self.config(state="readonly")
 
         if values is None:
             values = []
 
         self._values = values
 
-    @property
-    def values(self):
-        return self['values']
-
     def select(self, value: TComboboxValue):
         self.current(self._values.index(value))
+
+    @property
+    def values(self) -> List[TComboboxValue]:
+        return self._values
 
     @values.setter
     def values(self, values: Optional[List[TComboboxValue]] = None):

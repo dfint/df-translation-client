@@ -167,6 +167,14 @@ class DownloadTranslationsFrame(tk.Frame):
         if self.downloader_task and not self.downloader_task.done():
             self.downloader_task.cancel()
 
+    def on_combo_download_from_change(self, _event=None):
+        state = tk.DISABLED if self.combo_download_from.get() is DownloadFromEnum.GITHUB else tk.NORMAL
+        self.combo_projects.config(state=state)
+        self.entry_username.config(state=state)
+        self.entry_password.config(state=state)
+        self.combo_languages.values = []
+        self.listbox_resources.values = []
+
     def __init__(self, *args, config: Config, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -179,6 +187,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.combo_download_from = TypedCombobox[DownloadFromEnum](values=list(DownloadFromEnum))
             self.combo_download_from.select(DownloadFromEnum.GITHUB)
             grid.add_row("Download from:", self.combo_download_from)
+            self.combo_download_from.bind("<<ComboboxSelected>>", self.on_combo_download_from_change)
 
             self.combo_projects = Combobox(values=self.config_section["recent_projects"])
             self.combo_projects.current(0)
@@ -224,4 +233,5 @@ class DownloadTranslationsFrame(tk.Frame):
 
             grid.columnconfigure(1, weight=1)
 
+        self.on_combo_download_from_change()
         self.bind("<Destroy>", self.kill_background_tasks)
