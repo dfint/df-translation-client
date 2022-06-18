@@ -6,6 +6,7 @@ from typing import Optional
 
 from dfrus import dfrus
 from natsort import natsorted
+from tk_grid_helper import grid_manager
 
 from df_translation_client.frames.dialog_do_not_fix_spaces import DialogDoNotFixSpaces
 from df_translation_client.frames.frame_debug import DebugFrame
@@ -15,7 +16,6 @@ from df_translation_client.utils.po_languages import (
     load_dictionary_with_cleanup,
     load_dictionary_raw,
 )
-from df_translation_client.utils.tkinter_helpers import Grid, GridCell
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Checkbutton, Combobox, Text
 
@@ -151,7 +151,6 @@ class PatchExecutableFrame(tk.Frame):
             self.translation_file_language = None
             self.combo_encoding.values = tuple()
 
-
     def config_combo_encoding(self, translation_file: Path):
         self.update_combo_encoding_list(translation_file)
 
@@ -198,14 +197,16 @@ class PatchExecutableFrame(tk.Frame):
 
         self._dictionary = None
 
-        with Grid(self, sticky=tk.EW, padx=2, pady=2) as grid:
+        with grid_manager(self, sticky=tk.EW, padx=2, pady=2) as grid:
             self.file_entry_executable_file = FileEntry(
                 dialog_type="askopenfilename",
                 filetypes=[("Executable files", "*.exe")],
                 default_path=self.config_section.get("df_executable", ""),
                 on_change=lambda text: self.config_section.check_and_save_path("df_executable", text),
             )
-            grid.add_row("DF executable file:", self.file_entry_executable_file, ...)
+            grid.new_row() \
+                .add(tk.Label(text="DF executable file:"), sticky=tk.W) \
+                .add(self.file_entry_executable_file).column_span(2)
 
             self.fileentry_translation_file = FileEntry(
                 dialog_type="askopenfilename",
@@ -218,11 +219,15 @@ class PatchExecutableFrame(tk.Frame):
                 on_change=self.on_translation_file_change,
                 change_color=True
             )
-            grid.add_row("Translation file:", self.fileentry_translation_file, ...)
+            grid.new_row() \
+                .add(tk.Label(text="Translation file:"), sticky=tk.W) \
+                .add(self.fileentry_translation_file).column_span(2)
 
             self.combo_encoding = Combobox()
             self.config_combo_encoding(self.fileentry_translation_file.path)
-            grid.add_row("Encoding:", self.combo_encoding, ...)
+            grid.new_row() \
+                .add(tk.Label(text="Encoding:"), sticky=tk.W) \
+                .add(self.combo_encoding).column_span(2)
 
             # FIXME: chk_do_not_patch_charmap does nothing
             self.chk_do_not_patch_charmap = self.setup_checkbutton(
@@ -230,7 +235,7 @@ class PatchExecutableFrame(tk.Frame):
                 config_key="do_not_patch_charmap",
                 default_state=False)
 
-            grid.add_row(..., self.chk_do_not_patch_charmap, ...)
+            grid.new_row().skip(1).add(self.chk_do_not_patch_charmap).column_span(2)
 
             self.chk_add_leading_trailing_spaces = self.setup_checkbutton(
                 text="Add necessary leading/trailing spaces",
@@ -239,7 +244,7 @@ class PatchExecutableFrame(tk.Frame):
 
             button_exclusions = ttk.Button(self, text="Exclusions...", command=self.bt_exclusions)
 
-            grid.add_row(self.chk_add_leading_trailing_spaces, ..., button_exclusions)
+            grid.new_row().add(self.chk_add_leading_trailing_spaces).column_span(2).add(button_exclusions)
 
             if debug:
                 if self.fileentry_translation_file.path.is_file():
@@ -249,7 +254,7 @@ class PatchExecutableFrame(tk.Frame):
                     dictionary = None
                 self.debug_frame = DebugFrame(dictionary=dictionary)
 
-                grid.add_row(GridCell(self.debug_frame, sticky=tk.NSEW, columnspan=3)).configure(weight=1)
+                grid.new_row().add(self.debug_frame, sticky=tk.NSEW, columnspan=3).configure(weight=1)
             else:
                 self.debug_frame = None
 
@@ -264,7 +269,7 @@ class PatchExecutableFrame(tk.Frame):
                 text2="Stop!", command2=self.bt_stop
             )
 
-            grid.add_row(self.chk_debug_output, ..., self.button_patch)
+            grid.new_row().add(self.chk_debug_output).column_span(2).add(self.button_patch)
 
             # ------------------------------------------------------------------------------------------
 
@@ -272,7 +277,7 @@ class PatchExecutableFrame(tk.Frame):
                                              widget_args=dict(width=48, height=8, enabled=False),
                                              show_scrollbars=tk.VERTICAL)
 
-            grid.add_row(GridCell(scrollbar_frame, columnspan=3, sticky=tk.NSEW)).configure(weight=1)
+            grid.new_row().add(scrollbar_frame, sticky=tk.NSEW).column_span(3).configure(weight=1)
 
             self.log_field: Text = scrollbar_frame.widget
 

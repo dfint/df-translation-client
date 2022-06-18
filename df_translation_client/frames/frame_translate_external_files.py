@@ -6,6 +6,7 @@ from df_gettext_toolkit.translate_compressed import translate_compressed
 from df_gettext_toolkit.translate_plain_text import translate_plain_text
 from df_gettext_toolkit.translate_raws import translate_raws
 from natsort import natsorted
+from tk_grid_helper import grid_manager
 
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.po_languages import (
@@ -13,7 +14,7 @@ from df_translation_client.utils.po_languages import (
     filter_files_by_language,
     get_suitable_codepages_for_directory
 )
-from df_translation_client.utils.tkinter_helpers import Grid, Packer
+from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import FileEntry, ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Combobox, Listbox
 
@@ -117,14 +118,16 @@ class TranslateExternalFiles(tk.Frame):
         self.config_section = config.init_section(section_name="translate_external_files")
         config_section = self.config_section
 
-        with Grid(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
+        with grid_manager(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
             self.file_entry_df_root_path = FileEntry(
                 dialog_type="askdirectory",
                 default_path=config_section.get("df_root_path", ''),
                 on_change=lambda path: config_section.check_and_save_path("df_root_path", path),
             )
 
-            grid.add_row("Dwarf Fortress root path:", self.file_entry_df_root_path)
+            grid.new_row() \
+                .add(tk.Label(text="Dwarf Fortress root path:"), sticky=tk.W) \
+                .add(self.file_entry_df_root_path)
 
             self.file_entry_translation_files = FileEntry(
                 dialog_type="askdirectory",
@@ -132,10 +135,14 @@ class TranslateExternalFiles(tk.Frame):
                 on_change=lambda path: self.on_translation_files_path_change("translation_files_path", path),
             )
 
-            grid.add_row("Translation files' directory:", self.file_entry_translation_files)
+            grid.new_row()\
+                .add(tk.Label(text="Translation files' directory:"), sticky=tk.W) \
+                .add(self.file_entry_translation_files)
 
             self.combo_language = Combobox()
-            grid.add_row("Language:", self.combo_language)
+            grid.new_row()\
+                .add(tk.Label(text="Language:"), sticky=tk.W) \
+                .add(self.combo_language)
 
             directory = self.file_entry_translation_files.path
             if directory.exists():
@@ -151,12 +158,14 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_language.bind("<<ComboboxSelected>>", on_combo_language_change)
 
             self.combo_encoding = Combobox()
-            grid.add_row("Encoding:", self.combo_encoding)
+            grid.new_row() \
+                .add(tk.Label(text="Encoding:"), sticky=tk.W) \
+                .add(self.combo_encoding)
 
             self.update_combo_encoding()
 
             scrollbar_frame = ScrollbarFrame(widget_factory=Listbox, show_scrollbars=tk.VERTICAL)
-            grid.add_row(scrollbar_frame, ...)
+            grid.new_row().add(scrollbar_frame).column_span(2)
 
             self.listbox_translation_files: Listbox = scrollbar_frame.widget
             self.update_listbox_translation_files()
@@ -167,10 +176,10 @@ class TranslateExternalFiles(tk.Frame):
                     ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True))
                 )
 
-                grid.add_row(buttons.parent, ...)
+                grid.new_row().add(buttons.parent).column_span(2)
 
             scrollbar_frame = ScrollbarFrame(widget_factory=Listbox, show_scrollbars=tk.VERTICAL)
-            grid.add_row(scrollbar_frame, ...).configure(weight=1)
+            grid.new_row().add(scrollbar_frame).column_span(2).configure(weight=1)
 
             self.listbox_found_directories: Listbox = scrollbar_frame.widget
 

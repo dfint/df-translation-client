@@ -6,8 +6,9 @@ from tkinter import ttk
 from typing import List, Optional, Tuple, Iterable, Any
 
 from bidict import bidict, MutableBidict
+from tk_grid_helper import grid_manager
 
-from df_translation_client.utils.tkinter_helpers import Grid, Packer
+from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets.scrollbar_frame import ScrollbarFrame
 
 
@@ -68,7 +69,7 @@ class BisectTool(tk.Frame):
 
     def __init__(self, *args, strings: Optional[List[Tuple[str, str]]] = None, **kwargs):
         super().__init__(*args, **kwargs)
-        with Grid(self, sticky=tk.NSEW, pady=2) as grid:
+        with grid_manager(self, sticky=tk.NSEW, pady=2) as grid:
             scrollbar_frame = ScrollbarFrame(
                 widget_factory=ttk.Treeview,
                 show_scrollbars=tk.VERTICAL
@@ -82,7 +83,7 @@ class BisectTool(tk.Frame):
             self._nodes_by_item_ids = bidict()
             self.strings = strings
 
-            grid.add_row(scrollbar_frame).configure(weight=1)
+            grid.new_row().add(scrollbar_frame).configure(weight=1)
 
             with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
                 toolbar.pack_all(
@@ -92,7 +93,7 @@ class BisectTool(tk.Frame):
                     ttk.Button(text="Clear mark", command=partial(self.mark_selected_node, background="white")),
                 )
 
-                grid.add_row(toolbar.parent)
+                grid.new_row().add(toolbar.parent)
 
             grid.columnconfigure(0, weight=1)
 
