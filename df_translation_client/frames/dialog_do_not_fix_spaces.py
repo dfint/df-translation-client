@@ -4,7 +4,9 @@ from copy import deepcopy
 from tkinter import ttk
 from typing import MutableMapping, List, Mapping, Optional
 
-from df_translation_client.utils.tkinter_helpers import Grid, Packer
+from tk_grid_helper import grid_manager
+
+from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Listbox, Combobox, Entry
 
@@ -88,7 +90,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         self.strings = sorted((key for key in dictionary.keys() if key.startswith(' ') or key.endswith(' ')),
                               key=lambda x: x.lower().strip())
 
-        with Grid(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
+        with grid_manager(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
             with Packer(tk.Frame()) as language_frame_packer:
                 self.combo_language = Combobox(values=language_list)
                 self.combo_language.current(0)
@@ -103,10 +105,13 @@ class DialogDoNotFixSpaces(tk.Toplevel):
 
                 filter_frame_packer.left(tk.Label(text='Filter:')).expand(self.entry_filter)
 
-            grid.add_row(language_frame_packer.parent, filter_frame_packer.parent)
+            grid.new_row() \
+                .add(language_frame_packer.parent) \
+                .add(filter_frame_packer.parent)
 
-            grid.add_row(ttk.Button(text='-- Remove selected --', command=self.bt_remove_selected),
-                         ttk.Button(text='<< Add selected <<', command=self.bt_add_selected))
+            grid.new_row() \
+                .add(ttk.Button(text='-- Remove selected --', command=self.bt_remove_selected)) \
+                .add(ttk.Button(text='<< Add selected <<', command=self.bt_add_selected))
 
             scrollable_listbox_exclusions = ScrollbarFrame(widget_factory=Listbox,
                                                            widget_args=dict(width=40, height=20),
@@ -122,11 +127,14 @@ class DialogDoNotFixSpaces(tk.Toplevel):
             self.listbox_exclusions_hints = scrollable_listbox_hints.widget
             self.update_listbox_exclusions_hints()
 
-            grid.add_row(scrollable_listbox_exclusions,
-                         scrollable_listbox_hints).configure(weight=1)
+            grid.new_row() \
+                .add(scrollable_listbox_exclusions) \
+                .add(scrollable_listbox_hints) \
+                .configure(weight=1)
 
-            grid.add_row(ttk.Button(text="OK", command=self.destroy),
-                         ttk.Button(text="Cancel", command=self.cancel))
+            grid.new_row() \
+                .add(ttk.Button(text="OK", command=self.destroy)) \
+                .add(ttk.Button(text="Cancel", command=self.cancel))
 
             grid.columnconfigure(0, weight=1)
             grid.columnconfigure(1, weight=1)
