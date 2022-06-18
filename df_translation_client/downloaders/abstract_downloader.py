@@ -1,25 +1,12 @@
 from abc import abstractmethod, ABC
-from collections.abc import AsyncIterable
-from enum import Enum
-from typing import List, Optional, NamedTuple
+from typing import AsyncIterable, List
 
-
-class StatusEnum(Enum):
-    DOWNLOADING = "downloading..."
-    RETRY = "retry..."
-    FAILED = "failed"
-    OK = "ok!"
-
-
-class DownloadStage(NamedTuple):
-    resource: str
-    status: StatusEnum
-    error_text: Optional[str]
+from df_translation_client.downloaders.common import DownloadStage
 
 
 class AbstractDownloader(ABC):
     @abstractmethod
-    async def check_connection(self):
+    async def connect(self) -> None:
         ...
 
     @abstractmethod

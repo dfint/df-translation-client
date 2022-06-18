@@ -1,11 +1,11 @@
 import asyncio
 import traceback
-from collections.abc import AsyncIterable
-from typing import List
+from typing import AsyncIterable, List
 
 from transifex.api import TransifexAPI
 
-from df_translation_client.downloaders.abstract_downloader import AbstractDownloader, DownloadStage, StatusEnum
+from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
+from df_translation_client.downloaders.common import StatusEnum, DownloadStage
 
 try:
     from asyncio import to_thread  # added in Python 3.9
@@ -22,7 +22,7 @@ class TransifexApiDownloader(AbstractDownloader):
         self.transifex_api = TransifexAPI(username, password, "https://www.transifex.com")
         self.project_slug = project_slug
 
-    async def check_connection(self):
+    async def connect(self):
         assert await to_thread(self.transifex_api.ping), "No connection to the server"
         assert await to_thread(self.transifex_api.project_exists, self.project_slug), \
             f"Project {self.project_slug} does not exist"
@@ -34,12 +34,13 @@ class TransifexApiDownloader(AbstractDownloader):
             exception_info = None
             for j in range(10, 0, -1):
                 try:
+                    file_name = file_path_pattern.format(resource=resource, language=language)
                     await to_thread(
                         self.transifex_api.get_translation,
                         self.project_slug,
                         resource,
                         language,
-                        file_path_pattern.format(resource)
+                        file_name
                     )
                     break
                 except Exception:

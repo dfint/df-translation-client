@@ -10,8 +10,9 @@ from typing import List, Optional
 
 from async_tkinter_loop import async_handler
 
-from df_translation_client.downloaders.abstract_downloader import AbstractDownloader, DownloadStage, StatusEnum
-from df_translation_client.downloaders.transifex_api_2 import TransifexApiDownloader
+from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
+from df_translation_client.downloaders.common import StatusEnum, DownloadStage
+from df_translation_client.downloaders.github import GithubDownloader
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.tkinter_helpers import Grid, GridCell
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
@@ -35,8 +36,9 @@ class DownloadTranslationsFrame(tk.Frame):
         self.button_connect.config(state=tk.DISABLED)
 
         try:
-            self.downloader_api = TransifexApiDownloader(username, password, project)
-            await self.downloader_api.check_connection()
+            # self.downloader_api = TransifexApiDownloader(username, password, project)
+            self.downloader_api = GithubDownloader()
+            await self.downloader_api.connect()
             self.resources = await self.downloader_api.list_resources()
             languages = await self.downloader_api.list_languages(self.resources[0])
         except Exception as err:
@@ -67,7 +69,7 @@ class DownloadTranslationsFrame(tk.Frame):
     async def downloader(self, language: str, download_dir: Path):
         lines = {res: res for res in self.resources}  # { "resource": "resource - status" }
 
-        file_path_pattern = str(download_dir / f"{{}}_{language}.po")
+        file_path_pattern = str(download_dir / "{resource}_{language}.po")
         async for stage in self.downloader_api.async_downloader(
                 language, self.resources, file_path_pattern
         ):
