@@ -124,17 +124,14 @@ class DownloadTranslationsFrame(tk.Frame):
     def bt_download(self) -> bool:
         if not self.downloader_api:
             messagebox.showerror("Not connected", "Make connection first")
-            return False  # Don't change the two-state button state
         elif self.resources is None:
             messagebox.showerror("No resources", "No resources to download")
-            return False
         elif self.download_started:
             messagebox.showerror("Downloading in process", "Downloading is already started")
-            return False
         if not self.fileentry_download_to.path_is_valid():
             messagebox.showerror("Directory does not exist", "Specify existing directory first")
-            return False
         else:
+            self.resources: List[str]
             self.progressbar["maximum"] = len(self.resources) * 1.001
             self.progressbar["value"] = 0
             self.update()
@@ -144,15 +141,14 @@ class DownloadTranslationsFrame(tk.Frame):
 
             language = self.combo_languages.get()
 
-            initial_names = self.resources
-            resource_names = initial_names.copy()
-
-            self.listbox_resources.values = resource_names
+            self.listbox_resources.values = self.resources
 
             self.downloader_task: Task = asyncio.get_running_loop().create_task(
                 self.downloader(language, download_dir)
             )
             return True
+
+        return False  # Don't change state of the button
 
     def bt_stop_downloading(self):
         r = messagebox.showwarning("Are you sure?", "Stop downloading?", type=messagebox.OKCANCEL)
