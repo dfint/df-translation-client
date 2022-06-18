@@ -39,8 +39,8 @@ class DownloadTranslationsFrame(tk.Frame):
             self.resources = await self.downloader_api.list_resources()
             languages = await self.downloader_api.list_languages(self.resources[0]["slug"])
         except Exception as err:
-            messagebox.showerror("Error", str(err))
             traceback.print_exc()
+            messagebox.showerror("Error", str(err))
         else:
             self.combo_languages.values = sorted(languages)
             last_language = self.config_section.get("language", None)
