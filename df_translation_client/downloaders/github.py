@@ -20,7 +20,7 @@ class GithubDownloader(AbstractDownloader):
         pass
 
     async def connect(self) -> None:
-        url = "https://" + str(GithubDownloader.BASE_URL / "files_by_resource.json")
+        url = "https://" + str(GithubDownloader.BASE_URL / "metadata.json")
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 self.metadata = json.loads(await response.text())
