@@ -1,4 +1,4 @@
 [flake8]
-exclude =
-    venv/
-    .venv/
+ignore = W293
+exclude = venv/,.venv/
+max-line-length = 120
