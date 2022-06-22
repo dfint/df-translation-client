@@ -1,5 +1,3 @@
-import operator
-from functools import reduce
 from typing import List
 from hypothesis import given, strategies as st
 
@@ -35,13 +33,13 @@ def test_split(data: List):
         with pytest.raises(AssertionError):
             node.split()
     else:
-        children = node.split()
+        child_1, child_2 = node.split()
 
         if len(data) % 2 == 0:
-            assert children[0].size == children[1].size == len(data) // 2
+            assert child_1.size == child_2.size == len(data) // 2
         else:
-            assert children[0].size == len(data) // 2 + 1
-            assert children[1].size == len(data) // 2
+            assert child_1.size == len(data) // 2 + 1
+            assert child_2.size == len(data) // 2
 
-        assert sum(node.size for node in children) == len(data)
-        assert reduce(operator.add, (list(node.items) for node in children), []) == data
+        assert child_1.size + child_2.size == len(data)
+        assert list(child_1.items) + list(child_2.items) == data
