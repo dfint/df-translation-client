@@ -10,12 +10,14 @@ from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Listbox, Combobox, Entry
 
+SPACE_PLACEHOLDER = "•"
+
 
 class HighlightedSpacesItem:
     @staticmethod
     def highlight_spaces(s):
         parts = re.search(r'^(\s*)(.*?)(\s*)$', s)
-        return '•' * len(parts.group(1)) + parts.group(2) + '•' * len(parts.group(3))
+        return SPACE_PLACEHOLDER * len(parts.group(1)) + parts.group(2) + SPACE_PLACEHOLDER * len(parts.group(3))
 
     def __init__(self, value: str):
         self.value = value
