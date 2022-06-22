@@ -17,24 +17,30 @@ class Node:
     start: int
     end: int
 
-    def __init__(self, items: List, start: int = 0, end: int = -1):
+    def __init__(self, items: List, start: int = 0, end: int = None):
         self._all_items = items
         self.start = start
-        self.end = end if end >= 0 else len(items) - 1
-        assert 0 <= self.start <= self.end < len(items)
+
+        if end is None:
+            end = len(items) - 1
+
+        self.end = end
+        assert 0 <= self.start and self.end < len(items)
 
     @property
     def size(self):
         return self.end - self.start + 1
 
     def split(self) -> Tuple["Node", "Node"]:
-        assert self.size >= 2
+        assert self.size >= 2, f"Not enough items to split: {self.size}"
         mid = (self.start + self.end) // 2
         return Node(self._all_items, self.start, mid), Node(self._all_items, mid + 1, self.end)
 
     @property
     def tree_text(self):
-        if self.size == 1:
+        if self.size == 0:
+            return "[] (0 strings)"
+        elif self.size == 1:
             return f"[{self.start} : {self.end}] (1 string)"
         else:
             return f"[{self.start} : {self.end}] ({self.size} strings)"
@@ -45,7 +51,9 @@ class Node:
 
     @property
     def column_text(self) -> str:
-        if self.start == self.end:
+        if self.start > self.end:
+            return "<empty>"
+        elif self.start == self.end:
             return repr(self._all_items[self.start])
         else:
             if self.end - self.start + 1 <= 2:  # One or two strings in the slice: show all strings

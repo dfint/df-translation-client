@@ -4,6 +4,7 @@ venv/
 .venv/
 .pytest_cache/
 htmlcov/
+.hypothesis/
 *.po
 *.pot
 *.mo
