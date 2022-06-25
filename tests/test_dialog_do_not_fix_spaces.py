@@ -7,7 +7,7 @@ from hypothesis import given, strategies as st
 @given(
     st.text(alphabet=" "),
     st.text(alphabet=string.digits + string.ascii_letters + string.punctuation + " "),
-    st.text(alphabet=" ")
+    st.text(alphabet=" "),
 )
 def test_highlight_spaces(leading_spaces, text, trailing_spaces):
     text_with_spaces = leading_spaces + text.strip() + trailing_spaces

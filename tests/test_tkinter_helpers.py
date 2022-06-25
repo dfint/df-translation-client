@@ -13,8 +13,10 @@ def test_context_managers(context_manager, mocker):
 
     with pytest.raises(ValueError):
         with context_manager(mocker.Mock(name="parent")) as obj:
-            assert (default_root_wrapper.default_root == obj  # case for set_parent
-                    or default_root_wrapper.default_root == obj.parent)
+            assert (
+                default_root_wrapper.default_root == obj  # case for set_parent
+                or default_root_wrapper.default_root == obj.parent
+            )
             raise ValueError
 
     assert default_root_wrapper.default_root == old_default_root
