@@ -10,8 +10,9 @@ class AbstractDownloader(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def async_downloader(self, language: str, resources: List[str], file_path_pattern: str) \
-            -> AsyncIterable[DownloadStage]:
+    async def async_downloader(
+        self, language: str, resources: List[str], file_path_pattern: str
+    ) -> AsyncIterable[DownloadStage]:
         raise NotImplementedError
 
     @abstractmethod

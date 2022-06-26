@@ -15,10 +15,15 @@ class Config:
         self.config_path = config_path
 
     def save_settings(self):
-        with open(self.config_path, 'w', encoding='utf-8') as config_file:
-            json.dump({key: dict(section) for key, section in self._sections.items()
-                       if isinstance(section, dict)},  # ignore non-dict values (to avoid errors with old config)
-                      config_file, indent=4, sort_keys=True)
+        with open(self.config_path, "w", encoding="utf-8") as config_file:
+            json.dump(
+                {
+                    key: dict(section) for key, section in self._sections.items() if isinstance(section, dict)
+                },  # ignore non-dict values (to avoid errors with old config)
+                config_file,
+                indent=4,
+                sort_keys=True,
+            )
 
     def load_settings(self, config_path=None):
         if config_path is None:
@@ -27,7 +32,7 @@ class Config:
             self.config_path = config_path
 
         try:
-            with open(config_path, encoding='utf-8') as config_file:
+            with open(config_path, encoding="utf-8") as config_file:
                 self._sections.update(json.load(config_file))
         except (FileNotFoundError, ValueError):
             pass

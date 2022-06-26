@@ -10,6 +10,7 @@ from df_translation_client.downloaders.common import StatusEnum, DownloadStage
 try:
     from asyncio import to_thread  # added in Python 3.9
 except ImportError:
+
     async def to_thread(func, *args):
         return await asyncio.get_running_loop().run_in_executor(None, func, *args)
 
@@ -24,11 +25,13 @@ class TransifexApiDownloader(AbstractDownloader):
 
     async def connect(self):
         assert await to_thread(self.transifex_api.ping), "No connection to the server"
-        assert await to_thread(self.transifex_api.project_exists, self.project_slug), \
-            f"Project {self.project_slug} does not exist"
+        assert await to_thread(
+            self.transifex_api.project_exists, self.project_slug
+        ), f"Project {self.project_slug} does not exist"
 
-    async def async_downloader(self, language: str, resources: List[str], file_path_pattern: str) \
-            -> AsyncIterable[DownloadStage]:
+    async def async_downloader(
+        self, language: str, resources: List[str], file_path_pattern: str
+    ) -> AsyncIterable[DownloadStage]:
         for resource in resources:
             yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
             exception_info = None
@@ -36,11 +39,7 @@ class TransifexApiDownloader(AbstractDownloader):
                 try:
                     file_name = file_path_pattern.format(resource=resource, language=language)
                     await to_thread(
-                        self.transifex_api.get_translation,
-                        self.project_slug,
-                        resource,
-                        language,
-                        file_name
+                        self.transifex_api.get_translation, self.project_slug, resource, language, file_name
                     )
                     break
                 except Exception:

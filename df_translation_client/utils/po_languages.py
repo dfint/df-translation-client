@@ -67,15 +67,15 @@ def get_suitable_codepages_for_file(translation_file: Path):
     return filter_codepages(codepages, strings), translation_file_language
 
 
-def cleanup_translations_string(original: str, translation: str,
-                                exclusions_leading: Optional[Set[str]],
-                                exclusions_trailing: Optional[Set[str]]) -> str:
+def cleanup_translations_string(
+    original: str, translation: str, exclusions_leading: Optional[Set[str]], exclusions_trailing: Optional[Set[str]]
+) -> str:
     return fix_spaces(original, cleanup_string(translation), exclusions_leading, exclusions_trailing)
 
 
-def cleanup_dictionary(raw_dict: Iterable[Tuple[str, str]],
-                       exclusions_leading: Optional[Set[str]],
-                       exclusions_trailing: Optional[Set[str]]) -> Iterable[Tuple[str, str]]:
+def cleanup_dictionary(
+    raw_dict: Iterable[Tuple[str, str]], exclusions_leading: Optional[Set[str]], exclusions_trailing: Optional[Set[str]]
+) -> Iterable[Tuple[str, str]]:
     return {
         (original, cleanup_translations_string(original, translation, exclusions_leading, exclusions_trailing))
         for original, translation in raw_dict

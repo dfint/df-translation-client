@@ -21,8 +21,9 @@ class GithubDownloader(AbstractDownloader):
             self.metadata = response.json()
             self.resources = list(self.metadata)
 
-    async def async_downloader(self, language: str, resources: List[str], file_path_pattern: str) \
-            -> AsyncIterable[DownloadStage]:
+    async def async_downloader(
+        self, language: str, resources: List[str], file_path_pattern: str
+    ) -> AsyncIterable[DownloadStage]:
         async with httpx.AsyncClient() as client:
             for resource in resources:
                 yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
