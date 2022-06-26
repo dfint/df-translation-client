@@ -1,10 +1,9 @@
 import tkinter as tk
+import traceback
 from pathlib import Path
-from tkinter import messagebox, ttk
+from tkinter import ttk
 
-from df_gettext_toolkit.translate_compressed import translate_compressed
-from df_gettext_toolkit.translate_plain_text import translate_plain_text
-from df_gettext_toolkit.translate_raws import translate_raws
+from df_gettext_toolkit.translate_batch import translate_files
 from natsort import natsorted
 from tk_grid_helper import grid_manager
 
@@ -32,9 +31,10 @@ class TranslateExternalFiles(tk.Frame):
 
             self.update_listbox_translation_files()
             self.update_combo_encoding()
-        except Exception:
+        except Exception as ex:
             self.combo_language.values = tuple()
             self.combo_language.text = ''
+            traceback.print_exception(ex)
 
     def update_listbox_translation_files(self):
         language = self.combo_language.text
@@ -60,50 +60,16 @@ class TranslateExternalFiles(tk.Frame):
         self.update_combo_languages(self.file_entry_translation_files.path)
 
     def bt_search(self, translate=False):
-        patterns = {
-            "raw/objects": dict(
-                po_filename="raw-objects",
-                func=translate_raws,
-            ),
-            "data": dict(
-                po_filename="uncompressed",
-                func=lambda *args: translate_compressed(*args),
-            ),
-            "data/speech": dict(
-                po_filename="speech",
-                func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
-            ),
-            "raw/objects/text": dict(
-                po_filename="text",
-                func=lambda *args: translate_plain_text(*args, join_paragraphs=False),
-            ),
-        }
-
         # TODO: add progressbar
         self.listbox_found_directories.clear()
-        base_path = self.file_entry_df_root_path.path
-        po_directory = self.file_entry_translation_files.path
-        for cur_dir in base_path.rglob("*"):
-            if cur_dir.is_dir():
-                for pattern in patterns:
-                    if cur_dir.match("*/" + pattern):
-                        self.listbox_found_directories.append(f"Matched {pattern!r} pattern")
-                        base_name = patterns[pattern]["po_filename"]
-                        postfix = self.combo_language.text
-                        po_filename = f"{base_name}_{postfix}.po"
-
-                        po_file_path = po_directory / po_filename
-
-                        if not po_file_path.exists() or po_file_path.is_dir():
-                            messagebox.showerror(title="error",
-                                                 message=f"File {po_filename} doesn't exist or it is a directory")
-                            return
-
-                        if translate:
-                            func = patterns[pattern]["func"]
-                            for filename in func(po_file_path, cur_dir, self.combo_encoding.get()):
-                                # print(filename, file=sys.stderr)
-                                self.listbox_found_directories.append(filename)
+        for message in translate_files(
+            base_path=Path(self.file_entry_df_root_path.path),
+            po_directory=Path(self.file_entry_translation_files.path),
+            encoding=self.combo_encoding.get(),
+            po_name_postfix=self.combo_language.text,
+            translate=translate
+        ):
+            self.listbox_found_directories.append(message)
 
         if translate:
             self.listbox_found_directories.append("Completed.")
