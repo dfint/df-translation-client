@@ -1,3 +1,4 @@
+import traceback
 from pathlib import Path
 from typing import List, Mapping, Set, Iterable, Optional, Tuple, TextIO
 
@@ -12,8 +13,8 @@ def get_languages(directory: Path):
         try:
             with open(directory / filename, encoding="utf-8") as file:
                 languages.add(parse_po.PoReader(file).meta["Language"])
-        except Exception:
-            pass
+        except Exception as ex:
+            traceback.print_exception(ex)
 
     return sorted(languages)
 
@@ -24,8 +25,8 @@ def filter_files_by_language(directory: Path, language):
             try:
                 if parse_po.PoReader(file).meta["Language"] == language:
                     yield filename.name
-            except:
-                pass
+            except Exception as ex:
+                traceback.print_exception(ex)
 
 
 def filter_codepages(encodings: Iterable[str], strings: List[str]):
@@ -50,7 +51,7 @@ def get_suitable_codepages_for_directory(directory: Path, language: str):
     for file in files:
         with open(directory / file, "r", encoding="utf-8") as fn:
             po_file = parse_po.PoReader(fn)
-            strings = [cleanup_string(entry["msgstr"]) for entry in po_file]
+            strings = [cleanup_string(entry.translation) for entry in po_file]
         codepages = filter_codepages(codepages, strings)
 
     return codepages
@@ -62,7 +63,7 @@ def get_suitable_codepages_for_file(translation_file: Path):
     with open(translation_file, "r", encoding="utf-8") as fn:
         po_file = parse_po.PoReader(fn)
         translation_file_language = po_file.meta["Language"]
-        strings = [cleanup_string(entry["msgstr"]) for entry in po_file]
+        strings = [cleanup_string(entry.translation) for entry in po_file]
 
     return filter_codepages(codepages, strings), translation_file_language
 
@@ -85,7 +86,7 @@ def cleanup_dictionary(
 def load_dictionary_raw(translation_file: TextIO) -> Tuple[Iterable[Tuple[str, str]], str]:
     po_file = parse_po.PoReader(translation_file)
     language = po_file.meta["Language"]
-    dictionary = ((entry["msgid"], entry["msgstr"]) for entry in po_file)
+    dictionary = ((entry.text, entry.translation) for entry in po_file)
     return dictionary, language
 
 

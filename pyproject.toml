@@ -12,8 +12,7 @@ natsort = "8.0.0"
 requests = "^2.26.0"
 python-transifex = { url = "https://github.com/insolor/python-transifex/archive/master.zip" }
 dfrus = { url = "https://github.com/dfint/dfrus/releases/download/0.0.10/dfrus-0.0.10-py3-none-any.whl" }
-df-gettext-toolkit = { url = "https://github.com/dfint/df-gettext-toolkit/releases/download/0.2.4/df_gettext_toolkit-0.2.4-py3-none-any.whl" }
-df-raw-decoder = { url = "https://github.com/dfint/df_raw_decoder/releases/download/1.0.0/df_raw_decoder-1.0.0-py3-none-any.whl" }
+df-gettext-toolkit = { url = "https://github.com/dfint/df-gettext-toolkit/releases/download/0.3.3/df_gettext_toolkit-0.3.3-py3-none-any.whl" }
 async-tkinter-loop = "^0.3.0"
 tk_grid_helper = { url = "https://github.com/insolor/tk_grid_helper/releases/download/0.1.2/tk_grid_helper-0.1.2-py3-none-any.whl"}
 httpx = "^0.23.0"
