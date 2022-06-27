@@ -127,11 +127,11 @@ class PatchExecutableFrame(tk.Frame):
     def setup_checkbutton(self, text, config_key, default_state):
         config = self.config_section
 
-        def save_checkbox_state(event, option_name):
-            config[option_name] = not event.widget.is_checked  # Event occurs before the widget changes state
+        def save_checkbox_state(widget, option_name):
+            config[option_name] = widget.is_checked
 
         check = Checkbutton(text=text)
-        check.bind("<1>", lambda event: save_checkbox_state(event, config_key))
+        check.config(command=lambda: save_checkbox_state(check, config_key))
         check.is_checked = config[config_key] = config.get(config_key, default_state)
         return check
 
