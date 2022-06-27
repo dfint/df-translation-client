@@ -173,10 +173,10 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = "cp437"
 
-    def on_translation_file_change(self, file_path):
+    def on_translation_file_change(self, file_path: Path):
         self.config_section.check_and_save_path("df_exe_translation_file", file_path)
         self.update_combo_encoding(self.fileentry_translation_file.path)
-        if self.debug_frame:
+        if self.debug_frame and file_path.is_file():
             with open(self.fileentry_translation_file.path, "r", encoding="utf-8") as translation_file:
                 self.debug_frame.set_dictionary(load_dictionary_with_cleanup(translation_file, self.exclusions))
 
