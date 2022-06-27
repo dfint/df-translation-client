@@ -41,7 +41,7 @@ def filter_codepages(encodings: Iterable[str], strings: List[str]):
                     raise ValueError
             yield encoding
         except (UnicodeEncodeError, ValueError, LookupError):
-            pass
+            pass  # These exceptions mean that the chosen encoding is not suitable for the file
 
 
 def get_suitable_codepages_for_directory(directory: Path, language: str):
