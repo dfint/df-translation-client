@@ -20,7 +20,7 @@ class Checkbutton(ttk.Checkbutton):
 class Entry(tk.Entry):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
+
     def _set(self, value):
         self.delete(0, tk.END)
         self.insert(0, value)
@@ -60,7 +60,7 @@ class TypedCombobox(ttk.Combobox, Generic[TComboboxValue]):
     def values(self, values: Optional[List[TComboboxValue]] = None):
         if values is None:
             values = []
-        self['values'] = tuple(values)
+        self["values"] = tuple(values)
 
     def get(self) -> Optional[TComboboxValue]:
         if self.current() == -1:  # Если ничего не выбрано
@@ -87,11 +87,11 @@ class Combobox(ttk.Combobox):
 
     @property
     def values(self):
-        return self['values']
+        return self["values"]
 
     @values.setter
     def values(self, values):
-        self['values'] = tuple(values)
+        self["values"] = tuple(values)
 
 
 TListboxValue = TypeVar("TListboxValue")

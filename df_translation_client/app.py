@@ -12,7 +12,7 @@ from df_translation_client.utils.config import Config
 class App:
     @staticmethod
     def get_config_path():
-        config_name = '.df-translate.json'
+        config_name = ".df-translate.json"
         config_path = Path(__file__).parent.parent
 
         if not os.access(config_path, os.W_OK):
@@ -22,7 +22,7 @@ class App:
 
     @staticmethod
     def setup_config_autosave(window: MainWindow, config: Config):
-        window.bind('<Destroy>', lambda _: config.save_settings())  # Save settings on quit
+        window.bind("<Destroy>", lambda _: config.save_settings())  # Save settings on quit
         window.save_settings_repeatedly(config, delay=500)  # Save settings every 500 ms
 
     def __init__(self, ignore_config_file=False, debug=False):
@@ -44,4 +44,4 @@ class App:
 
 def main():
     mp.freeze_support()
-    App(ignore_config_file='--noconfig' in sys.argv, debug='--debug' in sys.argv).run()
+    App(ignore_config_file="--noconfig" in sys.argv, debug="--debug" in sys.argv).run()

@@ -78,10 +78,7 @@ class BisectTool(tk.Frame):
     def __init__(self, *args, strings: Optional[List[Tuple[str, str]]] = None, **kwargs):
         super().__init__(*args, **kwargs)
         with grid_manager(self, sticky=tk.NSEW, pady=2) as grid:
-            scrollbar_frame = ScrollbarFrame(
-                widget_factory=ttk.Treeview,
-                show_scrollbars=tk.VERTICAL
-            )
+            scrollbar_frame = ScrollbarFrame(widget_factory=ttk.Treeview, show_scrollbars=tk.VERTICAL)
 
             self.tree = tree = scrollbar_frame.widget
             tree["columns"] = ("strings",)
