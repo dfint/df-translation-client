@@ -26,7 +26,9 @@ class FileEntry(tk.Frame):
                 initial_file = ""
 
             file_path = filedialog.askopenfilename(
-                filetypes=self.filetypes, initialdir=initial_dir, initialfile=initial_file
+                filetypes=self.filetypes,
+                initialdir=initial_dir,
+                initialfile=initial_file,
             )
         elif self.dialog_type == "askdirectory":
             file_path = filedialog.askdirectory(initialdir=self.default_path)
@@ -52,28 +54,24 @@ class FileEntry(tk.Frame):
 
     def __init__(
         self,
-        *args,
-        button_text=None,
-        default_path=None,
+        default_path="",
         on_change=None,
-        filetypes=None,
+        filetypes=tuple(),
         dialog_type="askopenfilename",
         change_color=False,
         **kwargs
     ):
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
 
-        if button_text is None:
-            button_text = "Browse..."
-
-        self.filetypes = filetypes or []
+        self.filetypes = filetypes
         self.on_change = on_change
-        self.default_path = default_path or ""
+        self.default_path = default_path
         self.dialog_type = dialog_type
 
         with Packer(self) as packer:
             self.entry = Entry()
-            packer.right(ttk.Button(text=button_text, command=self._bt_browse), padx=2).expand(self.entry)
+            self.button = ttk.Button(text="Browse...", command=self._bt_browse)
+            packer.right(self.button, padx=2).expand(self.entry)
 
         self.entry.text = self.default_path
         self._prev_value = self.default_path
@@ -87,7 +85,7 @@ class FileEntry(tk.Frame):
 
     @property
     def text(self) -> str:
-        return self.entry.text
+        return self.entry.get()
 
     def path_is_valid(self) -> bool:
         return self.text and Path(self.text).exists()
