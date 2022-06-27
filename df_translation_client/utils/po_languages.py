@@ -29,7 +29,7 @@ def filter_files_by_language(directory: Path, language):
                 traceback.print_exception(ex)
 
 
-def filter_codepages(encodings: Iterable[str], strings: List[str]):
+def filter_codepages(encodings: Iterable[str], strings: List[str]):  # FIXME: make async
     for encoding in encodings:
         encoder_function = get_encoder(encoding)
 
@@ -44,7 +44,7 @@ def filter_codepages(encodings: Iterable[str], strings: List[str]):
             pass  # These exceptions mean that the chosen encoding is not suitable for the file
 
 
-def get_suitable_codepages_for_directory(directory: Path, language: str):
+def get_suitable_codepages_for_directory(directory: Path, language: str):  # FIXME: make async
     files = filter_files_by_language(directory, language)
     codepages = get_supported_codepages().keys()
 
@@ -57,7 +57,7 @@ def get_suitable_codepages_for_directory(directory: Path, language: str):
     return codepages
 
 
-def get_suitable_codepages_for_file(translation_file: Path):
+def get_suitable_codepages_for_file(translation_file: Path):  # FIXME: make async
     codepages = get_supported_codepages().keys()
 
     with open(translation_file, "r", encoding="utf-8") as fn:
@@ -74,7 +74,7 @@ def cleanup_translations_string(
     return fix_spaces(original, cleanup_string(translation), exclusions_leading, exclusions_trailing)
 
 
-def cleanup_dictionary(
+def cleanup_dictionary(  # FIXME: make async
     raw_dict: Iterable[Tuple[str, str]], exclusions_leading: Optional[Set[str]], exclusions_trailing: Optional[Set[str]]
 ) -> Iterable[Tuple[str, str]]:
     return {
@@ -83,7 +83,7 @@ def cleanup_dictionary(
     }
 
 
-def load_dictionary_raw(translation_file: TextIO) -> Tuple[Iterable[Tuple[str, str]], str]:
+def load_dictionary_raw(translation_file: TextIO) -> Tuple[Iterable[Tuple[str, str]], str]:  # FIXME: make async
     po_file = parse_po.PoReader(translation_file)
     language = po_file.meta["Language"]
     dictionary = ((entry.text, entry.translation) for entry in po_file)
