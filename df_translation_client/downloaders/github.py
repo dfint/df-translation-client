@@ -1,3 +1,4 @@
+import io
 import traceback
 from pathlib import PurePosixPath
 from typing import AsyncIterable, List, Mapping
@@ -29,10 +30,12 @@ class GithubDownloader(AbstractDownloader):
                 yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
                 url = "https://" + str(GithubDownloader.BASE_URL / "translations" / self.metadata[resource][language])
                 try:
-                    response = await client.get(url)
-                    file_name = file_path_pattern.format(resource=resource, language=language)
-                    with open(file_name, "wb") as file:
-                        file.write(response.content)
+                    async with client.stream("GET", url) as response:
+                        response = await client.get(url)
+                        file_name = file_path_pattern.format(resource=resource, language=language)
+                        with open(file_name, "wb") as file:
+                            async for chunk in response.aiter_bytes(io.DEFAULT_BUFFER_SIZE):
+                                file.write(chunk)
                 except Exception:
                     yield DownloadStage(resource, StatusEnum.FAILED, traceback.format_exc())
                 else:
