@@ -1,9 +1,11 @@
+import asyncio
 import multiprocessing as mp
 import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
 from typing import Optional
 
+from async_tkinter_loop import async_handler
 from dfrus import dfrus
 from natsort import natsorted
 from tk_grid_helper import grid_manager
@@ -142,17 +144,17 @@ class PatchExecutableFrame(tk.Frame):
         if self.translation_file_language:
             self.config_section["language_codepages"][self.translation_file_language] = event.widget.text
 
-    def update_combo_encoding_list(self, translation_file):
+    async def update_combo_encoding_list(self, translation_file):
         try:
-            codepages, language = get_suitable_codepages_for_file(translation_file)
+            codepages, language = await get_suitable_codepages_for_file(translation_file)
             self.combo_encoding.values = natsorted(codepages)
             self.translation_file_language = language
         except Exception:
             self.translation_file_language = None
             self.combo_encoding.values = tuple()
 
-    def config_combo_encoding(self, translation_file: Path):
-        self.update_combo_encoding_list(translation_file)
+    async def config_combo_encoding(self, translation_file: Path):
+        await self.update_combo_encoding_list(translation_file)
 
         if "last_encoding" in self.config_section:
             self.combo_encoding.text = self.config_section["last_encoding"]
@@ -161,8 +163,8 @@ class PatchExecutableFrame(tk.Frame):
 
         self.combo_encoding.bind("<<ComboboxSelected>>", func=self.save_encoding_into_config)
 
-    def update_combo_encoding(self, translation_file: Path):
-        self.update_combo_encoding_list(translation_file)
+    async def update_combo_encoding(self, translation_file: Path):
+        await self.update_combo_encoding_list(translation_file)
 
         if (self.translation_file_language
                 and self.translation_file_language in self.config_section["language_codepages"]):
@@ -173,9 +175,9 @@ class PatchExecutableFrame(tk.Frame):
         else:
             self.combo_encoding.text = "cp437"
 
-    def on_translation_file_change(self, file_path: Path):
+    async def on_translation_file_change(self, file_path: Path):
         self.config_section.check_and_save_path("df_exe_translation_file", file_path)
-        self.update_combo_encoding(self.fileentry_translation_file.path)
+        await self.update_combo_encoding(self.fileentry_translation_file.path)
         if self.debug_frame and file_path.is_file():
             with open(self.fileentry_translation_file.path, "r", encoding="utf-8") as translation_file:
                 self.debug_frame.set_dictionary(load_dictionary_with_cleanup(translation_file, self.exclusions))
@@ -216,7 +218,7 @@ class PatchExecutableFrame(tk.Frame):
                     # ("csv file", "*.csv"), # @TODO: Currently not supported
                 ],
                 default_path=self.config_section.get("df_exe_translation_file", ""),
-                on_change=self.on_translation_file_change,
+                on_change=async_handler(self.on_translation_file_change),
                 change_color=True
             )
             grid.new_row() \
@@ -224,7 +226,7 @@ class PatchExecutableFrame(tk.Frame):
                 .add(self.fileentry_translation_file).column_span(2)
 
             self.combo_encoding = Combobox()
-            self.config_combo_encoding(self.fileentry_translation_file.path)
+            asyncio.get_event_loop().create_task(self.config_combo_encoding(self.fileentry_translation_file.path))
             grid.new_row() \
                 .add(tk.Label(text="Encoding:"), sticky=tk.W) \
                 .add(self.combo_encoding).column_span(2)

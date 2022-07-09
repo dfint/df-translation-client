@@ -2,7 +2,9 @@ import tkinter as tk
 import traceback
 from pathlib import Path
 from tkinter import ttk
+import asyncio
 
+from async_tkinter_loop import async_handler
 from df_gettext_toolkit.translate_batch import translate_files
 from natsort import natsorted
 from tk_grid_helper import grid_manager
@@ -42,21 +44,23 @@ class TranslateExternalFiles(tk.Frame):
         files = sorted(filter_files_by_language(directory, language)) if directory.exists() else tuple()
         self.listbox_translation_files.values = files
 
-    def update_combo_encoding(self):
+    async def update_combo_encoding(self):
         if self.file_entry_translation_files.path_is_valid():
             directory = self.file_entry_translation_files.path
             language = self.combo_language.text
-            self.combo_encoding.values = natsorted(get_suitable_codepages_for_directory(directory, language))
+            encodings = await get_suitable_codepages_for_directory(directory, language)
+            self.combo_encoding.values = natsorted(encodings)
 
             if self.combo_encoding.values:
                 self.combo_encoding.current(0)
             else:
                 self.combo_encoding.text = "cp437"
 
-    def update(self):
+    @async_handler
+    async def update(self):
         super().update()
         self.update_listbox_translation_files()
-        self.update_combo_encoding()
+        await self.update_combo_encoding()
         self.update_combo_languages(self.file_entry_translation_files.path)
 
     def bt_search(self, translate=False):
@@ -128,7 +132,7 @@ class TranslateExternalFiles(tk.Frame):
                 .add(tk.Label(text="Encoding:"), sticky=tk.W) \
                 .add(self.combo_encoding)
 
-            self.update_combo_encoding()
+            asyncio.get_event_loop().create_task(self.update_combo_encoding())
 
             scrollbar_frame = ScrollbarFrame(widget_factory=Listbox, show_scrollbars=tk.VERTICAL)
             grid.new_row().add(scrollbar_frame).column_span(2)
