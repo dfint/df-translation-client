@@ -19,6 +19,7 @@ class GithubDownloader(AbstractDownloader):
         url = "https://" + str(GithubDownloader.BASE_URL / "metadata.json")
         async with httpx.AsyncClient() as client:
             response = await client.get(url)
+            response.raise_for_status()
             self.metadata = response.json()
             self.resources = list(self.metadata)
 
@@ -31,6 +32,7 @@ class GithubDownloader(AbstractDownloader):
                 url = "https://" + str(GithubDownloader.BASE_URL / "translations" / self.metadata[resource][language])
                 try:
                     async with client.stream("GET", url) as response:
+                        response.raise_for_status()
                         file_name = file_path_pattern.format(resource=resource, language=language)
                         with open(file_name, "wb") as file:
                             async for chunk in response.aiter_bytes(io.DEFAULT_BUFFER_SIZE):
