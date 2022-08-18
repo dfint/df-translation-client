@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-bidict = "^0.21.4"
+bidict = "^0.22.0"
 natsort = "8.1.0"
 requests = "^2.26.0"
 python-transifex = { url = "https://github.com/insolor/python-transifex/archive/master.zip" }
