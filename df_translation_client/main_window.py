@@ -43,19 +43,19 @@ class MainWindow(tk.Tk):
             if 0 <= tab < len(notebook.tabs()):
                 notebook.select(tab)
 
-            notebook.bind("<<NotebookTabChanged>>", lambda _event: self.update_selected_tab())
+            notebook.bind("<<NotebookTabChanged>>", lambda _event: self.update_selected_tab(), add=False)
 
             return notebook
 
-    def report_callback_exception(self, exc_type, exc_value, exc_traceback):
-        if issubclass(exc_type, KeyboardInterrupt):
+    def report_callback_exception(self, exc, val, tb):
+        if issubclass(exc, KeyboardInterrupt):
             self.quit()
             return
 
-        super().report_callback_exception(exc_type, exc_value, exc_traceback)
+        super().report_callback_exception(exc, val, tb)
 
-        filename, line, *_ = traceback.extract_tb(exc_traceback).pop()
-        messagebox.showerror("Unhandled Exception", f"{exc_type.__name__}: {exc_value}\n{filename}, Line: {line}")
+        filename, line, *_ = traceback.extract_tb(tb).pop()
+        messagebox.showerror("Unhandled Exception", f"{exc.__name__}: {val}\n{filename}, Line: {line}")
 
     def __init__(self, app):
         super().__init__()

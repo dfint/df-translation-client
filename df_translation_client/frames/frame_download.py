@@ -237,4 +237,4 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.columnconfigure(1, weight=1)
 
         self.on_combo_download_from_change()
-        self.bind("<Destroy>", self.kill_background_tasks)
+        self.bind("<Destroy>", self.kill_background_tasks, add=False)

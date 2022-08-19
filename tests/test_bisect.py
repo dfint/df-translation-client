@@ -12,7 +12,7 @@ def test_node(data):
     assert node.size == len(data)
     assert node.start == 0 and node.end == len(data) - 1
     if len(data) == 0:
-        assert node.tree_text == f"[] (0 strings)"
+        assert node.tree_text == "[] (0 strings)"
         assert node.column_text == "<empty>"
     elif len(data) == 1:
         assert node.tree_text == f"[{node.start} : {node.end}] ({node.end - node.start + 1} string)"

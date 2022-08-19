@@ -6,11 +6,11 @@ from typing import Union, Generic, TypeVar
 class DefaultRootWrapper:  # pragma: no cover
     @property
     def default_root(self):
-        return tk._default_root
+        return tk._default_root  # pylint: disable=protected-access
 
     @default_root.setter
     def default_root(self, value):
-        tk._default_root = value
+        tk._default_root = value  # pylint: disable=protected-access
 
 
 default_root_wrapper = DefaultRootWrapper()
@@ -31,6 +31,7 @@ T = TypeVar("T")
 
 class ParentSetter(AbstractContextManager, Generic[T]):
     parent: tk.Widget
+    _old_root: tk.Widget
 
     def __init__(self, parent: Union[tk.Tk, tk.Frame, tk.Toplevel]):
         self.parent = parent

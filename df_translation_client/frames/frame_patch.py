@@ -283,4 +283,4 @@ class PatchExecutableFrame(tk.Frame):
 
             grid.columnconfigure(1, weight=1)
 
-        self.bind("<Destroy>", self.kill_processes)
+        self.bind("<Destroy>", self.kill_processes, add=False)
