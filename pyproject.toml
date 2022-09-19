@@ -24,7 +24,7 @@ pytest-mock = "^3.6.1"
 pytest-timeout = "^2.0.1"
 flake8 = "^5.0.4"
 # tkinter-stubs = { url = "https://github.com/insolor/tkinter-stubs/releases/download/0.1.0/tkinter_stubs-0.1.0-py3-none-any.whl" }
-hypothesis = "^6.54.5"
+hypothesis = "^6.54.6"
 flake8-tkinter = "^0.5.4"
 
 [tool.poetry.scripts]
