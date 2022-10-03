@@ -20,7 +20,7 @@ httpx = "^0.23.0"
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"
 pytest-cov = "^3.0.0"
-pytest-mock = "^3.6.1"
+pytest-mock = "^3.9.0"
 pytest-timeout = "^2.0.1"
 flake8 = "^5.0.4"
 # tkinter-stubs = { url = "https://github.com/insolor/tkinter-stubs/releases/download/0.1.0/tkinter_stubs-0.1.0-py3-none-any.whl" }
