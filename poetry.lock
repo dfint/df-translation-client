@@ -237,7 +237,7 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "hypothesis"
-version = "6.56.0"
+version = "6.56.1"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
@@ -582,7 +582,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b913b0e366e162c4e7e6d0fcbb441d11d7ef250fcade376bfe11b04fd492aec3"
+content-hash = "ce5d89cd612c1a717bc7f545610522050e5451230ecc1c40a842a2534e2ac6dd"
 
 [metadata.files]
 anyio = [
@@ -702,8 +702,8 @@ httpx = [
     {file = "httpx-0.23.0.tar.gz", hash = "sha256:f28eac771ec9eb4866d3fb4ab65abd42d38c424739e80c08d8d20570de60b0ef"},
 ]
 hypothesis = [
-    {file = "hypothesis-6.56.0-py3-none-any.whl", hash = "sha256:dc3a296f1c23fc402ec50a3d90785fcf4a6290156ad4c97e23b0f972b0c3e32c"},
-    {file = "hypothesis-6.56.0.tar.gz", hash = "sha256:38ac02dba2801e26b964da57950cbc574fb22a3e16951c227150282b986ed002"},
+    {file = "hypothesis-6.56.1-py3-none-any.whl", hash = "sha256:df01b518d3c79c34ca5a15462af5407d1e73dd2d7003d374299dddb195aa155d"},
+    {file = "hypothesis-6.56.1.tar.gz", hash = "sha256:cefdaf6143170f1aa28adf4816d12547ab60f93c143f7d5205507d9e4804fccd"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
