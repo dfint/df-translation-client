@@ -36,19 +36,24 @@ class DownloadTranslationsFrame(tk.Frame):
 
     @async_handler
     async def bt_connect(self):
-        username = self.entry_username.text
-        password = self.entry_password.text
-        project = self.combo_projects.text
-
         download_from = self.combo_download_from.get()
+
         if download_from is DownloadFromEnum.GITHUB:
             self.downloader_api = GithubDownloader()
-        else:  # DownloadFromEnum.TRANSIFEX
+
+        elif download_from is DownloadFromEnum.TRANSIFEX:
+            username = self.entry_username.text
+            password = self.entry_password.text
+            project = self.combo_projects.text
+        
             if not username or not password or not project:
                 messagebox.showerror("Required fields", "Fields Username, Password and Project are required")
                 return
 
             self.downloader_api = TransifexApiDownloader(username, password, project)
+
+        else:
+            return
 
         self.button_connect.config(state=tk.DISABLED)
 
