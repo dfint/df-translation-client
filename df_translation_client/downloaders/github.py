@@ -1,6 +1,5 @@
 import io
 import traceback
-from pathlib import PurePosixPath
 from typing import AsyncIterable, List, Mapping
 
 import httpx
@@ -10,13 +9,13 @@ from df_translation_client.downloaders.common import DownloadStage, StatusEnum
 
 
 class GithubDownloader(AbstractDownloader):
+    BASE_URL = "https://raw.githubusercontent.com/dfint/translations-backup/main/"
+
     metadata: Mapping[str, Mapping[str, str]]
     resources: List[str]
 
-    BASE_URL = PurePosixPath("raw.githubusercontent.com/dfint/translations-backup/main/")
-
     async def connect(self) -> None:
-        url = "https://" + str(GithubDownloader.BASE_URL / "metadata.json")
+        url = GithubDownloader.BASE_URL + "metadata.json"
         async with httpx.AsyncClient() as client:
             response = await client.get(url)
             response.raise_for_status()
@@ -24,12 +23,16 @@ class GithubDownloader(AbstractDownloader):
             self.resources = list(self.metadata)
 
     async def async_downloader(
-        self, language: str, resources: List[str], file_path_pattern: str
+        self,
+        language: str,
+        resources: List[str],
+        file_path_pattern: str,
     ) -> AsyncIterable[DownloadStage]:
         async with httpx.AsyncClient() as client:
             for resource in resources:
                 yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
-                url = "https://" + str(GithubDownloader.BASE_URL / "translations" / self.metadata[resource][language])
+                file_name = self.metadata[resource][language]
+                url = GithubDownloader.BASE_URL + "translations/" + file_name
                 try:
                     async with client.stream("GET", url) as response:
                         response.raise_for_status()
