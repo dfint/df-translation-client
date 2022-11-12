@@ -30,7 +30,10 @@ class TransifexApiDownloader(AbstractDownloader):
         ), f"Project {self.project_slug} does not exist"
 
     async def async_downloader(
-        self, language: str, resources: List[str], file_path_pattern: str
+        self,
+        language: str,
+        resources: List[str],
+        file_path_pattern: str,
     ) -> AsyncIterable[DownloadStage]:
         for resource in resources:
             yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
