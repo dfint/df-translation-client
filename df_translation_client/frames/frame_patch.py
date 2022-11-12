@@ -29,7 +29,7 @@ class ProcessMessageWrapper:
 
     def write(self, s):
         for i in range(0, len(s), self._chunk_size):
-            self._message_receiver.send(s[i:i + self._chunk_size])
+            self._message_receiver.send(s[i : i + self._chunk_size])
 
     def flush(self):
         pass  # stub method
@@ -84,8 +84,8 @@ class PatchExecutableFrame(tk.Frame):
                     codepage=self.combo_encoding.text,
                     debug=self.chk_debug_output.is_checked,
                     stdout=ProcessMessageWrapper(child_conn),
-                    stderr=ProcessMessageWrapper(child_conn)
-                )
+                    stderr=ProcessMessageWrapper(child_conn),
+                ),
             )
             self.dfrus_process.start()
             return True
@@ -164,8 +164,10 @@ class PatchExecutableFrame(tk.Frame):
     def update_combo_encoding(self, translation_file: Path):
         self.update_combo_encoding_list(translation_file)
 
-        if (self.translation_file_language
-                and self.translation_file_language in self.config_section["language_codepages"]):
+        if (
+            self.translation_file_language
+            and self.translation_file_language in self.config_section["language_codepages"]
+        ):
 
             self.combo_encoding.text = self.config_section["language_codepages"][self.translation_file_language]
         elif self.combo_encoding.values:
@@ -188,7 +190,7 @@ class PatchExecutableFrame(tk.Frame):
             defaults=dict(
                 fix_space_exclusions=dict(ru=["Histories of "]),
                 language_codepages=dict(),
-            )
+            ),
         )
 
         self.exclusions = self.config_section["fix_space_exclusions"]
@@ -204,9 +206,9 @@ class PatchExecutableFrame(tk.Frame):
                 default_path=self.config_section.get("df_executable", ""),
                 on_change=lambda text: self.config_section.check_and_save_path("df_executable", text),
             )
-            grid.new_row() \
-                .add(tk.Label(text="DF executable file:"), sticky=tk.W) \
-                .add(self.file_entry_executable_file).column_span(2)
+            grid.new_row().add(tk.Label(text="DF executable file:"), sticky=tk.W).add(
+                self.file_entry_executable_file
+            ).column_span(2)
 
             self.fileentry_translation_file = FileEntry(
                 dialog_type="askopenfilename",
@@ -217,30 +219,30 @@ class PatchExecutableFrame(tk.Frame):
                 ],
                 default_path=self.config_section.get("df_exe_translation_file", ""),
                 on_change=self.on_translation_file_change,
-                change_color=True
+                change_color=True,
             )
-            grid.new_row() \
-                .add(tk.Label(text="Translation file:"), sticky=tk.W) \
-                .add(self.fileentry_translation_file).column_span(2)
+            grid.new_row().add(tk.Label(text="Translation file:"), sticky=tk.W).add(
+                self.fileentry_translation_file
+            ).column_span(2)
 
             self.combo_encoding = Combobox()
             self.config_combo_encoding(self.fileentry_translation_file.path)
-            grid.new_row() \
-                .add(tk.Label(text="Encoding:"), sticky=tk.W) \
-                .add(self.combo_encoding).column_span(2)
+            grid.new_row().add(tk.Label(text="Encoding:"), sticky=tk.W).add(self.combo_encoding).column_span(2)
 
             # FIXME: chk_do_not_patch_charmap does nothing
             self.chk_do_not_patch_charmap = self.setup_checkbutton(
                 text="Don't patch charmap table",
                 config_key="do_not_patch_charmap",
-                default_state=False)
+                default_state=False,
+            )
 
             grid.new_row().skip(1).add(self.chk_do_not_patch_charmap).column_span(2)
 
             self.chk_add_leading_trailing_spaces = self.setup_checkbutton(
                 text="Add necessary leading/trailing spaces",
                 config_key="add_leading_trailing_spaces",
-                default_state=True)
+                default_state=True,
+            )
 
             button_exclusions = ttk.Button(self, text="Exclusions...", command=self.bt_exclusions)
 
@@ -261,21 +263,25 @@ class PatchExecutableFrame(tk.Frame):
             self.chk_debug_output = self.setup_checkbutton(
                 text="Enable debugging output",
                 config_key="debug_output",
-                default_state=False
+                default_state=False,
             )
 
             self.button_patch = TwoStateButton(
-                text="Patch!", command=self.bt_patch,
-                text2="Stop!", command2=self.bt_stop
+                text="Patch!",
+                command=self.bt_patch,
+                text2="Stop!",
+                command2=self.bt_stop,
             )
 
             grid.new_row().add(self.chk_debug_output).column_span(2).add(self.button_patch)
 
             # ------------------------------------------------------------------------------------------
 
-            scrollbar_frame = ScrollbarFrame(widget_factory=Text,
-                                             widget_args=dict(width=48, height=8, enabled=False),
-                                             show_scrollbars=tk.VERTICAL)
+            scrollbar_frame = ScrollbarFrame(
+                widget_factory=Text,
+                widget_args=dict(width=48, height=8, enabled=False),
+                show_scrollbars=tk.VERTICAL,
+            )
 
             grid.new_row().add(scrollbar_frame, sticky=tk.NSEW).column_span(3).configure(weight=1)
 

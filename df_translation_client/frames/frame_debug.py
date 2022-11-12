@@ -21,8 +21,7 @@ class DebugFrame(tk.Frame):
                 dictionary = list(dictionary)
             self.bisect = BisectTool(self, strings=dictionary)
 
-            packer.pack(ttk.Button(text="Reload dfrus", command=self.reload)) \
-                  .expand(self.bisect)
+            packer.pack(ttk.Button(text="Reload dfrus", command=self.reload)).expand(self.bisect)
 
     def set_dictionary(self, dictionary: Iterable[Tuple[str, str]]):
         self.bisect.strings = list(dictionary)

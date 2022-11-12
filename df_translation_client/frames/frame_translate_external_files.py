@@ -11,7 +11,7 @@ from df_translation_client.utils.config import Config
 from df_translation_client.utils.po_languages import (
     get_languages,
     filter_files_by_language,
-    get_suitable_codepages_for_directory
+    get_suitable_codepages_for_directory,
 )
 from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import FileEntry, ScrollbarFrame
@@ -27,13 +27,13 @@ class TranslateExternalFiles(tk.Frame):
             if languages:
                 self.combo_language.current(0)
             else:
-                self.combo_language.text = ''
+                self.combo_language.text = ""
 
             self.update_listbox_translation_files()
             self.update_combo_encoding()
         except Exception as ex:
             self.combo_language.values = tuple()
-            self.combo_language.text = ''
+            self.combo_language.text = ""
             traceback.print_exception(ex)
 
     def update_listbox_translation_files(self):
@@ -67,7 +67,7 @@ class TranslateExternalFiles(tk.Frame):
             po_directory=Path(self.file_entry_translation_files.path),
             encoding=self.combo_encoding.get(),
             po_name_postfix=self.combo_language.text,
-            translate=translate
+            translate=translate,
         ):
             self.listbox_found_directories.append(message)
 
@@ -87,28 +87,26 @@ class TranslateExternalFiles(tk.Frame):
         with grid_manager(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
             self.file_entry_df_root_path = FileEntry(
                 dialog_type="askdirectory",
-                default_path=config_section.get("df_root_path", ''),
+                default_path=config_section.get("df_root_path", ""),
                 on_change=lambda path: config_section.check_and_save_path("df_root_path", path),
             )
 
-            grid.new_row() \
-                .add(tk.Label(text="Dwarf Fortress root path:"), sticky=tk.W) \
-                .add(self.file_entry_df_root_path)
+            grid.new_row().add(tk.Label(text="Dwarf Fortress root path:"), sticky=tk.W).add(
+                self.file_entry_df_root_path
+            )
 
             self.file_entry_translation_files = FileEntry(
                 dialog_type="askdirectory",
-                default_path=config_section.get("translation_files_path", ''),
+                default_path=config_section.get("translation_files_path", ""),
                 on_change=lambda path: self.on_translation_files_path_change("translation_files_path", path),
             )
 
-            grid.new_row()\
-                .add(tk.Label(text="Translation files' directory:"), sticky=tk.W) \
-                .add(self.file_entry_translation_files)
+            grid.new_row().add(tk.Label(text="Translation files' directory:"), sticky=tk.W).add(
+                self.file_entry_translation_files
+            )
 
             self.combo_language = Combobox()
-            grid.new_row()\
-                .add(tk.Label(text="Language:"), sticky=tk.W) \
-                .add(self.combo_language)
+            grid.new_row().add(tk.Label(text="Language:"), sticky=tk.W).add(self.combo_language)
 
             directory = self.file_entry_translation_files.path
             if directory.exists():
@@ -124,9 +122,7 @@ class TranslateExternalFiles(tk.Frame):
             self.combo_language.bind("<<ComboboxSelected>>", on_combo_language_change)
 
             self.combo_encoding = Combobox()
-            grid.new_row() \
-                .add(tk.Label(text="Encoding:"), sticky=tk.W) \
-                .add(self.combo_encoding)
+            grid.new_row().add(tk.Label(text="Encoding:"), sticky=tk.W).add(self.combo_encoding)
 
             self.update_combo_encoding()
 
@@ -139,7 +135,7 @@ class TranslateExternalFiles(tk.Frame):
             with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=2) as buttons:
                 buttons.pack_all(
                     ttk.Button(text="Search", command=self.bt_search),
-                    ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True))
+                    ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True)),
                 )
 
                 grid.new_row().add(buttons.parent).column_span(2)

@@ -45,7 +45,7 @@ class DownloadTranslationsFrame(tk.Frame):
             username = self.entry_username.text
             password = self.entry_password.text
             project = self.combo_projects.text
-        
+
             if not username or not password or not project:
                 messagebox.showerror("Required fields", "Fields Username, Password and Project are required")
                 return
@@ -94,9 +94,7 @@ class DownloadTranslationsFrame(tk.Frame):
         lines = {res: res for res in self.resources}  # { "resource": "resource - status" }
 
         file_path_pattern = str(download_dir / "{resource}_{language}.po")
-        async for stage in self.downloader_api.async_downloader(
-                language, self.resources, file_path_pattern
-        ):
+        async for stage in self.downloader_api.async_downloader(language, self.resources, file_path_pattern):
             stage: DownloadStage
             lines[stage.resource] = "{} - {}".format(stage.resource, stage.status.value)
             self.listbox_resources.values = list(lines.values())
@@ -148,9 +146,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
             self.listbox_resources.values = self.resources
 
-            self.downloader_task: Task = asyncio.get_running_loop().create_task(
-                self.downloader(language, download_dir)
-            )
+            self.downloader_task: Task = asyncio.get_running_loop().create_task(self.downloader(language, download_dir))
             return True
 
         return False  # Don't change state of the button
@@ -181,7 +177,7 @@ class DownloadTranslationsFrame(tk.Frame):
 
         self.config_section = config.init_section(
             section_name="download_translations",
-            defaults=dict(recent_projects=["dwarf-fortress"])
+            defaults=dict(recent_projects=["dwarf-fortress"]),
         )
 
         with grid_manager(self, sticky=tk.EW, padx=2, pady=2) as grid:
@@ -191,10 +187,10 @@ class DownloadTranslationsFrame(tk.Frame):
             self.combo_download_from.bind("<<ComboboxSelected>>", self.on_combo_download_from_change)
 
             self.button_connect = ttk.Button(text="Connect...", command=self.bt_connect)
-            grid.new_row() \
-                .add(tk.Label(text="Download from:"), sticky=tk.W) \
-                .add(self.combo_download_from) \
-                .add(self.button_connect, sticky=tk.NSEW).row_span(3)
+            grid.new_row().add(tk.Label(text="Download from:"), sticky=tk.W).add(self.combo_download_from).add(
+                self.button_connect,
+                sticky=tk.NSEW,
+            ).row_span(3)
 
             self.combo_projects = Combobox(values=self.config_section["recent_projects"])
             self.combo_projects.current(0)
@@ -210,9 +206,7 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
             self.combo_languages = Combobox()
-            grid.new_row() \
-                .add(tk.Label(text="Choose language:"), sticky=tk.W) \
-                .add(self.combo_languages).column_span(2)
+            grid.new_row().add(tk.Label(text="Choose language:"), sticky=tk.W).add(self.combo_languages).column_span(2)
 
             grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
@@ -221,12 +215,16 @@ class DownloadTranslationsFrame(tk.Frame):
                 default_path=self.config_section.get("download_to", ""),
                 on_change=lambda text: self.config_section.check_and_save_path("download_to", text),
             )
-            grid.new_row()\
-                .add(tk.Label(text="Download to:"), sticky=tk.W)\
-                .add(self.fileentry_download_to).column_span(2)
+            grid.new_row().add(tk.Label(text="Download to:"), sticky=tk.W).add(self.fileentry_download_to).column_span(
+                2
+            )
 
-            self.button_download = TwoStateButton(text="Download translations", command=self.bt_download,
-                                                  text2="Stop", command2=self.bt_stop_downloading)
+            self.button_download = TwoStateButton(
+                text="Download translations",
+                command=self.bt_download,
+                text2="Stop",
+                command2=self.bt_stop_downloading,
+            )
 
             self.progressbar = ttk.Progressbar()
 
