@@ -11,7 +11,7 @@ bidict = "^0.22.0"
 natsort = "8.2.0"
 requests = "^2.26.0"
 python-transifex = { url = "https://github.com/insolor/python-transifex/archive/master.zip" }
-dfrus = { url = "https://github.com/dfint/dfrus/releases/download/0.0.10/dfrus-0.0.10-py3-none-any.whl" }
+dfrus = { url = "https://github.com/dfint/dfrus/releases/download/0.0.11/dfrus-0.0.11-py3-none-any.whl" }
 df-gettext-toolkit = { url = "https://github.com/dfint/df-gettext-toolkit/releases/download/0.3.3/df_gettext_toolkit-0.3.3-py3-none-any.whl" }
 async-tkinter-loop = "^0.6.0"
 tk_grid_helper = { url = "https://github.com/insolor/tk_grid_helper/releases/download/0.1.2/tk_grid_helper-0.1.2-py3-none-any.whl"}
@@ -26,6 +26,7 @@ flake8 = "^5.0.4"
 # tkinter-stubs = { url = "https://github.com/insolor/tkinter-stubs/releases/download/0.1.0/tkinter_stubs-0.1.0-py3-none-any.whl" }
 hypothesis = "^6.56.4"
 flake8-tkinter = "^0.5.4"
+black = "^22.10.0"
 
 [tool.poetry.scripts]
 df-translate = "df_translation_client.app:main"
