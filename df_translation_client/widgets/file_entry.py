@@ -75,7 +75,7 @@ class FileEntry(tk.Frame):
         with Packer(self) as packer:
             self.entry = Entry()
             self.button = ttk.Button(text="Browse...", command=self._bt_browse)
-            packer.right(self.button, padx=2).expand(self.entry)
+            packer.pack_right(self.button, padx=2).pack_expanded(self.entry)
 
         self.entry.text = self.default_path
         self._prev_value = self.default_path

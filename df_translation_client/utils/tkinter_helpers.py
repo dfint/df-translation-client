@@ -65,14 +65,14 @@ class Packer(ParentSetter["Packer"]):
         widget.pack(**kwargs)
         return self
 
-    def left(self, widget: tk.Widget, **kwargs):
+    def pack_left(self, widget: tk.Widget, **kwargs):
         widget.pack(side=tk.LEFT, **kwargs)
         return self
 
-    def right(self, widget: tk.Widget, **kwargs):
+    def pack_right(self, widget: tk.Widget, **kwargs):
         widget.pack(side=tk.RIGHT, **kwargs)
         return self
 
-    def expand(self, widget: tk.Widget, **kwargs):
+    def pack_expanded(self, widget: tk.Widget, **kwargs):
         widget.pack(fill=tk.BOTH, expand=True, **kwargs)
         return self

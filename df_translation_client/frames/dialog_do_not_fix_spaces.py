@@ -104,13 +104,13 @@ class DialogDoNotFixSpaces(tk.Toplevel):
                 self.combo_language.bind("<<ComboboxSelected>>", self.combo_language_change_selection)
                 self.combo_language.bind("<Any-KeyRelease>", self.combo_language_change_selection)
 
-                language_frame_packer.left(tk.Label(text="Language:")).expand(self.combo_language)
+                language_frame_packer.pack_left(tk.Label(text="Language:")).pack_expanded(self.combo_language)
 
             with Packer(tk.Frame()) as filter_frame_packer:
                 self.entry_filter = Entry()
                 self.entry_filter.bind("<Any-KeyRelease>", self.entry_search_key_release)
 
-                filter_frame_packer.left(tk.Label(text="Filter:")).expand(self.entry_filter)
+                filter_frame_packer.pack_left(tk.Label(text="Filter:")).pack_expanded(self.entry_filter)
 
             grid.new_row().add(language_frame_packer.parent).add(filter_frame_packer.parent)
 
