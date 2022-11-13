@@ -6,7 +6,7 @@ from df_translation_client.frames.frame_download import DownloadTranslationsFram
 from df_translation_client.frames.frame_patch import PatchExecutableFrame
 from df_translation_client.frames.frame_translate_external_files import TranslateExternalFiles
 from df_translation_client.utils.config import Config
-from df_translation_client.utils.tkinter_helpers import pack_expand, set_parent
+from df_translation_client.utils.tkinter_helpers import pack_expanded, set_parent
 
 
 class MainWindow(tk.Tk):
@@ -64,4 +64,4 @@ class MainWindow(tk.Tk):
         config = self.app.config
         self.config_section = config.init_section("application", dict(last_tab_opened=0))
         self.notebook = self.init_notebook(config)
-        pack_expand(self.notebook)
+        pack_expanded(self.notebook)

@@ -45,7 +45,7 @@ class ParentSetter(AbstractContextManager, Generic[T]):
         default_root_wrapper.default_root = self._old_root
 
 
-def pack_expand(widget: tk.Widget, **kwargs):
+def pack_expanded(widget: tk.Widget, **kwargs):
     widget.pack(fill=tk.BOTH, expand=True, **kwargs)
 
 
@@ -62,17 +62,17 @@ class Packer(ParentSetter["Packer"]):
             item.pack(**self.options)
 
     def pack(self, widget: tk.Widget, **kwargs):
-        widget.pack(**kwargs)
+        widget.pack(**self.options, **kwargs)
         return self
 
     def pack_left(self, widget: tk.Widget, **kwargs):
-        widget.pack(side=tk.LEFT, **kwargs)
+        widget.pack(side=tk.LEFT, **self.options, **kwargs)
         return self
 
     def pack_right(self, widget: tk.Widget, **kwargs):
-        widget.pack(side=tk.RIGHT, **kwargs)
+        widget.pack(side=tk.RIGHT, **self.options,  **kwargs)
         return self
 
     def pack_expanded(self, widget: tk.Widget, **kwargs):
-        widget.pack(fill=tk.BOTH, expand=True, **kwargs)
+        pack_expanded(widget, **self.options, **kwargs)
         return self
