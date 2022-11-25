@@ -141,7 +141,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.downloader_task.cancel()
 
     def on_combo_download_from_change(self, _event=None):
-        state = tk.DISABLED if self.combo_download_from.get() is DownloadFromEnum.GITHUB else tk.NORMAL
+        # state = tk.DISABLED if self.combo_download_from.get() is DownloadFromEnum.GITHUB else tk.NORMAL
         self.combo_languages.values = []
         self.listbox_resources.values = []
 
