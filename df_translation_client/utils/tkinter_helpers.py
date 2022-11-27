@@ -70,7 +70,7 @@ class Packer(ParentSetter["Packer"]):
         return self
 
     def pack_right(self, widget: tk.Widget, **kwargs):
-        widget.pack(side=tk.RIGHT, **self.options,  **kwargs)
+        widget.pack(side=tk.RIGHT, **self.options, **kwargs)
         return self
 
     def pack_expanded(self, widget: tk.Widget, **kwargs):

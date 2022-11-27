@@ -1,4 +1,4 @@
 [flake8]
-ignore = W293,W503,TK504
+ignore = W293,W503,TK504,E203
 exclude = venv/,.venv/
 max-line-length = 120
