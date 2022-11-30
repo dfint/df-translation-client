@@ -15,15 +15,13 @@ from tk_grid_helper import grid_manager
 from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
 from df_translation_client.downloaders.common import StatusEnum, DownloadStage
 from df_translation_client.downloaders.github import GithubDownloader
-from df_translation_client.downloaders.transifex_api_2 import TransifexApiDownloader
 from df_translation_client.utils.config import Config
 from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
-from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox, TypedCombobox
+from df_translation_client.widgets.custom_widgets import Combobox, Listbox, TypedCombobox
 
 
 class DownloadFromEnum(Enum):
-    GITHUB = "Github (faster, no registration, data updates at midnight GMT+00)"
-    TRANSIFEX = "Transifex (slower, needs registration, up-to-date)"
+    GITHUB = "Github (data updates at midnight GMT+00)"
 
     def __str__(self):
         return self.value
@@ -40,17 +38,6 @@ class DownloadTranslationsFrame(tk.Frame):
 
         if download_from is DownloadFromEnum.GITHUB:
             self.downloader_api = GithubDownloader()
-
-        elif download_from is DownloadFromEnum.TRANSIFEX:
-            username = self.entry_username.text
-            password = self.entry_password.text
-            project = self.combo_projects.text
-
-            if not username or not password or not project:
-                messagebox.showerror("Required fields", "Fields Username, Password and Project are required")
-                return
-
-            self.downloader_api = TransifexApiDownloader(username, password, project)
 
         else:
             return
@@ -78,17 +65,6 @@ class DownloadTranslationsFrame(tk.Frame):
             self.listbox_resources.values = tuple(res for res in self.resources)
         finally:
             self.button_connect.config(state=tk.ACTIVE)
-
-        if download_from is DownloadFromEnum.TRANSIFEX:
-            # Remember last successfully credentials
-            self.config_section["username"] = username
-
-            recent_projects = self.config_section["recent_projects"]
-            if recent_projects or project != recent_projects[0]:
-                if project in recent_projects:
-                    recent_projects.remove(project)
-                recent_projects.insert(0, project)
-            self.combo_projects.values = recent_projects
 
     async def downloader(self, language: str, download_dir: Path):
         lines = {res: res for res in self.resources}  # { "resource": "resource - status" }
@@ -165,10 +141,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.downloader_task.cancel()
 
     def on_combo_download_from_change(self, _event=None):
-        state = tk.DISABLED if self.combo_download_from.get() is DownloadFromEnum.GITHUB else tk.NORMAL
-        self.combo_projects.config(state=state)
-        self.entry_username.config(state=state)
-        self.entry_password.config(state=state)
+        # state = tk.DISABLED if self.combo_download_from.get() is DownloadFromEnum.GITHUB else tk.NORMAL
         self.combo_languages.values = []
         self.listbox_resources.values = []
 
@@ -190,18 +163,11 @@ class DownloadTranslationsFrame(tk.Frame):
             grid.new_row().add(tk.Label(text="Download from:"), sticky=tk.W).add(self.combo_download_from).add(
                 self.button_connect,
                 sticky=tk.NSEW,
-            ).row_span(3)
+            ).row_span(1)
 
-            self.combo_projects = Combobox(values=self.config_section["recent_projects"])
-            self.combo_projects.current(0)
-            grid.new_row().add(tk.Label(text="Transifex project:"), sticky=tk.W).add(self.combo_projects)
-
-            self.entry_username = Entry()
-            self.entry_username.text = self.config_section.get("username", "")
-            grid.new_row().add(tk.Label(text="Username:"), sticky=tk.W).add(self.entry_username)
-
-            self.entry_password = Entry(show="•")
-            grid.new_row().add(tk.Label(text="Password:"), sticky=tk.W).add(self.entry_password)
+            # self.combo_projects = Combobox(values=self.config_section["recent_projects"])
+            # self.combo_projects.current(0)
+            # grid.new_row().add(tk.Label(text="Transifex project:"), sticky=tk.W).add(self.combo_projects)
 
             grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
