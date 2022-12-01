@@ -1,7 +1,7 @@
 import importlib
 import tkinter as tk
 from tkinter import ttk
-from typing import Optional, Iterable, Tuple
+from typing import Iterable, Optional, Tuple
 
 from dfrus import dfrus
 

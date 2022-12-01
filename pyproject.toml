@@ -26,6 +26,7 @@ flake8 = "^5.0.4"
 hypothesis = "^6.58.2"
 flake8-tkinter = "^0.5.4"
 black = "^22.10.0"
+isort = "^5.10.1"
 
 [tool.poetry.scripts]
 df-translate = "df_translation_client.app:main"
@@ -36,3 +37,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
+
+[tool.isort]
+profile = "black"

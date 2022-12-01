@@ -13,10 +13,10 @@ from df_translation_client.frames.frame_debug import DebugFrame
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.po_languages import (
     get_suitable_codepages_for_file,
-    load_dictionary_with_cleanup,
     load_dictionary_raw,
+    load_dictionary_with_cleanup,
 )
-from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
+from df_translation_client.widgets import FileEntry, ScrollbarFrame, TwoStateButton
 from df_translation_client.widgets.custom_widgets import Checkbutton, Combobox, Text
 
 

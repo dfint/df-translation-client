@@ -1,6 +1,6 @@
 import pytest
 
-from df_translation_client.utils.tkinter_helpers import Packer, set_parent, ParentSetter
+from df_translation_client.utils.tkinter_helpers import Packer, ParentSetter, set_parent
 
 
 @pytest.mark.parametrize("context_manager", [set_parent, ParentSetter, Packer])

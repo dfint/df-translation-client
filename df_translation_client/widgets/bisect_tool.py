@@ -3,9 +3,9 @@ from functools import partial
 from itertools import islice
 from operator import itemgetter
 from tkinter import ttk
-from typing import List, Optional, Tuple, Iterable, Any
+from typing import Any, Iterable, List, Optional, Tuple
 
-from bidict import bidict, MutableBidict
+from bidict import MutableBidict, bidict
 from tk_grid_helper import grid_manager
 
 from df_translation_client.utils.tkinter_helpers import Packer

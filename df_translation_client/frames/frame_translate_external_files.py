@@ -9,8 +9,8 @@ from tk_grid_helper import grid_manager
 
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.po_languages import (
-    get_languages,
     filter_files_by_language,
+    get_languages,
     get_suitable_codepages_for_directory,
 )
 from df_translation_client.utils.tkinter_helpers import Packer

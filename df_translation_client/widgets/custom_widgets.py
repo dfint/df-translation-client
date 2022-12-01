@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import TypeVar, Generic, Iterable, List, Tuple, Optional
+from typing import Generic, Iterable, List, Optional, Tuple, TypeVar
 
 
 class Checkbutton(ttk.Checkbutton):

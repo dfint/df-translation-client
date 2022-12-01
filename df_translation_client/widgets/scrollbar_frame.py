@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
-from typing import Any, Callable, Mapping, Union, TypeVar, Generic
+from typing import Any, Callable, Generic, Mapping, TypeVar, Union
 
 TWidget = TypeVar("TWidget")
 

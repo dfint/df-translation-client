@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import AsyncIterable, List
 
 from df_translation_client.downloaders.common import DownloadStage

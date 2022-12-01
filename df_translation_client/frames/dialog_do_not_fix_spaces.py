@@ -2,13 +2,13 @@ import re
 import tkinter as tk
 from copy import deepcopy
 from tkinter import ttk
-from typing import MutableMapping, List, Mapping, Optional
+from typing import List, Mapping, MutableMapping, Optional
 
 from tk_grid_helper import grid_manager
 
 from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import ScrollbarFrame
-from df_translation_client.widgets.custom_widgets import Listbox, Combobox, Entry
+from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox
 
 SPACE_PLACEHOLDER = "•"
 

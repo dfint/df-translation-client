@@ -6,18 +6,22 @@ import traceback
 from asyncio import Task
 from enum import Enum
 from pathlib import Path
-from tkinter import ttk, messagebox
+from tkinter import messagebox, ttk
 from typing import List, Optional
 
 from async_tkinter_loop import async_handler
 from tk_grid_helper import grid_manager
 
 from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
-from df_translation_client.downloaders.common import StatusEnum, DownloadStage
+from df_translation_client.downloaders.common import DownloadStage, StatusEnum
 from df_translation_client.downloaders.github import GithubDownloader
 from df_translation_client.utils.config import Config
-from df_translation_client.widgets import FileEntry, TwoStateButton, ScrollbarFrame
-from df_translation_client.widgets.custom_widgets import Combobox, Listbox, TypedCombobox
+from df_translation_client.widgets import FileEntry, ScrollbarFrame, TwoStateButton
+from df_translation_client.widgets.custom_widgets import (
+    Combobox,
+    Listbox,
+    TypedCombobox,
+)
 
 
 class DownloadFromEnum(Enum):

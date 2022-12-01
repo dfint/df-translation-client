@@ -1,10 +1,10 @@
 import traceback
 from pathlib import Path
-from typing import List, Mapping, Set, Iterable, Optional, Tuple, TextIO
+from typing import Iterable, List, Mapping, Optional, Set, TextIO, Tuple
 
 from df_gettext_toolkit import parse_po
 from df_gettext_toolkit.fix_translated_strings import cleanup_string, fix_spaces
-from dfrus.patch_charmap import get_supported_codepages, get_encoder
+from dfrus.patch_charmap import get_encoder, get_supported_codepages
 
 
 def get_languages(directory: Path):

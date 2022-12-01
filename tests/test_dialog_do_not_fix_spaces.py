@@ -1,8 +1,12 @@
 import string
 
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
-from df_translation_client.frames.dialog_do_not_fix_spaces import HighlightedSpacesItem, SPACE_PLACEHOLDER
+from df_translation_client.frames.dialog_do_not_fix_spaces import (
+    SPACE_PLACEHOLDER,
+    HighlightedSpacesItem,
+)
 
 
 @given(

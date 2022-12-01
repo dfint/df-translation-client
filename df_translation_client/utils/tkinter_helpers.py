@@ -1,6 +1,6 @@
 import tkinter as tk
 from contextlib import AbstractContextManager, contextmanager
-from typing import Union, Generic, TypeVar
+from typing import Generic, TypeVar, Union
 
 
 class DefaultRootWrapper:  # pragma: no cover
