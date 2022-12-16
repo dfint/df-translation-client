@@ -32,6 +32,15 @@ class DownloadFromEnum(Enum):
 
 
 class DownloadTranslationsFrame(tk.Frame):
+    combo_download_from: TypedCombobox[DownloadFromEnum]
+    button_connect: ttk.Button
+    combo_projects: Combobox
+    combo_languages: Combobox
+    fileentry_download_to: FileEntry
+    button_download: TwoStateButton
+    progressbar: ttk.Progressbar
+    listbox_resources: Listbox
+
     downloader_api: Optional[AbstractDownloader] = None
     projects: Optional[List[str]] = None
     resources: Optional[List[str]] = None
@@ -59,6 +68,7 @@ class DownloadTranslationsFrame(tk.Frame):
             messagebox.showerror("Error", str(err))
             return
         else:
+            self.combo_projects.values = sorted(self.projects)
             self.combo_languages.values = sorted(languages)
             last_language = self.config_section.get("language", None)
 
@@ -113,10 +123,9 @@ class DownloadTranslationsFrame(tk.Frame):
             messagebox.showerror("No resources", "No resources to download")
         elif self.download_started:
             messagebox.showerror("Downloading in process", "Downloading is already started")
-        if not self.fileentry_download_to.path_is_valid():
+        elif not self.fileentry_download_to.path_is_valid():
             messagebox.showerror("Directory does not exist", "Specify existing directory first")
         else:
-            self.resources: List[str]
             self.progressbar["maximum"] = len(self.resources) * 1.001
             self.progressbar["value"] = 0
             self.update()
@@ -151,6 +160,18 @@ class DownloadTranslationsFrame(tk.Frame):
         self.combo_languages.values = []
         self.listbox_resources.values = []
 
+    @async_handler
+    async def on_combo_project_change(self, _event=None):
+        if self.downloader_api is not None:
+            project = self.combo_projects.get()
+            languages = await self.downloader_api.list_resources(project)
+            self.listbox_resources.values = languages
+            self.combo_languages.values = await self.downloader_api.list_languages(project, languages[0])
+
+        else:
+            self.combo_languages.values = []
+            self.listbox_resources.values = []
+
     def __init__(self, *args, config: Config, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -171,9 +192,10 @@ class DownloadTranslationsFrame(tk.Frame):
                 sticky=tk.NSEW,
             ).row_span(1)
 
-            # self.combo_projects = Combobox(values=self.config_section["recent_projects"])
-            # self.combo_projects.current(0)
-            # grid.new_row().add(tk.Label(text="Transifex project:"), sticky=tk.W).add(self.combo_projects)
+            self.combo_projects = Combobox(values=self.config_section["recent_projects"])
+            self.combo_projects.current(0)
+            grid.new_row().add(tk.Label(text="Transifex project:"), sticky=tk.W).add(self.combo_projects)
+            self.combo_download_from.bind("<<ComboboxSelected>>", self.on_combo_project_change)
 
             grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
