@@ -61,8 +61,10 @@ class DownloadTranslationsFrame(tk.Frame):
         try:
             await self.downloader_api.connect()
             self.projects = await self.downloader_api.list_projects()
-            self.resources = await self.downloader_api.list_resources(self.projects[0])
-            languages = await self.downloader_api.list_languages(self.projects[0], self.resources[0])
+            project = self.projects[0]
+            self.resources = await self.downloader_api.list_resources(project)
+            resource = self.resources[0]
+            languages = await self.downloader_api.list_languages(project, resource)
         except Exception as err:
             traceback.print_exc()
             messagebox.showerror("Error", str(err))
@@ -162,15 +164,15 @@ class DownloadTranslationsFrame(tk.Frame):
 
     @async_handler
     async def on_combo_project_change(self, _event=None):
-        if self.downloader_api is not None:
-            project = self.combo_projects.get()
-            languages = await self.downloader_api.list_resources(project)
-            self.listbox_resources.values = languages
-            self.combo_languages.values = await self.downloader_api.list_languages(project, languages[0])
-
-        else:
+        if self.downloader_api is None:
             self.combo_languages.values = []
             self.listbox_resources.values = []
+        else:
+            project = self.combo_projects.get()
+            self.resources = sorted(await self.downloader_api.list_resources(project))
+            languages = sorted(await self.downloader_api.list_languages(project, self.resources[0]))
+            self.combo_languages.values = languages
+            self.listbox_resources.values = self.resources
 
     def __init__(self, *args, config: Config, **kwargs):
         super().__init__(*args, **kwargs)
@@ -195,7 +197,7 @@ class DownloadTranslationsFrame(tk.Frame):
             self.combo_projects = Combobox(values=self.config_section["recent_projects"])
             self.combo_projects.current(0)
             grid.new_row().add(tk.Label(text="Transifex project:"), sticky=tk.W).add(self.combo_projects)
-            self.combo_download_from.bind("<<ComboboxSelected>>", self.on_combo_project_change)
+            self.combo_projects.bind("<<ComboboxSelected>>", self.on_combo_project_change)
 
             grid.new_row().add(ttk.Separator(orient=tk.HORIZONTAL)).column_span(3)
 
