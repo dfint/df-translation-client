@@ -33,6 +33,7 @@ class DownloadFromEnum(Enum):
 
 class DownloadTranslationsFrame(tk.Frame):
     downloader_api: Optional[AbstractDownloader] = None
+    projects: Optional[List[str]] = None
     resources: Optional[List[str]] = None
     downloader_task: Optional[Task] = None
 
@@ -50,8 +51,9 @@ class DownloadTranslationsFrame(tk.Frame):
 
         try:
             await self.downloader_api.connect()
-            self.resources = await self.downloader_api.list_resources()
-            languages = await self.downloader_api.list_languages(self.resources[0])
+            self.projects = await self.downloader_api.list_projects()
+            self.resources = await self.downloader_api.list_resources(self.projects[0])
+            languages = await self.downloader_api.list_languages(self.projects[0], self.resources[0])
         except Exception as err:
             traceback.print_exc()
             messagebox.showerror("Error", str(err))
