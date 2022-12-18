@@ -259,6 +259,7 @@ Unidecode = ">=1.2.0,<2.0.0"
 [package.source]
 type = "url"
 url = "https://github.com/dfint/df-gettext-toolkit/releases/download/0.3.3/df_gettext_toolkit-0.3.3-py3-none-any.whl"
+
 [[package]]
 name = "df-raw-decoder"
 version = "1.1.0"
@@ -292,6 +293,7 @@ peclasses = {url = "https://github.com/dfint/peclasses/releases/download/0.2.0/p
 [package.source]
 type = "url"
 url = "https://github.com/dfint/dfrus/releases/download/0.0.11/dfrus-0.0.11-py3-none-any.whl"
+
 [[package]]
 name = "exceptiongroup"
 version = "1.0.4"
@@ -760,6 +762,7 @@ files = [
 [package.source]
 type = "url"
 url = "https://github.com/insolor/tk_grid_helper/releases/download/0.1.2/tk_grid_helper-0.1.2-py3-none-any.whl"
+
 [[package]]
 name = "tomli"
 version = "2.0.1"

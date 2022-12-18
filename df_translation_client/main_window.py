@@ -2,6 +2,7 @@ import tkinter as tk
 import traceback
 from tkinter import messagebox, ttk
 
+from df_translation_client.frames.frame_create_csv import CreateCsvFrame
 from df_translation_client.frames.frame_download import DownloadTranslationsFrame
 from df_translation_client.frames.frame_translate_external_files import (
     TranslateExternalFiles,
@@ -38,6 +39,10 @@ class MainWindow(tk.Tk):
             notebook.add(
                 TranslateExternalFiles(config=config, borderwidth=3),
                 text="Translate external text files",
+            )
+            notebook.add(
+                CreateCsvFrame(),
+                text="Convert hardcoded to csv",
             )
 
             tab = self.config_section.get("last_tab_opened", 0)
