@@ -3,7 +3,6 @@ import traceback
 from tkinter import messagebox, ttk
 
 from df_translation_client.frames.frame_download import DownloadTranslationsFrame
-from df_translation_client.frames.frame_patch import PatchExecutableFrame
 from df_translation_client.frames.frame_translate_external_files import (
     TranslateExternalFiles,
 )
@@ -32,10 +31,10 @@ class MainWindow(tk.Tk):
                 DownloadTranslationsFrame(config=config, borderwidth=3),
                 text="Download translations",
             )
-            notebook.add(
-                PatchExecutableFrame(config=config, debug=self.app.debug, borderwidth=3),
-                text="Patch executable file",
-            )
+            # notebook.add(
+            #     PatchExecutableFrame(config=config, debug=self.app.debug, borderwidth=3),
+            #     text="Patch executable file",
+            # )
             notebook.add(
                 TranslateExternalFiles(config=config, borderwidth=3),
                 text="Translate external text files",
