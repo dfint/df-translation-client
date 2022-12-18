@@ -11,19 +11,20 @@ from df_translation_client.downloaders.common import DownloadStage, StatusEnum
 class GithubDownloader(AbstractDownloader):
     BASE_URL = "https://raw.githubusercontent.com/dfint/translations-backup/main/"
 
-    metadata: Mapping[str, Mapping[str, str]]
-    resources: List[str]
+    metadata: Mapping[str, Mapping[str, Mapping[str, str]]]
+    projects: List[str]
 
     async def connect(self) -> None:
-        url = GithubDownloader.BASE_URL + "metadata.json"
+        url = GithubDownloader.BASE_URL + "metadata-v2.json"
         async with httpx.AsyncClient() as client:
             response = await client.get(url)
             response.raise_for_status()
             self.metadata = response.json()
-            self.resources = list(self.metadata)
+            self.projects = list(self.metadata)
 
     async def async_downloader(
         self,
+        project: str,
         language: str,
         resources: List[str],
         file_path_pattern: str,
@@ -31,7 +32,7 @@ class GithubDownloader(AbstractDownloader):
         async with httpx.AsyncClient() as client:
             for resource in resources:
                 yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
-                file_name = self.metadata[resource][language]
+                file_name = self.metadata[project][resource][language]
                 url = GithubDownloader.BASE_URL + "translations/" + file_name
                 try:
                     async with client.stream("GET", url) as response:
@@ -45,10 +46,11 @@ class GithubDownloader(AbstractDownloader):
                 else:
                     yield DownloadStage(resource, StatusEnum.OK, None)
 
-    async def list_resources(self) -> List[str]:
-        return self.resources
+    async def list_projects(self) -> List[str]:
+        return list(self.projects)
 
-    async def list_languages(self, resource_slug: str = None) -> List[str]:
-        if resource_slug is None:
-            resource_slug = self.resources[0]
-        return list(self.metadata[resource_slug])
+    async def list_resources(self, project: str) -> List[str]:
+        return list(self.metadata[project])
+
+    async def list_languages(self, project: str, resource_slug: str) -> List[str]:
+        return list(self.metadata[project][resource_slug])

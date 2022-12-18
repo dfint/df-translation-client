@@ -11,14 +11,22 @@ class AbstractDownloader(ABC):
 
     @abstractmethod
     async def async_downloader(
-        self, language: str, resources: List[str], file_path_pattern: str
+        self,
+        project: str,
+        language: str,
+        resources: List[str],
+        file_path_pattern: str,
     ) -> AsyncIterable[DownloadStage]:
         raise NotImplementedError
 
     @abstractmethod
-    async def list_resources(self) -> List[str]:
+    async def list_projects(self) -> List[str]:
         raise NotImplementedError
 
     @abstractmethod
-    async def list_languages(self, resource_slug: str) -> List[str]:
+    async def list_resources(self, project: str) -> List[str]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def list_languages(self, project: str, resource_slug: str) -> List[str]:
         raise NotImplementedError
