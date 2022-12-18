@@ -84,11 +84,11 @@ class DownloadTranslationsFrame(tk.Frame):
         finally:
             self.button_connect.config(state=tk.ACTIVE)
 
-    async def downloader(self, language: str, download_dir: Path):
+    async def downloader(self, project: str, language: str, download_dir: Path):
         lines = {res: res for res in self.resources}  # { "resource": "resource - status" }
 
         file_path_pattern = str(download_dir / "{resource}_{language}.po")
-        async for stage in self.downloader_api.async_downloader(language, self.resources, file_path_pattern):
+        async for stage in self.downloader_api.async_downloader(project, language, self.resources, file_path_pattern):
             stage: DownloadStage
             lines[stage.resource] = "{} - {}".format(stage.resource, stage.status.value)
             self.listbox_resources.values = list(lines.values())
@@ -135,11 +135,14 @@ class DownloadTranslationsFrame(tk.Frame):
             download_dir = self.fileentry_download_to.path
             self.config_section.check_and_save_path("download_to", download_dir)
 
+            project = self.combo_projects.get()
             language = self.combo_languages.get()
 
             self.listbox_resources.values = self.resources
 
-            self.downloader_task: Task = asyncio.get_running_loop().create_task(self.downloader(language, download_dir))
+            self.downloader_task: Task = asyncio.get_running_loop().create_task(
+                self.downloader(project, language, download_dir)
+            )
             return True
 
         return False  # Don't change state of the button

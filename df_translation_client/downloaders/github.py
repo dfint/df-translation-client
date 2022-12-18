@@ -24,6 +24,7 @@ class GithubDownloader(AbstractDownloader):
 
     async def async_downloader(
         self,
+        project: str,
         language: str,
         resources: List[str],
         file_path_pattern: str,
@@ -31,7 +32,7 @@ class GithubDownloader(AbstractDownloader):
         async with httpx.AsyncClient() as client:
             for resource in resources:
                 yield DownloadStage(resource, StatusEnum.DOWNLOADING, None)
-                file_name = self.metadata[resource][language]
+                file_name = self.metadata[project][resource][language]
                 url = GithubDownloader.BASE_URL + "translations/" + file_name
                 try:
                     async with client.stream("GET", url) as response:
