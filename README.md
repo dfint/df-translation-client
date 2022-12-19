@@ -7,7 +7,7 @@ A GUI client intended to simplify usage of all the utils of the localization pro
 
 ## Installation
 
-* [Python 3](https://www.python.org) must be installed (version 3.7 or higher).  
+* [Python 3](https://www.python.org) must be installed (version 3.8.1 or higher).  
     Also, on Linux tkinter library must be installed (e.g. run `sudo apt install python3-tk` on Ubuntu).
 * Download project as zip archive and unpack it (or just clone with git if you know how to use it)
 
