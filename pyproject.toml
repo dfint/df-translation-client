@@ -26,7 +26,7 @@ flake8 = "^6.0.0"
 hypothesis = "^6.58.2"
 flake8-tkinter = "^0.5.4"
 black = "^22.10.0"
-isort = "^5.10.1"
+isort = "^5.11.4"
 
 [tool.poetry.scripts]
 df-translate = "df_translation_client.app:main"
