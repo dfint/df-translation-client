@@ -14,7 +14,7 @@ dfrus = { url = "https://github.com/dfint/dfrus/releases/download/0.0.11/dfrus-0
 df-gettext-toolkit = { url = "https://github.com/dfint/df-gettext-toolkit/releases/download/0.3.3/df_gettext_toolkit-0.3.3-py3-none-any.whl" }
 async-tkinter-loop = "^0.7.0"
 tk_grid_helper = { url = "https://github.com/insolor/tk_grid_helper/releases/download/0.1.2/tk_grid_helper-0.1.2-py3-none-any.whl"}
-httpx = "^0.23.0"
+httpx = "^0.23.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.1"
