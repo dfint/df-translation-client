@@ -497,14 +497,14 @@ files = [
 
 [[package]]
 name = "natsort"
-version = "8.3.0"
+version = "8.3.1"
 description = "Simple yet flexible natural sorting in Python."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "natsort-8.3.0-py3-none-any.whl", hash = "sha256:6c15c663d3fc57dd2af52a56ffa06e9fdf2edfcf8d2e129bf115941a7aeec61e"},
-    {file = "natsort-8.3.0.tar.gz", hash = "sha256:5c64ff0743181dfbb4dd5f0b211434e734992b308ec54b6fa24e0f77f4678ed2"},
+    {file = "natsort-8.3.1-py3-none-any.whl", hash = "sha256:d583bc9050dd10538de36297c960b93f873f0cd01671a3c50df5bd86dd391dcb"},
+    {file = "natsort-8.3.1.tar.gz", hash = "sha256:517595492dde570a4fd6b6a76f644440c1ba51e2338c8a671d7f0475fda8f9fd"},
 ]
 
 [package.extras]
@@ -795,4 +795,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "96bd762d65fc3c03939a4272fb003e72bd2dc7ee6e6f464e88b2a5eb74ee291f"
+content-hash = "865c81ff4172dead1c4ea3ec42cb0bbef68159d0af6458e8e64c33e4b1b61328"
