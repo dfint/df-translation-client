@@ -23,21 +23,21 @@ trio = ["trio (>=0.16,<0.22)"]
 
 [[package]]
 name = "async-tkinter-loop"
-version = "0.7.0"
+version = "0.8.1"
 description = "Asynchronous mainloop implementation for tkinter"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "async_tkinter_loop-0.7.0-py3-none-any.whl", hash = "sha256:fcf16a98e0a73ba079f141f2f2a9075c6935ef9939433d5fc4a871655adc30e7"},
-    {file = "async_tkinter_loop-0.7.0.tar.gz", hash = "sha256:d6b2df2d1e30ce3cfb237a9352d4142f05f680e3b31b0cf87f3581e421fec9eb"},
+    {file = "async_tkinter_loop-0.8.1-py3-none-any.whl", hash = "sha256:4b29dc003e7d72b62141587f92f17c9bd15e035cfbe7c15eedd81a8b8ce4f420"},
+    {file = "async_tkinter_loop-0.8.1.tar.gz", hash = "sha256:fbd02f9d821931609ba4210a75b21a77253cce0c94956fdf4586320cec40cde8"},
 ]
 
 [package.dependencies]
 asyncio = ">=3.4.3,<4.0.0"
 
 [package.extras]
-examples = ["Pillow (>=9.1.1,<10.0.0)", "httpx (>=0.23.0,<0.24.0)"]
+examples = ["Pillow (>=9.1.1,<10.0.0)", "httpx (>=0.23.1,<0.24.0)"]
 
 [[package]]
 name = "asyncio"
@@ -777,4 +777,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "060d751c37d9d06037d032c6295ba605c3cd819766d7087ceceeed4fea1cec06"
+content-hash = "9ad1534b81234cfb3650ffee4756afdaf4c25d52f606272ec222d79bbfc2a433"
