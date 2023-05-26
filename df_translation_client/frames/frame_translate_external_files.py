@@ -5,7 +5,7 @@ from tkinter import ttk
 
 from df_gettext_toolkit.translate_batch import translate_files
 from natsort import natsorted
-from tk_grid_helper import grid_manager
+from tkinter_layout_helpers import grid_manager, pack_manager
 
 from df_translation_client.utils.config import Config
 from df_translation_client.utils.po_languages import (
@@ -13,7 +13,6 @@ from df_translation_client.utils.po_languages import (
     get_languages,
     get_suitable_codepages_for_directory,
 )
-from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import FileEntry, ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Combobox, Listbox
 
@@ -132,7 +131,7 @@ class TranslateExternalFiles(tk.Frame):
             self.listbox_translation_files: Listbox = scrollbar_frame.widget
             self.update_listbox_translation_files()
 
-            with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=2) as buttons:
+            with pack_manager(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=2) as buttons:
                 buttons.pack_all(
                     ttk.Button(text="Search", command=self.bt_search),
                     ttk.Button(text="Translate", command=lambda: self.bt_search(translate=True)),

@@ -4,9 +4,8 @@ from copy import deepcopy
 from tkinter import ttk
 from typing import List, Mapping, MutableMapping, Optional
 
-from tk_grid_helper import grid_manager
+from tkinter_layout_helpers import grid_manager, pack_manager
 
-from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets import ScrollbarFrame
 from df_translation_client.widgets.custom_widgets import Combobox, Entry, Listbox
 
@@ -98,7 +97,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
         )
 
         with grid_manager(self, sticky=tk.NSEW, padx=2, pady=2) as grid:
-            with Packer(tk.Frame()) as language_frame_packer:
+            with pack_manager(tk.Frame()) as language_frame_packer:
                 self.combo_language = Combobox(values=language_list)
                 self.combo_language.current(0)
                 self.combo_language.bind("<<ComboboxSelected>>", self.combo_language_change_selection)
@@ -106,7 +105,7 @@ class DialogDoNotFixSpaces(tk.Toplevel):
 
                 language_frame_packer.pack_left(tk.Label(text="Language:")).pack_expanded(self.combo_language)
 
-            with Packer(tk.Frame()) as filter_frame_packer:
+            with pack_manager(tk.Frame()) as filter_frame_packer:
                 self.entry_filter = Entry()
                 self.entry_filter.bind("<Any-KeyRelease>", self.entry_search_key_release)
 

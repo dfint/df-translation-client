@@ -6,7 +6,7 @@ from typing import Optional
 
 from dfrus import dfrus
 from natsort import natsorted
-from tk_grid_helper import grid_manager
+from tkinter_layout_helpers import grid_manager
 
 from df_translation_client.frames.dialog_do_not_fix_spaces import DialogDoNotFixSpaces
 from df_translation_client.frames.frame_debug import DebugFrame

@@ -10,7 +10,7 @@ from tkinter import messagebox, ttk
 from typing import List, Optional
 
 from async_tkinter_loop import async_handler
-from tk_grid_helper import grid_manager
+from tkinter_layout_helpers import grid_manager
 
 from df_translation_client.downloaders.abstract_downloader import AbstractDownloader
 from df_translation_client.downloaders.common import DownloadStage, StatusEnum

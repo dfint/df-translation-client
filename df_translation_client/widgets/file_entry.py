@@ -3,7 +3,8 @@ from pathlib import Path
 from tkinter import filedialog, ttk
 from typing import Callable, Optional
 
-from df_translation_client.utils.tkinter_helpers import Packer
+from tkinter_layout_helpers import pack_manager
+
 from df_translation_client.widgets.custom_widgets import Entry
 
 
@@ -72,7 +73,7 @@ class FileEntry(tk.Frame):
         self.default_path = Path(default_path)
         self.dialog_type = dialog_type
 
-        with Packer(self) as packer:
+        with pack_manager(self) as packer:
             self.entry = Entry()
             self.button = ttk.Button(text="Browse...", command=self._bt_browse)
             packer.pack_right(self.button, padx=2).pack_expanded(self.entry)

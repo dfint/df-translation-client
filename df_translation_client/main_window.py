@@ -2,13 +2,14 @@ import tkinter as tk
 import traceback
 from tkinter import messagebox, ttk
 
+from tkinter_layout_helpers import set_parent, pack_expanded
+
 from df_translation_client.frames.frame_download import DownloadTranslationsFrame
 from df_translation_client.frames.frame_patch import PatchExecutableFrame
 from df_translation_client.frames.frame_translate_external_files import (
     TranslateExternalFiles,
 )
 from df_translation_client.utils.config import Config
-from df_translation_client.utils.tkinter_helpers import pack_expanded, set_parent
 
 
 class MainWindow(tk.Tk):

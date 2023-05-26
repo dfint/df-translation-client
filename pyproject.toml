@@ -12,8 +12,8 @@ natsort = "8.3.1"
 dfrus = { url = "https://github.com/dfint/dfrus/releases/download/0.0.11/dfrus-0.0.11-py3-none-any.whl" }
 df-gettext-toolkit = { url = "https://github.com/dfint/df-gettext-toolkit/releases/download/0.3.3/df_gettext_toolkit-0.3.3-py3-none-any.whl" }
 async-tkinter-loop = "^0.8.1"
-tk_grid_helper = { url = "https://github.com/insolor/tk_grid_helper/releases/download/0.1.2/tk_grid_helper-0.1.2-py3-none-any.whl"}
 httpx = "^0.24.0"
+tkinter-layout-helpers = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.3.1"
@@ -23,7 +23,7 @@ pytest-timeout = "^2.0.1"
 flake8 = "^6.0.0"
 # tkinter-stubs = { url = "https://github.com/insolor/tkinter-stubs/releases/download/0.1.0/tkinter_stubs-0.1.0-py3-none-any.whl" }
 hypothesis = "^6.75.1"
-flake8-tkinter = "^0.5.4"
+flake8-tkinter = "^0.6.0"
 black = "^23.3.0"
 isort = "^5.12.0"
 

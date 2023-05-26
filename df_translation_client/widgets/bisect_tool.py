@@ -6,9 +6,8 @@ from tkinter import ttk
 from typing import Any, Iterable, List, Optional, Tuple
 
 from bidict import MutableBidict, bidict
-from tk_grid_helper import grid_manager
+from tkinter_layout_helpers import grid_manager, pack_manager
 
-from df_translation_client.utils.tkinter_helpers import Packer
 from df_translation_client.widgets.scrollbar_frame import ScrollbarFrame
 
 
@@ -90,7 +89,7 @@ class BisectTool(tk.Frame):
 
             grid.new_row().add(scrollbar_frame).configure(weight=1)
 
-            with Packer(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
+            with pack_manager(tk.Frame(), side=tk.LEFT, expand=True, fill=tk.X, padx=1) as toolbar:
                 toolbar.pack_all(
                     ttk.Button(text="Split", command=self.split_selected_node),
                     ttk.Button(text="Mark as bad", command=partial(self.mark_selected_node, background="orange")),
