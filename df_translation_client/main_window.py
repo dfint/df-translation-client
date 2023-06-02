@@ -2,7 +2,7 @@ import tkinter as tk
 import traceback
 from tkinter import messagebox, ttk
 
-from tkinter_layout_helpers import set_parent, pack_expanded
+from tkinter_layout_helpers import pack_expanded, set_parent
 
 from df_translation_client.frames.frame_download import DownloadTranslationsFrame
 from df_translation_client.frames.frame_patch import PatchExecutableFrame

@@ -168,7 +168,6 @@ class PatchExecutableFrame(tk.Frame):
             self.translation_file_language
             and self.translation_file_language in self.config_section["language_codepages"]
         ):
-
             self.combo_encoding.text = self.config_section["language_codepages"][self.translation_file_language]
         elif self.combo_encoding.values:
             self.combo_encoding.current(0)

@@ -19,7 +19,6 @@ class ScrollbarFrame(tk.Frame, Generic[TWidget]):
         scrollbar: Callable[..., Union[tk.Scrollbar, ttk.Scrollbar]] = ttk.Scrollbar,
         **kwargs
     ):
-
         super().__init__(*args, **kwargs)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)

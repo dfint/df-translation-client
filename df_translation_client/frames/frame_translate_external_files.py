@@ -3,7 +3,7 @@ import traceback
 from pathlib import Path
 from tkinter import ttk
 
-from df_gettext_toolkit.translate_batch import translate_files
+from df_gettext_toolkit.translate.batch import translate_files
 from natsort import natsorted
 from tkinter_layout_helpers import grid_manager, pack_manager
 
