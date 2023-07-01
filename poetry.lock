@@ -646,13 +646,13 @@ socks = ["socksio (==1.*)"]
 
 [[package]]
 name = "hypothesis"
-version = "6.75.9"
+version = "6.80.0"
 description = "A library for property-based testing"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "hypothesis-6.75.9-py3-none-any.whl", hash = "sha256:a971fe32c916ac7a210e2d6a66b33f841a76ec81c7d4146a2a25ae0141d14967"},
-    {file = "hypothesis-6.75.9.tar.gz", hash = "sha256:d006279cbfaef990ac60273fc598a5052a10ae40ea30b7860ade0a767a2e6fc2"},
+    {file = "hypothesis-6.80.0-py3-none-any.whl", hash = "sha256:63dc6b094b52da6180ca50edd63bf08184bc96810f8624fdbe66578aaf377993"},
+    {file = "hypothesis-6.80.0.tar.gz", hash = "sha256:75d74da36fd3837b5b3fe15211dabc7389e78d882bf2c91bab2184ccf91fe64c"},
 ]
 
 [package.dependencies]
@@ -661,7 +661,7 @@ exceptiongroup = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 sortedcontainers = ">=2.1.0,<3.0.0"
 
 [package.extras]
-all = ["backports.zoneinfo (>=0.2.1)", "black (>=19.10b0)", "click (>=7.0)", "django (>=3.2)", "dpcontracts (>=0.4)", "importlib-metadata (>=3.6)", "lark (>=0.10.1)", "libcst (>=0.3.16)", "numpy (>=1.16.0)", "pandas (>=1.1)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "tzdata (>=2023.3)"]
+all = ["backports.zoneinfo (>=0.2.1)", "black (>=19.10b0)", "click (>=7.0)", "django (>=3.2)", "dpcontracts (>=0.4)", "lark (>=0.10.1)", "libcst (>=0.3.16)", "numpy (>=1.17.3)", "pandas (>=1.1)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "tzdata (>=2023.3)"]
 cli = ["black (>=19.10b0)", "click (>=7.0)", "rich (>=9.0.0)"]
 codemods = ["libcst (>=0.3.16)"]
 dateutil = ["python-dateutil (>=1.4)"]
@@ -669,7 +669,7 @@ django = ["django (>=3.2)"]
 dpcontracts = ["dpcontracts (>=0.4)"]
 ghostwriter = ["black (>=19.10b0)"]
 lark = ["lark (>=0.10.1)"]
-numpy = ["numpy (>=1.16.0)"]
+numpy = ["numpy (>=1.17.3)"]
 pandas = ["pandas (>=1.1)"]
 pytest = ["pytest (>=4.6)"]
 pytz = ["pytz (>=2014.1)"]
@@ -1276,4 +1276,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "8a8c2dbf3040c54203553ca8d9f2bc1d3dbed60f6ccb5d1ba45d44ffb0e84f68"
+content-hash = "70ae4fa3a25ef057a3571a1fde936640f92b2c1d4a566d71950518bff36a6a22"
