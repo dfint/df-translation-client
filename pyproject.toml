@@ -19,7 +19,7 @@ babel = "^2.12.1"
 [tool.poetry.dev-dependencies]
 pytest = "^7.3.1"
 pytest-cov = "^4.0.0"
-pytest-mock = "^3.10.0"
+pytest-mock = "^3.11.1"
 pytest-timeout = "^2.0.1"
 flake8 = "^6.0.0"
 # tkinter-stubs = { url = "https://github.com/insolor/tkinter-stubs/releases/download/0.1.0/tkinter_stubs-0.1.0-py3-none-any.whl" }
